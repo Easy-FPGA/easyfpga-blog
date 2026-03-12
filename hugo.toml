@@ -1,0 +1,60 @@
+baseURL = 'https://easyfpga.blog/'
+languageCode = 'en-us'
+title = 'EasyFPGA'
+theme = 'PaperMod'
+paginate = 10
+enableRobotsTXT = true
+buildDrafts = false
+buildFuture = false
+
+[params]
+  author = 'EasyFPGA'
+  description = 'FPGA Tutorials, RTL Design, and IP Cores'
+  defaultTheme = 'auto'
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  TocOpen = false
+  math = true
+
+  [params.homeInfoParams]
+    Title = 'EasyFPGA'
+    Content = 'FPGA tutorials, RTL design, and IP cores — from basics to production.'
+
+  [[params.socialIcons]]
+    name = 'youtube'
+    url = 'https://www.youtube.com/@easy-fpga'
+
+  [[params.socialIcons]]
+    name = 'github'
+    url = 'https://github.com/Easy-FPGA'
+
+[menu]
+  [[menu.main]]
+    identifier = 'posts'
+    name = 'Posts'
+    url = '/posts/'
+    weight = 10
+
+  [[menu.main]]
+    identifier = 'tags'
+    name = 'Tags'
+    url = '/tags/'
+    weight = 20
+
+  [[menu.main]]
+    identifier = 'ip-store'
+    name = 'IP Store'
+    url = '/ip-store/'
+    weight = 30
+
+[markup]
+  [markup.highlight]
+    style = 'monokai'
+    lineNos = true
+    lineNumbersInTable = true
+  [markup.goldmark.renderer]
+    unsafe = true
