@@ -19,6 +19,7 @@ buildFuture = false
   ShowToc = true
   TocOpen = false
   math = true
+  comments = true
 
   [params.homeInfoParams]
     Title = 'EasyFPGA'
@@ -56,6 +57,12 @@ buildFuture = false
     name = 'IP Store'
     url = '/ip-store/'
     weight = 40
+
+  [[menu.main]]
+    identifier = 'contact'
+    name = 'Contact'
+    url = '/contact/'
+    weight = 50
 
 [markup]
   [markup.highlight]
