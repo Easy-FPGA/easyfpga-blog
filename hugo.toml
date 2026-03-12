@@ -20,6 +20,7 @@ buildFuture = false
   TocOpen = false
   math = true
   comments = true
+  googleSiteVerification = "FBC2q9FRoQfXZDZJ4tHF7KjE4Q2w_3ffmlA7m1cHSsg"
 
   [params.homeInfoParams]
     Title = 'EasyFPGA'
