@@ -29,18 +29,57 @@
   }
 
   function drawData(y, color) {
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
-    for(let x=0;x<W;x++){
-      const ph = (x + t) % period;
-      const v = ph < 6 || ph > period-6 ? y+11 : (ph < period/2 ? y+2 : y+20);
-      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    const H = y + 5;
+    const L = y + 25;
+    const M = (H + L) / 2;
+    const tw = 8;
+
+    function topY(x) {
+      const ph = ((x + t) % period + period) % period;
+      if (ph < tw) return M + (H - M) * (ph / tw);
+      if (ph > period - tw) return H + (M - H) * ((ph - (period - tw)) / tw);
+      return H;
     }
+    function botY(x) {
+      const ph = ((x + t) % period + period) % period;
+      if (ph < tw) return M + (L - M) * (ph / tw);
+      if (ph > period - tw) return L + (M - L) * ((ph - (period - tw)) / tw);
+      return L;
+    }
+
+    // Fill between rails
+    ctx.beginPath();
+    ctx.moveTo(0, topY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, topY(x));
+    for (let x = W - 1; x >= 0; x--) ctx.lineTo(x, botY(x));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(104,211,145,0.12)';
+    ctx.fill();
+
+    // Top rail
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, topY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, topY(x));
     ctx.stroke();
-    for(let x=8;x<W;x+=period){
-      const xPos = (x - t%period + period) % period + 8;
-      if(xPos > 10 && xPos+period < W+period){
-        ctx.fillStyle = color; ctx.font='bold 12px monospace';
-        ctx.fillText('0x'+dataValues[(Math.floor((xPos+t)/period))%dataValues.length], xPos+8, y+15);
+
+    // Bottom rail
+    ctx.beginPath();
+    ctx.moveTo(0, botY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, botY(x));
+    ctx.stroke();
+
+    // Data value labels
+    const baseSeg = Math.floor(t / period);
+    const offset = t % period;
+    for (let i = -1; i <= Math.ceil(W / period) + 1; i++) {
+      const segX = i * period - offset;
+      const labelX = segX + tw + 6;
+      if (labelX >= 4 && labelX < W - 28) {
+        const idx = ((baseSeg + i) % dataValues.length + dataValues.length) % dataValues.length;
+        ctx.fillStyle = color;
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText('0x' + dataValues[idx], labelX, M + 4);
       }
     }
   }
