@@ -1,0 +1,58 @@
+<div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:14px;">Bandwidth comparison: Parallel bus &#8594; Serial PCIe</div>
+  <canvas id="bwCanvas" width="680" height="200" style="width:100%;border-radius:6px;"></canvas>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('bwCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const bars = [
+    {label:'PCI',       bw:0.133, color:'#fc8181', type:'Parallel'},
+    {label:'PCI-X',     bw:1.066, color:'#f6ad55', type:'Parallel'},
+    {label:'PCIe G1x16',bw:4,     color:'#68d391', type:'Serial'},
+    {label:'PCIe G3x16',bw:16,    color:'#76e4f7', type:'Serial'},
+    {label:'PCIe G5x16',bw:64,    color:'#b794f4', type:'Serial'},
+  ];
+  const maxBW = 64;
+  let anim = 0;
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    const barH = 28, gap = 10, leftPad = 110, topPad = 10;
+    anim = Math.min(anim+0.03, 1);
+    const ease = 1-Math.pow(1-anim,3);
+
+    bars.forEach((b,i)=>{
+      const y = topPad + i*(barH+gap);
+      const maxW = W - leftPad - 80;
+      const bw = b.bw * ease;
+      const barW = Math.max(2, (bw/maxBW)*maxW);
+
+      ctx.fillStyle='#a0aec0'; ctx.font='12px monospace';
+      ctx.fillText(b.label, 4, y+barH/2+4);
+
+      ctx.fillStyle=b.color+'33';
+      ctx.fillRect(leftPad, y, maxW, barH);
+      ctx.fillStyle=b.color;
+      ctx.fillRect(leftPad, y, barW, barH);
+
+      ctx.fillStyle='#e2e8f0'; ctx.font='bold 12px monospace';
+      const bwText = b.bw >= 1 ? b.bw+' GB/s' : (b.bw*1000).toFixed(0)+' MB/s';
+      ctx.fillText(bwText, leftPad+barW+6, y+barH/2+4);
+
+      ctx.fillStyle = b.type==='Serial'?'#68d39133':'#fc818133';
+      ctx.fillRect(W-72, y+4, 66, barH-8);
+      ctx.fillStyle = b.type==='Serial'?'#68d391':'#fc8181';
+      ctx.font='10px monospace';
+      ctx.fillText(b.type, W-68, y+barH/2+3);
+    });
+
+    if(anim < 1) requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>

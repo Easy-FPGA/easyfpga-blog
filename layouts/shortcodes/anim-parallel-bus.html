@@ -1,0 +1,77 @@
+<div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:10px;">Parallel Bus — 8 data bits transferred simultaneously each clock cycle</div>
+  <canvas id="parallelBusCanvas" width="680" height="130" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:0.78rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; CLK</span>
+    <span style="color:#68d391;">&#9632; D[7:0] data</span>
+    <span style="color:#76e4f7;">&#9632; VALID</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('parallelBusCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const period = 90;
+  let t = 0;
+  const dataValues = ['A3','F0','12','7E','C9','55','88','3B'];
+
+  function drawClk(y, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = (x + t) % period;
+      const v = ph < period/2 ? y : y+22;
+      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function drawData(y, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = (x + t) % period;
+      const v = ph < 6 || ph > period-6 ? y+11 : (ph < period/2 ? y+2 : y+20);
+      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+    for(let x=8;x<W;x+=period){
+      const xPos = (x - t%period + period) % period + 8;
+      if(xPos > 10 && xPos+period < W+period){
+        ctx.fillStyle = color; ctx.font='bold 12px monospace';
+        ctx.fillText('0x'+dataValues[(Math.floor((xPos+t)/period))%dataValues.length], xPos+8, y+15);
+      }
+    }
+  }
+
+  function drawValid(y, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = (x + t) % period;
+      const v = ph < 6 || ph > period-6 ? y+11 : y+2;
+      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function label(text, y, color){
+    ctx.fillStyle = color; ctx.font='11px monospace';
+    ctx.fillText(text, 4, y);
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    drawClk(10, '#f6e05e');
+    label('CLK', 22, '#f6e05e');
+    drawData(50, '#68d391');
+    label('D[7:0]', 62, '#68d391');
+    drawValid(95, '#76e4f7');
+    label('VALID', 107, '#76e4f7');
+    t = (t+0.7) % period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>

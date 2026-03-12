@@ -1,0 +1,74 @@
+<div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:10px;">Skew — each signal arrives at a different time due to trace length differences</div>
+  <canvas id="skewCanvas" width="680" height="160" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:0.78rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; CLK</span>
+    <span style="color:#68d391;">&#9632; D[0] ideal</span>
+    <span style="color:#fc8181;">&#9632; D[1] +70ps skew</span>
+    <span style="color:#76e4f7;">&#9632; D[2] +140ps skew</span>
+    <span style="color:#ff6b6b;">&#8597; valid sampling window</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('skewCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const period = 100;
+  const skews = [0, 10, 20];
+  const colors = ['#68d391','#fc8181','#76e4f7'];
+  let t = 0;
+
+  function drawWave(y, color, skew){
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = ((x+t-skew)%period+period)%period;
+      const v = ph<period/2 ? y : y+24;
+      x===0?ctx.moveTo(x,v):ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function drawClk(y){
+    ctx.strokeStyle='#f6e05e'; ctx.lineWidth=2.5; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph=(x+t)%period;
+      const v=ph<period/2?y:y+24;
+      x===0?ctx.moveTo(x,v):ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    drawClk(8);
+    ctx.fillStyle='#f6e05e'; ctx.font='11px monospace'; ctx.fillText('CLK',4,20);
+    skews.forEach((sk,i)=>{
+      drawWave(45+i*36, colors[i], sk);
+      ctx.fillStyle=colors[i]; ctx.font='11px monospace';
+      ctx.fillText('D['+i+']',4,57+i*36);
+    });
+    ctx.fillStyle='rgba(255,107,107,0.12)';
+    for(let x=0;x<W;x+=period){
+      const xBase = (x - t%period + period)%period;
+      ctx.fillRect(xBase+skews[2], 0, period/2-skews[2], H);
+    }
+    ctx.strokeStyle='#ff6b6b'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    for(let x=period/2;x<W;x+=period){
+      const xBase=(x-t%period+period)%period;
+      if(xBase>10 && xBase<W-40){
+        skews.forEach(sk=>{
+          ctx.beginPath(); ctx.moveTo(xBase+sk,0); ctx.lineTo(xBase+sk,H); ctx.stroke();
+        });
+      }
+    }
+    ctx.setLineDash([]);
+    t=(t+0.5)%period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
