@@ -35,66 +35,7 @@ At 1 GHz (1 ns period), 70 ps of skew already consumes **7% of your entire timin
 
 In a globally synchronous system, one central clock is distributed to all receivers across the board.
 
-<div class="anim-container" style="background:#1a1a2e;border-radius:10px;padding:24px;margin:24px 0;font-family:monospace;">
-  <div style="color:#a0aec0;font-size:0.85rem;margin-bottom:12px;">Global Synchronous — Clock skew accumulates across traces</div>
-  <canvas id="globalClkCanvas" width="680" height="180" style="width:100%;border-radius:6px;"></canvas>
-  <div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem;">
-    <span style="color:#f6e05e;">■ CLK</span>
-    <span style="color:#68d391;">■ D[0] (short trace)</span>
-    <span style="color:#fc8181;">■ D[1] (long trace)</span>
-    <span style="color:#76e4f7;">■ D[2] (longer trace)</span>
-  </div>
-</div>
-
-<script>
-(function() {
-  const canvas = document.getElementById('globalClkCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const colors = ['#f6e05e','#68d391','#fc8181','#76e4f7'];
-  const labels = ['CLK','D[0]','D[1]','D[2]'];
-  const delays = [0, 0, 8, 18]; // px delay (skew)
-  let t = 0;
-
-  function drawWave(y, color, delay, period, high, label) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    const rowH = 28;
-    for (let x = 0; x < W; x++) {
-      const phase = ((x - delay + t) % period + period) % period;
-      const val = phase < period / 2 ? high : high + rowH;
-      if (x === 0) ctx.moveTo(x, y + val);
-      else ctx.lineTo(x, y + val);
-    }
-    ctx.stroke();
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, W, H);
-    const period = 80;
-    const rowSpacing = 42;
-    delays.forEach((d, i) => {
-      drawWave(i * rowSpacing + 4, colors[i], d, period, 0, labels[i]);
-    });
-    // skew arrows
-    ctx.strokeStyle = '#ff6b6b';
-    ctx.setLineDash([3,3]);
-    ctx.lineWidth = 1;
-    [120, 200, 280].forEach(xBase => {
-      ctx.beginPath(); ctx.moveTo(xBase, 8); ctx.lineTo(xBase, H - 8); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(xBase + delays[2], 8); ctx.lineTo(xBase + delays[2], H - 8); ctx.stroke();
-    });
-    ctx.setLineDash([]);
-    t = (t + 0.6) % period;
-    requestAnimationFrame(render);
-  }
-  render();
-})();
-</script>
+{{< anim-global-sync >}}
 
 **The core problem:** As trace lengths diverge, each data bit arrives at a slightly different time. The receiver must sample all bits with a single clock edge — but the valid window shrinks as skew grows.
 
@@ -106,79 +47,7 @@ The source-synchronous approach eliminates the global clock problem by having th
 
 In DDR memory, this is the **DQS (Data Strobe)** signal — one strobe per byte lane, traveling with its 8 data bits (DQ).
 
-<div class="anim-container" style="background:#1a1a2e;border-radius:10px;padding:24px;margin:24px 0;font-family:monospace;">
-  <div style="color:#a0aec0;font-size:0.85rem;margin-bottom:12px;">Source-Synchronous — DQS strobe travels with DQ data</div>
-  <canvas id="ssCanvas" width="680" height="220" style="width:100%;border-radius:6px;"></canvas>
-  <div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem;flex-wrap:wrap;">
-    <span style="color:#f6e05e;">■ DQS (strobe)</span>
-    <span style="color:#68d391;">■ DQ[0]</span>
-    <span style="color:#fc8181;">■ DQ[1]</span>
-    <span style="color:#76e4f7;">■ DQ[2]</span>
-    <span style="color:#b794f4;">■ DQ[3]</span>
-    <span style="color:#ff6b6b;">↕ sample point</span>
-  </div>
-</div>
-
-<script>
-(function() {
-  const canvas = document.getElementById('ssCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const groupDelay = 22; // whole group shifts together
-  const colors = ['#f6e05e','#68d391','#fc8181','#76e4f7','#b794f4'];
-  const labels = ['DQS','DQ[0]','DQ[1]','DQ[2]','DQ[3]'];
-  const intraSkew = [0, 2, -2, 3, -1]; // tiny intra-pair skew (ps-level)
-  let t = 0;
-  const period = 80;
-  const rowSpacing = 40;
-
-  function drawWave(y, color, skew, isDQS) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = isDQS ? 2.5 : 1.8;
-    ctx.beginPath();
-    const rowH = isDQS ? 22 : 20;
-    for (let x = 0; x < W; x++) {
-      const phase = ((x - groupDelay - skew + t) % period + period) % period;
-      const val = phase < period / 2 ? 0 : rowH;
-      if (x === 0) ctx.moveTo(x, y + val);
-      else ctx.lineTo(x, y + val);
-    }
-    ctx.stroke();
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, W, H);
-
-    labels.forEach((l, i) => {
-      drawWave(i * rowSpacing + 6, colors[i], intraSkew[i], i === 0);
-    });
-
-    // sample points at DQS rising edges
-    ctx.strokeStyle = '#ff6b6b';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4,3]);
-    for (let x = groupDelay; x < W; x += period) {
-      const xPos = (x - t % period + period) % period + groupDelay;
-      if (xPos > 0 && xPos < W) {
-        ctx.beginPath(); ctx.moveTo(xPos, 0); ctx.lineTo(xPos, H); ctx.stroke();
-      }
-    }
-    ctx.setLineDash([]);
-
-    // DQS label
-    ctx.fillStyle = '#f6e05e';
-    ctx.font = '11px monospace';
-    ctx.fillText('DQS', 4, 20);
-
-    t = (t + 0.6) % period;
-    requestAnimationFrame(render);
-  }
-  render();
-})();
-</script>
+{{< anim-source-sync >}}
 
 **Key insight:** The DQS strobe and DQ data experience the *same* board-level delay — they travel the same path. The receiver simply uses DQS edges to sample DQ, regardless of how long the traces are.
 

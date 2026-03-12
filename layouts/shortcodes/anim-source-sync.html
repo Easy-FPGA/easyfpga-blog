@@ -1,0 +1,83 @@
+<div class="anim-container" style="background:#1a1a2e;border-radius:10px;padding:24px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.85rem;margin-bottom:12px;">Source-Synchronous — DQS strobe travels with DQ data</div>
+  <canvas id="ssCanvas" width="680" height="220" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; DQS (strobe)</span>
+    <span style="color:#68d391;">&#9632; DQ[0]</span>
+    <span style="color:#fc8181;">&#9632; DQ[1]</span>
+    <span style="color:#76e4f7;">&#9632; DQ[2]</span>
+    <span style="color:#b794f4;">&#9632; DQ[3]</span>
+    <span style="color:#ff6b6b;">&#8597; sample point</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('ssCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const groupDelay = 22;
+  const colors = ['#f6e05e','#68d391','#fc8181','#76e4f7','#b794f4'];
+  const labels = ['DQS','DQ[0]','DQ[1]','DQ[2]','DQ[3]'];
+  const intraSkew = [0, 2, -2, 3, -1];
+  let t = 0;
+  const period = 80;
+  const rowSpacing = 40;
+
+  function drawWave(y, color, skew, isDQS) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isDQS ? 2.5 : 1.8;
+    ctx.beginPath();
+    const rowH = isDQS ? 22 : 20;
+    for (let x = 0; x < W; x++) {
+      const phase = ((x - groupDelay - skew + t) % period + period) % period;
+      const val = phase < period / 2 ? 0 : rowH;
+      if (x === 0) ctx.moveTo(x, y + val);
+      else ctx.lineTo(x, y + val);
+    }
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.font = '11px monospace';
+    ctx.fillText(labels[isDQS ? 0 : intraSkew.indexOf(skew)], 4, y + 14);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, W, H);
+
+    labels.forEach((l, i) => {
+      ctx.strokeStyle = colors[i];
+      ctx.lineWidth = i === 0 ? 2.5 : 1.8;
+      ctx.beginPath();
+      const rowH = i === 0 ? 22 : 20;
+      for (let x = 0; x < W; x++) {
+        const phase = ((x - groupDelay - intraSkew[i] + t) % period + period) % period;
+        const val = phase < period / 2 ? 0 : rowH;
+        if (x === 0) ctx.moveTo(x, i * rowSpacing + 6 + val);
+        else ctx.lineTo(x, i * rowSpacing + 6 + val);
+      }
+      ctx.stroke();
+      ctx.fillStyle = colors[i];
+      ctx.font = '11px monospace';
+      ctx.fillText(l, 4, i * rowSpacing + 20);
+    });
+
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,3]);
+    for (let x = groupDelay; x < W; x += period) {
+      const xPos = (x - t % period + period) % period + groupDelay;
+      if (xPos > 0 && xPos < W) {
+        ctx.beginPath(); ctx.moveTo(xPos, 0); ctx.lineTo(xPos, H); ctx.stroke();
+      }
+    }
+    ctx.setLineDash([]);
+
+    t = (t + 0.6) % period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
