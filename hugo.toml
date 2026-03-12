@@ -21,6 +21,11 @@ buildFuture = false
   math = true
   comments = true
   googleSiteVerification = "FBC2q9FRoQfXZDZJ4tHF7KjE4Q2w_3ffmlA7m1cHSsg"
+  images = ["images/easyfpga_logo.jpg"]
+
+  [params.label]
+    icon = "images/easyfpga_logo.jpg"
+    iconHeight = 35
 
   [params.homeInfoParams]
     Title = 'EasyFPGA'
