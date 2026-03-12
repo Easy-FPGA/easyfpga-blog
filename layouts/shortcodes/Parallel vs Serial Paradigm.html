@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Parallel vs Serial Paradigm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background:#0f172a; font-family:'Segoe UI',sans-serif; overflow:hidden; }
+
+  .wire { position:absolute; height:3px; border-radius:2px; }
+  .wire-parallel { background:#ef4444; }
+  .wire-serial-p { background:#60a5fa; }
+  .wire-serial-n { background:#f59e0b; }
+
+  @keyframes pulse-travel {
+    0%   { left:0%;   opacity:0; }
+    5%   { opacity:1; }
+    90%  { opacity:1; }
+    100% { left:100%; opacity:0; }
+  }
+  .packet {
+    position:absolute;
+    height:100%;
+    width:18px;
+    border-radius:3px;
+    top:0;
+    animation: pulse-travel linear infinite;
+  }
+
+  .chip {
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:13px;
+    writing-mode:horizontal-tb;
+  }
+
+  .label-tag {
+    font-size:10px;
+    padding:1px 5px;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+
+  .skew-bar {
+    height:6px;
+    border-radius:3px;
+    transition: width 0.4s ease;
+  }
+
+  .tab-btn { transition:all 0.2s; }
+  .tab-btn.active { background:#2563eb; color:white; }
+  .tab-btn:not(.active) { background:#1e293b; color:#94a3b8; }
+  .tab-btn:not(.active):hover { background:#334155; }
+</style>
+</head>
+<body class="flex flex-col items-center justify-start p-3 text-white" style="height:500px;">
+
+  <div class="flex gap-2 mb-3">
+    <button class="tab-btn active px-4 py-1.5 rounded-lg text-sm font-semibold" onclick="showMode('parallel')">Parallel Interface</button>
+    <button class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold" onclick="showMode('serial')">Serial Interface</button>
+    <button class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold" onclick="showMode('compare')">Side-by-Side</button>
+  </div>
+
+  <!-- PARALLEL MODE -->
+  <div id="mode-parallel" class="w-full max-w-3xl">
+    <div class="bg-slate-800 rounded-xl p-4 border border-red-800">
+      <div class="text-red-400 font-bold text-base mb-3">❌ Parallel Interface (8-bit @ 1 GHz)</div>
+
+      <!-- Wire canvas -->
+      <div class="relative" style="height:210px;">
+        <!-- TX chip -->
+        <div class="chip absolute bg-red-900 border-2 border-red-500 text-red-200" style="left:0;top:10px;width:64px;height:190px;">TX</div>
+        <!-- RX chip -->
+        <div class="chip absolute bg-red-900 border-2 border-red-500 text-red-200" style="right:0;top:10px;width:64px;height:190px;">RX</div>
+
+        <!-- 8 data wires + CLK -->
+        <div id="parallel-wires" class="absolute" style="left:68px;right:68px;top:16px;height:188px;"></div>
+      </div>
+
+      <!-- Skew meter -->
+      <div class="mt-2 bg-slate-900 rounded-lg p-3 border border-slate-700">
+        <div class="flex justify-between items-center mb-1 text-xs">
+          <span class="text-slate-400">Arrival time spread (Skew)</span>
+          <span id="skew-value" class="text-red-400 font-bold">~350 ps</span>
+        </div>
+        <div class="bg-slate-700 rounded-full h-2">
+          <div id="skew-fill" class="skew-bar bg-red-500" style="width:85%;"></div>
+        </div>
+        <div class="flex justify-between text-xs text-slate-500 mt-1">
+          <span>0 ps</span><span>400 ps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERIAL MODE -->
+  <div id="mode-serial" class="w-full max-w-3xl hidden">
+    <div class="bg-slate-800 rounded-xl p-4 border border-green-800">
+      <div class="text-green-400 font-bold text-base mb-3">✅ Serial Interface (8 Gbps Differential)</div>
+
+      <div class="relative" style="height:120px;">
+        <!-- TX chip -->
+        <div class="chip absolute bg-green-900 border-2 border-green-500 flex-col gap-1" style="left:0;top:10px;width:64px;height:100px;">
+          <span style="color:#60a5fa;font-size:12px;font-weight:700;">TX+</span>
+          <span style="color:#f59e0b;font-size:12px;font-weight:700;">TX-</span>
+        </div>
+        <!-- RX chip -->
+        <div class="chip absolute bg-green-900 border-2 border-green-500 flex-col gap-1" style="right:0;top:10px;width:64px;height:100px;">
+          <span style="color:#60a5fa;font-size:12px;font-weight:700;">RX+</span>
+          <span style="color:#f59e0b;font-size:12px;font-weight:700;">RX-</span>
+        </div>
+
+        <!-- 2 serial wires -->
+        <div id="serial-wires" class="absolute" style="left:68px;right:68px;top:24px;height:72px;"></div>
+      </div>
+
+      <!-- Intra-pair skew meter -->
+      <div class="mt-2 bg-slate-900 rounded-lg p-3 border border-slate-700">
+        <div class="flex justify-between items-center mb-1 text-xs">
+          <span class="text-slate-400">Intra-pair skew (TX+ vs TX-)</span>
+          <span class="text-green-400 font-bold">±5 ps</span>
+        </div>
+        <div class="bg-slate-700 rounded-full h-2">
+          <div class="skew-bar bg-green-500" style="width:6%;"></div>
+        </div>
+        <div class="flex justify-between text-xs text-slate-500 mt-1">
+          <span>0 ps</span><span>400 ps</span>
+        </div>
+      </div>
+
+      <!-- CDR info -->
+      <div class="mt-2 grid grid-cols-3 gap-2 text-xs text-center">
+        <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+          <div class="text-blue-400 font-bold">Differential</div>
+          <div class="text-slate-400">Common-mode noise cancelled</div>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+          <div class="text-yellow-400 font-bold">CDR</div>
+          <div class="text-slate-400">Clock embedded in data</div>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+          <div class="text-green-400 font-bold">Only 2 traces</div>
+          <div class="text-slate-400">Simple PCB routing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARE MODE -->
+  <div id="mode-compare" class="w-full max-w-3xl hidden">
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Left: Parallel summary -->
+      <div class="bg-slate-800 rounded-xl p-3 border border-red-800">
+        <div class="text-red-400 font-bold text-sm mb-2">❌ Parallel (8-bit @ 1 GHz)</div>
+        <div class="relative" style="height:130px;">
+          <div class="chip absolute bg-red-900 border border-red-600 text-red-200 text-xs" style="left:0;top:0;width:36px;height:130px;">TX</div>
+          <div class="chip absolute bg-red-900 border border-red-600 text-red-200 text-xs" style="right:0;top:0;width:36px;height:130px;">RX</div>
+          <div id="cmp-parallel-wires" class="absolute" style="left:40px;right:40px;top:6px;height:118px;"></div>
+        </div>
+        <table class="w-full text-xs mt-2 text-slate-300">
+          <tr><td class="text-slate-500 pr-2">Pins</td><td class="text-red-400 font-bold">11+ pins</td></tr>
+          <tr><td class="text-slate-500 pr-2">Skew</td><td class="text-red-400 font-bold">~350 ps</td></tr>
+          <tr><td class="text-slate-500 pr-2">Max speed</td><td class="text-red-400 font-bold">~1 GHz</td></tr>
+          <tr><td class="text-slate-500 pr-2">EMI</td><td class="text-red-400 font-bold">High</td></tr>
+        </table>
+      </div>
+      <!-- Right: Serial summary -->
+      <div class="bg-slate-800 rounded-xl p-3 border border-green-800">
+        <div class="text-green-400 font-bold text-sm mb-2">✅ Serial (8 Gbps Diff)</div>
+        <div class="relative" style="height:130px;">
+          <div class="chip absolute bg-green-900 border border-green-600 flex-col" style="left:0;top:30px;width:36px;height:70px;">
+            <span style="color:#60a5fa;font-size:8px;font-weight:700;">TX+</span>
+            <span style="color:#f59e0b;font-size:8px;font-weight:700;">TX-</span>
+          </div>
+          <div class="chip absolute bg-green-900 border border-green-600 flex-col" style="right:0;top:30px;width:36px;height:70px;">
+            <span style="color:#60a5fa;font-size:8px;font-weight:700;">RX+</span>
+            <span style="color:#f59e0b;font-size:8px;font-weight:700;">RX-</span>
+          </div>
+          <div id="cmp-serial-wires" class="absolute" style="left:40px;right:40px;top:40px;height:50px;"></div>
+        </div>
+        <table class="w-full text-xs mt-2 text-slate-300">
+          <tr><td class="text-slate-500 pr-2">Pins</td><td class="text-green-400 font-bold">2 pins</td></tr>
+          <tr><td class="text-slate-500 pr-2">Skew</td><td class="text-green-400 font-bold">±5 ps</td></tr>
+          <tr><td class="text-slate-500 pr-2">Max speed</td><td class="text-green-400 font-bold">56+ Gbps</td></tr>
+          <tr><td class="text-slate-500 pr-2">EMI</td><td class="text-green-400 font-bold">Low (diff)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ── Wire / packet builder ───────────────────────────────────────
+const SIGNALS = [
+  { label:'D0', color:'#f87171', delay:0.0 },
+  { label:'D1', color:'#fb923c', delay:0.05 },
+  { label:'D2', color:'#fbbf24', delay:0.1 },
+  { label:'D3', color:'#a3e635', delay:0.15 },
+  { label:'D4', color:'#34d399', delay:0.2 },
+  { label:'D5', color:'#22d3ee', delay:0.25 },
+  { label:'D6', color:'#818cf8', delay:0.3 },
+  { label:'D7', color:'#e879f9', delay:0.35 },
+  { label:'CLK',color:'#ffffff', delay:0.0, isClk:true },
+];
+
+function buildParallelWires(containerId, compact=false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  const n = SIGNALS.length;
+  const gap = container.offsetHeight / n;
+
+  SIGNALS.forEach((sig, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = `position:absolute;left:0;right:0;top:${i*gap + gap/2 - 1.5}px;height:3px;`;
+
+    // wire background
+    const wire = document.createElement('div');
+    wire.style.cssText = `position:absolute;inset:0;border-radius:2px;background:${sig.isClk ? '#475569' : '#334155'};`;
+    row.appendChild(wire);
+
+    // active wire glow
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;inset:0;border-radius:2px;background:${sig.color};opacity:0.5;box-shadow:0 0 5px ${sig.color};`;
+    row.appendChild(glow);
+
+    // packets
+    for (let p = 0; p < 3; p++) {
+      const pkt = document.createElement('div');
+      pkt.className = 'packet';
+      pkt.style.background = sig.color;
+      pkt.style.boxShadow = `0 0 8px ${sig.color}`;
+      const dur  = sig.isClk ? 0.6 : (0.9 + sig.delay * 0.5);
+      const dly  = sig.delay + p * (dur / 3);
+      pkt.style.animationDuration  = `${dur}s`;
+      pkt.style.animationDelay     = `${dly}s`;
+      row.appendChild(pkt);
+    }
+
+    // label
+    const lbl = document.createElement('span');
+    lbl.textContent = sig.label;
+    lbl.style.cssText = `position:absolute;left:-${compact?22:28}px;top:-6px;font-size:${compact?8:9}px;color:${sig.color};`;
+    row.appendChild(lbl);
+
+    container.appendChild(row);
+  });
+}
+
+function buildSerialWires(containerId, compact=false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const pairs = [
+    { label:'TX+', color:'#60a5fa', top: compact ? 8  : 16 },
+    { label:'TX-', color:'#f59e0b', top: compact ? 28 : 46 },
+  ];
+
+  pairs.forEach(sig => {
+    const row = document.createElement('div');
+    row.style.cssText = `position:absolute;left:0;right:0;top:${sig.top}px;height:3px;`;
+
+    const wire = document.createElement('div');
+    wire.style.cssText = `position:absolute;inset:0;border-radius:2px;background:#1e3a5f;`;
+    row.appendChild(wire);
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;inset:0;border-radius:2px;background:${sig.color};opacity:0.6;box-shadow:0 0 6px ${sig.color};`;
+    row.appendChild(glow);
+
+    for (let p = 0; p < 5; p++) {
+      const pkt = document.createElement('div');
+      pkt.className = 'packet';
+      pkt.style.background = sig.color;
+      pkt.style.boxShadow   = `0 0 8px ${sig.color}`;
+      pkt.style.width       = '12px';
+      const dur = 0.35;
+      pkt.style.animationDuration = `${dur}s`;
+      pkt.style.animationDelay    = `${p * dur / 5}s`;
+      row.appendChild(pkt);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+// ── Skew animation ──────────────────────────────────────────────
+let skewDir = 1, skewVal = 350;
+setInterval(() => {
+  skewVal += skewDir * 15;
+  if (skewVal > 390 || skewVal < 220) skewDir *= -1;
+  const el = document.getElementById('skew-fill');
+  const vl = document.getElementById('skew-value');
+  if (el) el.style.width = `${(skewVal/400)*100}%`;
+  if (vl) vl.textContent = `~${skewVal} ps`;
+}, 300);
+
+// ── Tab logic ───────────────────────────────────────────────────
+function showMode(name) {
+  ['parallel','serial','compare'].forEach(m => {
+    document.getElementById(`mode-${m}`).classList.toggle('hidden', m !== name);
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    const tabs = ['parallel','serial','compare'];
+    btn.classList.toggle('active', tabs[i] === name);
+  });
+
+  setTimeout(() => {
+    if (name === 'parallel') buildParallelWires('parallel-wires');
+    if (name === 'serial')   buildSerialWires('serial-wires');
+    if (name === 'compare') {
+      buildParallelWires('cmp-parallel-wires', true);
+      buildSerialWires('cmp-serial-wires', true);
+    }
+  }, 30);
+}
+
+// init
+setTimeout(() => buildParallelWires('parallel-wires'), 50);
+</script>
+</body>
+</html>

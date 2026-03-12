@@ -73,7 +73,7 @@ buildFuture = false
   [markup.goldmark.renderer]
     unsafe = true
   [markup.goldmark.extensions.passthrough]
-    enable = true
+    enable = false
     [markup.goldmark.extensions.passthrough.delimiters]
       block = [['$$', '$$']]
       inline = [['$', '$']]
