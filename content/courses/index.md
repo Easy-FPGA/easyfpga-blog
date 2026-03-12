@@ -13,13 +13,26 @@ Structured video courses for learning FPGA design, RTL development, and digital 
 
 ### Inflearn
 
-#### FPGA Basics (인프런)
+#### FPGA Basics
 
 A comprehensive introduction to FPGA design — from logic fundamentals to RTL coding and simulation.
 
-- **Platform:** Inflearn
 - **Language:** Korean
 - **Link:** [강의 바로가기 →](https://inf.run/DvsYv)
+
+#### UART 구현
+
+Hands-on UART implementation on FPGA — from serial protocol fundamentals to verified RTL design.
+
+- **Language:** Korean
+- **Link:** [강의 바로가기 →](https://inf.run/HeFon)
+
+#### Gigabit Ethernet 구현
+
+Gigabit Ethernet controller implementation on FPGA — MAC, PHY interface, and packet processing in RTL.
+
+- **Language:** Korean
+- **Link:** [강의 바로가기 →](https://inf.run/tkTrc)
 
 ---
 
