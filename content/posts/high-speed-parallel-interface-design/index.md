@@ -142,6 +142,8 @@ endmodule
 
 This module registers 8-bit parallel data with a 1-clock pipeline delay — the foundation of synchronous parallel data transfer in FPGA and ASIC design.
 
+![Parallel Interface Waveform](parallel_waveform.png)
+
 **Waveform behavior:** `data_in` is captured on the rising edge of `clk`, and `data_out` appears one clock cycle later. The `valid` signal is delayed identically to maintain handshake timing.
 
 ---
