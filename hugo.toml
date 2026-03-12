@@ -54,6 +54,12 @@ buildFuture = false
     weight = 30
 
   [[menu.main]]
+    identifier = 'courses'
+    name = 'Courses'
+    url = '/courses/'
+    weight = 35
+
+  [[menu.main]]
     identifier = 'ip-store'
     name = 'IP Store'
     url = '/ip-store/'
