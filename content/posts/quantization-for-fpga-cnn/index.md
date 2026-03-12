@@ -3,6 +3,7 @@ title: "Quantization for CNN Inference on FPGA"
 date: 2025-11-24T23:03:14+00:00
 draft: false
 description: "Why integer quantization is essential for running CNN models on FPGA, how the conversion works, and a concrete fixed-point example."
+math: true
 categories:
   - "CNN on FPGA"
 tags:

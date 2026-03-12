@@ -3,6 +3,7 @@ title: "LeNet-5 Implementation on FPGA: An Overview"
 date: 2025-11-23T22:47:19+00:00
 draft: false
 description: "Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources."
+math: true
 categories:
   - "CNN on FPGA"
 tags:

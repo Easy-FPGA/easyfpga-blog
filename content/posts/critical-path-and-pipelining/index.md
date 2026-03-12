@@ -3,6 +3,7 @@ title: "Critical Path and Pipelining in FPGA Design"
 date: 2025-11-28T22:09:14+00:00
 draft: false
 description: "What a critical path is, how it limits your clock frequency, and how to fix it with pipelining — with SystemVerilog examples."
+math: true
 categories:
   - "FPGA Design"
 tags:

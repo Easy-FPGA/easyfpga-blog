@@ -3,6 +3,7 @@ title: "High-Speed Parallel Interface Design: Principles, Limitations, and Pract
 date: 2026-03-12T09:00:00+09:00
 draft: false
 description: "A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces."
+math: true
 categories:
   - "High Speed Interface"
 tags:

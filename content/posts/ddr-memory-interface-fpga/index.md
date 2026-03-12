@@ -3,6 +3,7 @@ title: "Implementing a DDR Memory Interface on FPGA with Xilinx MIG"
 date: 2025-09-04T03:20:49+00:00
 draft: false
 description: "Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP."
+math: true
 categories:
   - "FPGA Design"
 tags:
