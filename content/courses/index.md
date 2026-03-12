@@ -18,6 +18,7 @@ Structured video courses for learning FPGA design, RTL development, and digital 
 A comprehensive introduction to FPGA design — from logic fundamentals to RTL coding and simulation.
 
 - **Language:** Korean
+- **Price:** Free
 - **Link:** [강의 바로가기 →](https://inf.run/DvsYv)
 
 #### UART 구현
@@ -25,6 +26,7 @@ A comprehensive introduction to FPGA design — from logic fundamentals to RTL c
 Hands-on UART implementation on FPGA — from serial protocol fundamentals to verified RTL design.
 
 - **Language:** Korean
+- **Price:** Paid
 - **Link:** [강의 바로가기 →](https://inf.run/HeFon)
 
 #### Gigabit Ethernet 구현
@@ -32,6 +34,7 @@ Hands-on UART implementation on FPGA — from serial protocol fundamentals to ve
 Gigabit Ethernet controller implementation on FPGA — MAC, PHY interface, and packet processing in RTL.
 
 - **Language:** Korean
+- **Price:** Paid
 - **Link:** [강의 바로가기 →](https://inf.run/tkTrc)
 
 ---
