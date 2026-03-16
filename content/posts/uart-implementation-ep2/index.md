@@ -1,7 +1,7 @@
 ﻿---
 title: "UART Frame Format"
 date: 2026-03-16T12:00:00+09:00
-draft: false
+draft: true
 description: "A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications."
 categories:
   - "UART"
