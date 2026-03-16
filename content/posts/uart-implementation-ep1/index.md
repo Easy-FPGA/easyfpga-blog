@@ -122,7 +122,7 @@ RX samples (drifted): ●    ●    ●    ●    ●    ●    ●   ●
 
 *0x55 frame (alternating bits) — watch sample points drift into the wrong bit window as offset accumulates*
 
-<iframe src="html/UART Clock Drift.html" width="100%" height="450" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
+<iframe src="/uart-html/UART Clock Drift.html" width="100%" height="450" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
 
 ## UART vs SPI vs I²C
 
@@ -170,6 +170,7 @@ RX samples (drifted): ●    ●    ●    ●    ●    ●    ●   ●
 
 - RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git
 - YouTube: https://www.youtube.com/@easy-fpga
+
 
 
 

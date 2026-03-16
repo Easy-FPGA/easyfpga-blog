@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 8px 16px; background: #f5f5f0; font-family: monospace; }
+  h3 { color: #1a7a4a; font-size: 14px; margin: 0 0 6px 0; }
+  svg text { font-family: monospace; }
+</style>
+</head>
+<body>
+<h3>RS-232 Signal (Single-ended, Inverted Polarity)</h3>
+<svg width="720" height="160" viewBox="0 0 720 160">
+  <!-- Background -->
+  <rect width="720" height="160" fill="#f5f5f0"/>
+
+  <!-- Grid lines -->
+  <line x1="60" y1="30" x2="60" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="160" y1="30" x2="160" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="260" y1="30" x2="260" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="360" y1="30" x2="360" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="460" y1="30" x2="460" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="560" y1="30" x2="560" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="660" y1="30" x2="660" y2="130" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- 0V reference line -->
+  <line x1="40" y1="80" x2="710" y2="80" stroke="#999" stroke-width="0.8" stroke-dasharray="4,4"/>
+  <text x="10" y="84" font-size="11" fill="#999">0V</text>
+
+  <!-- Voltage labels -->
+  <text x="2" y="38" font-size="10" fill="#c0392b">+12V</text>
+  <text x="2" y="128" font-size="10" fill="#2980b9">−12V</text>
+
+  <!-- Y axis -->
+  <line x1="40" y1="25" x2="40" y2="135" stroke="#666" stroke-width="1"/>
+  <!-- X axis arrow -->
+  <line x1="40" y1="135" x2="710" y2="135" stroke="#666" stroke-width="1"/>
+  <polygon points="710,132 718,135 710,138" fill="#666"/>
+  <text x="695" y="148" font-size="10" fill="#666">t</text>
+
+  <!--
+    UART byte: 0x55 = 0101 0101, 8N1
+    Bit layout: IDLE | START | D0=1 | D1=0 | D2=1 | D3=0 | D4=1 | D5=0 | D6=1 | D7=0 | STOP | IDLE
+    RS-232 polarity: IDLE/MARK/'1' = −12V (low on diagram), '0'/SPACE = +12V (high)
+    
+    IDLE   = low  (−12V = y=120)
+    START  = high (+12V = y=40)  ← logic 0
+    D0=1   = low  (−12V)         ← logic 1
+    D1=0   = high (+12V)         ← logic 0
+    D2=1   = low
+    D3=0   = high
+    D4=1   = low
+    D5=0   = high
+    D6=1   = low
+    D7=0   = high
+    STOP   = low  (−12V)         ← logic 1
+    IDLE   = low
+    
+    x positions: each bit = 60px wide, starting at x=60
+    Bit 0 (IDLE before): 0-60     → low
+    Bit 1 (START):       60-160   → high
+    Bit 2 (D0=1):        160-260  → low
+    Bit 3 (D1=0):        260-360  → high
+    Bit 4 (D2=1):        360-460  → low
+    Bit 5 (D3=0):        460-560  → high
+    Bit 6 (D4=1):        560-660  → low
+    Bit 7 (STOP):        660-720  → low
+  -->
+
+  <!-- Waveform: polyline segments -->
+  <!-- IDLE (before): x=40..60, y=120 (−12V) -->
+  <polyline points="
+    40,120
+    60,120
+    60,40
+    160,40
+    160,120
+    260,120
+    260,40
+    360,40
+    360,120
+    460,120
+    460,40
+    560,40
+    560,120
+    660,120
+    715,120
+  " fill="none" stroke="#2c5aa0" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Bit labels -->
+  <text x="42" y="22" font-size="10" fill="#555" text-anchor="middle">IDLE</text>
+  <text x="110" y="22" font-size="10" fill="#c0392b" text-anchor="middle">START</text>
+  <text x="210" y="22" font-size="10" fill="#555" text-anchor="middle">D0=1</text>
+  <text x="310" y="22" font-size="10" fill="#555" text-anchor="middle">D1=0</text>
+  <text x="410" y="22" font-size="10" fill="#555" text-anchor="middle">D2=1</text>
+  <text x="510" y="22" font-size="10" fill="#555" text-anchor="middle">D3=0</text>
+  <text x="610" y="22" font-size="10" fill="#555" text-anchor="middle">D4=1</text>
+  <text x="685" y="22" font-size="10" fill="#555" text-anchor="middle">STOP</text>
+
+  <!-- +12V / −12V level label on waveform -->
+  <text x="720" y="44" font-size="10" fill="#c0392b" text-anchor="start"> +12V = Logic '0' (SPACE)</text>
+  <text x="720" y="124" font-size="10" fill="#2980b9" text-anchor="start"> −12V = Logic '1' (MARK)</text>
+</svg>
+</body>
+</html>

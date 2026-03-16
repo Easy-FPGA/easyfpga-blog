@@ -38,7 +38,7 @@ Every UART transmission is based on a fixed **Frame** structure.
 
 *0xA5 frame (8E1) — bits transmitted one at a time, LSB first. Watch each field highlighted in sequence.*
 
-<iframe src="html/UART Frame Transmission.html" width="100%" height="400" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
+<iframe src="/uart-html/UART Frame Transmission.html" width="100%" height="400" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
 
 ## Start Bit & Stop Bit
 
@@ -179,6 +179,7 @@ $$\text{Effective throughput} = 115200 \times \frac{8}{10} = 92{,}160 \text{ bps
 
 - RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git
 - YouTube: https://www.youtube.com/@easy-fpga
+
 
 
 

@@ -53,7 +53,7 @@ Logic '0' (SPACE) : +3V to +15V  ← Positive voltage = logic 0 !
 
 > **Opposite polarity** from TTL/CMOS — a transceiver is always required.
 
-<iframe src="html/rs232_waveform.html" width="100%" height="175" frameborder="0" scrolling="no"></iframe>
+<iframe src="/uart-html/rs232_waveform.html" width="100%" height="175" frameborder="0" scrolling="no"></iframe>
 
 ### RS-232 Signal on Oscilloscope
 
@@ -72,7 +72,7 @@ Logic '0' (SPACE) : +3V to +15V  ← Positive voltage = logic 0 !
 
 ### Differential Signal Principle
 
-<iframe src="html/rs485_waveform.html" width="100%" height="260" frameborder="0" scrolling="no"></iframe>
+<iframe src="/uart-html/rs485_waveform.html" width="100%" height="260" frameborder="0" scrolling="no"></iframe>
 
 - Data is determined by the **voltage difference (A−B)**
 - Noise is injected **equally** into both A and B → cancels out in the difference (**CMRR**)
@@ -88,7 +88,7 @@ Logic '0' (SPACE) : +3V to +15V  ← Positive voltage = logic 0 !
 
 ## RS-485 Bus Topology
 
-<iframe src="html/rs485_topology.html" width="100%" height="190" frameborder="0" scrolling="no"></iframe>
+<iframe src="/uart-html/rs485_topology.html" width="100%" height="190" frameborder="0" scrolling="no"></iframe>
 
 - **120Ω termination resistors**: prevent signal reflections; placed at both ends
 - **Address-based protocols** (e.g., Modbus RTU, DMX512) used with RS-485
@@ -151,6 +151,7 @@ FPGA UART → RS-485 driver → A/B bus → each node
 
 - RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git
 - YouTube: https://www.youtube.com/@easy-fpga
+
 
 
 

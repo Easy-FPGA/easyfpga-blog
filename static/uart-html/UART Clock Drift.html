@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UART Clock Drift</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f1117; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: 'Segoe UI', monospace; color: #ccc; }
+    h2 { font-size: 15px; color: #90caf9; margin-bottom: 10px; letter-spacing: .5px; }
+    canvas { border-radius: 8px; display: block; }
+    #legend { margin-top: 10px; display: flex; gap: 20px; font-size: 12px; }
+    .leg { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <h2>Clock Drift — Why UART Needs Oversampling</h2>
+  <canvas id="c" width="700" height="210"></canvas>
+  <div id="legend">
+    <div class="leg"><div class="dot" style="background:#42a5f5"></div>TX waveform</div>
+    <div class="leg"><div class="dot" style="background:#66bb6a"></div>Sample in correct window</div>
+    <div class="leg"><div class="dot" style="background:#ef5350"></div>Sample drifted out of window</div>
+  </div>
+
+  <script>
+  (function () {
+    var c = document.getElementById('c');
+    var g = c.getContext('2d');
+    var W = 700, H = 210;
+
+    // 0x55 = 01010101 → LSB first: D0-D7 = 1,0,1,0,1,0,1,0
+    // Frame: idle(1), Start(0), D0..D7, Even-Parity(0 for four 1s), Stop(1), idle(1)
+    var bits = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1];
+    var lbls = ['idle', 'S', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'P', 'E', 'idle'];
+    var N = bits.length;
+    var bw = 47, ox = 10, ty = 88, th = 38;
+
+    var drift = 0, dir = 1, pauseTick = 0;
+
+    function draw() {
+      g.clearRect(0, 0, W, H);
+      g.fillStyle = '#0f1117'; g.fillRect(0, 0, W, H);
+
+      // TX waveform
+      g.strokeStyle = '#42a5f5'; g.lineWidth = 2.5;
+      g.beginPath();
+      var px = ox, py = ty - bits[0] * th;
+      g.moveTo(px, py);
+      for (var i = 0; i < N; i++) {
+        var nx = ox + bw * (i + 1);
+        var cy2 = ty - bits[i] * th;
+        g.lineTo(nx, cy2);
+        if (i < N - 1 && bits[i] !== bits[i + 1]) {
+          g.lineTo(nx, ty - bits[i + 1] * th);
+        }
+      }
+      g.stroke();
+
+      // Labels and dividers
+      for (var i = 0; i < N; i++) {
+        var cx = ox + bw * i + bw / 2;
+        // dividers
+        g.strokeStyle = '#1e2035'; g.lineWidth = 1; g.setLineDash([2, 4]);
+        g.beginPath(); g.moveTo(ox + bw * i, ty - th - 4); g.lineTo(ox + bw * i, ty + th + 22); g.stroke();
+        g.setLineDash([]);
+        // label
+        var col = i === 1 ? '#ef5350' : (i === N - 2 ? '#ffa726' : (i === 0 || i === N - 1 ? '#66bb6a' : '#78909c'));
+        g.fillStyle = col; g.font = '10px monospace'; g.textAlign = 'center';
+        g.fillText(lbls[i], cx, ty + th + 20);
+      }
+
+      // TX label
+      g.fillStyle = '#90caf9'; g.font = 'bold 11px monospace'; g.textAlign = 'left';
+      g.fillText('TX  (0x55, 8E1)', 2, ty - th - 8);
+
+      // RX sample markers — skip idle bits (index 0, N-1)
+      var wrongCount = 0;
+      for (var i = 1; i < N - 1; i++) {
+        var ideal = ox + bw * i + bw / 2;
+        var d = drift * ((i - 1) / (N - 3));
+        var sx = ideal + d;
+
+        // Is sample still inside the bit window?
+        var winL = ox + bw * i + 1;
+        var winR = ox + bw * (i + 1) - 1;
+        var inWin = (sx >= winL && sx <= winR);
+        if (!inWin) wrongCount++;
+
+        var sy = ty - bits[i] * th;
+
+        // Dashed vertical guide
+        g.strokeStyle = inWin ? '#66bb6a44' : '#ef535044';
+        g.lineWidth = 1; g.setLineDash([3, 3]);
+        g.beginPath(); g.moveTo(sx, sy + 7); g.lineTo(sx, ty + th + 4); g.stroke();
+        g.setLineDash([]);
+
+        // Sample dot
+        g.beginPath(); g.arc(sx, sy, 5.5, 0, Math.PI * 2);
+        g.fillStyle = inWin ? '#66bb6a' : '#ef5350'; g.fill();
+        // white border
+        g.strokeStyle = '#0f1117'; g.lineWidth = 1.2; g.stroke();
+      }
+
+      // RX label
+      g.fillStyle = '#aaa'; g.font = 'bold 11px monospace'; g.textAlign = 'left';
+      g.fillText('RX samples', 2, ty + th + 20);
+
+      // Status bar
+      var driftPct = ((drift / bw) * 100).toFixed(1);
+      g.fillStyle = '#ffd54f'; g.font = '12px monospace';
+      g.textAlign = 'left';
+      g.fillText('Accumulated drift: ' + (drift > 0 ? '+' : '') + driftPct + '% of bit width', 12, H - 12);
+
+      if (wrongCount > 0) {
+        g.fillStyle = '#ef5350'; g.font = 'bold 12px monospace';
+        g.fillText('  ⚠  ' + wrongCount + ' sample(s) outside correct window → framing error!', 260, H - 12);
+      } else {
+        g.fillStyle = '#66bb6a'; g.font = 'bold 12px monospace';
+        g.fillText('  ✓  All samples within correct window', 260, H - 12);
+      }
+
+      // Advance drift
+      if (pauseTick > 0) {
+        pauseTick--;
+      } else {
+        drift += dir * 0.18;
+        if (drift > bw * 0.78) { dir = -1; pauseTick = 50; }
+        if (drift < 0.3 && dir === -1) { dir = 1; drift = 0; pauseTick = 35; }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  })();
+  </script>
+</body>
+</html>
