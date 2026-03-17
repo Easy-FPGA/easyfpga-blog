@@ -50,7 +50,7 @@ RTL Design (.sv)
 Add `(* mark_debug = "true" *)` attributes to signals you want to probe in hardware.
 
 ```systemverilog
-// In uart_ctrl.sv — mark internal signals for ILA
+// In uart_loopback_top.sv — mark internal signals for ILA
 (* mark_debug = "true" *) logic [7:0] rx_data;
 (* mark_debug = "true" *) logic       rx_valid;
 (* mark_debug = "true" *) logic       tx_busy;
@@ -63,6 +63,47 @@ Add `(* mark_debug = "true" *)` attributes to signals you want to probe in hardw
 - Inspect captured waveforms for RX data, parity, and frame validity at full clock speed
 
 > **ILA vs printf**: In FPGA design, you cannot add print statements to RTL. The ILA is the equivalent — it captures hardware signal waveforms in on-chip BRAM with a configurable trigger, at full system clock speed, with zero impact on timing. Use ILA for any signal you would want to `$display` in simulation.
+
+## Board-Level Wrapper (Physical Top)
+
+`uart_top` is a UART core interface (parallel control/data + serial pins). For FPGA implementation, use a board-level top module that only exposes physical I/O ports (`clk`, `rst_n`, `rx`, `tx`) and keeps `tx_data/rx_data` internal.
+
+```systemverilog
+module uart_loopback_top (
+     input  logic clk,
+     input  logic rst_n,
+     input  logic rx,
+     output logic tx
+);
+     logic       tx_start, tx_busy;
+     logic [7:0] tx_data, rx_data;
+     logic       rx_valid, parity_err, frame_err;
+
+     uart_top u_uart (
+          .clk(clk), .rst_n(rst_n),
+          .tx_start(tx_start), .tx_data(tx_data), .tx_busy(tx_busy), .tx(tx),
+          .rx(rx), .rx_data(rx_data), .rx_valid(rx_valid),
+          .parity_err(parity_err), .frame_err(frame_err)
+     );
+
+     // Loopback: retransmit each received byte when TX is idle.
+     always_ff @(posedge clk or negedge rst_n) begin
+          if (!rst_n) begin
+               tx_start <= 1'b0;
+               tx_data  <= '0;
+          end else begin
+               tx_start <= 1'b0;
+               if (rx_valid && !tx_busy) begin
+                    tx_data  <= rx_data;
+                    tx_start <= 1'b1;
+               end
+          end
+     end
+endmodule
+```
+
+- `tx_data/rx_data` are internal bus signals in `uart_loopback_top`
+- `.xdc` constraints apply only to external top-level ports (`clk`, `rst_n`, `rx`, `tx`)
 
 ## .xdc Pin Assignment (KCU105)
 
