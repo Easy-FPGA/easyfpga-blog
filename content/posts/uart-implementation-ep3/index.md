@@ -14,6 +14,8 @@ tags:
 ---
 # RS-232 & RS-485
 
+When FPGAs communicate with external devices over UART, the signal rarely stays at 3.3V CMOS all the way to the destination. RS-232 defines an electrical standard for single-ended serial links up to 15 m, while RS-485 uses differential signaling to reach 1,200 m on a multi-drop bus. The most important lesson of this episode: UART is a logical protocol, and RS-232/RS-485 are completely separate physical standards that FPGA GPIO cannot directly drive.
+
 ## UART vs RS-232 vs RS-485
 
 > **UART** = Logical protocol (3.3V/0V digital signal)
@@ -52,6 +54,8 @@ Logic '0' (SPACE) : +3V to +15V  ← Positive voltage = logic 0 !
 ```
 
 > **Opposite polarity** from TTL/CMOS — a transceiver is always required.
+
+> **Warning**: RS-232 voltages (up to ±15V) will damage FPGA I/O pins rated for 3.3V. Never connect an RS-232 cable directly to FPGA GPIO without a MAX3232 or equivalent transceiver. The transceiver also performs the polarity inversion automatically — the FPGA side sees standard TTL levels.
 
 <iframe src="/uart-html/rs232_waveform.html" width="100%" height="175" frameborder="0" scrolling="no"></iframe>
 
@@ -111,6 +115,8 @@ Modern PCs no longer have RS-232 ports → use a **USB-UART bridge IC**
 PC USB ──► FT232R ──► UART TX/RX ──► FPGA / MCU
 ```
 
+> **Practical recommendation**: For any new UART-to-PC connection, use a USB-UART bridge (FT232R or CP2102) rather than RS-232. Modern laptops have no RS-232 port; the bridge provides a clean 3.3V UART interface, draws power from USB, and installs standard CDC drivers automatically. FT232R has the most stable driver history; avoid PL2303 for new designs.
+
 ## Practical Summary
 
 ### RS-232 Connection (FPGA ↔ PC)
@@ -143,9 +149,10 @@ FPGA UART → RS-485 driver → A/B bus → each node
 
 ## Key Takeaways
 
-- Build UART logic with timing assumptions made explicit
-- Verify behavior with both simulation and hardware-oriented checks
-- Keep interfaces minimal and move complexity into reusable RTL blocks
+- UART is a logical protocol (TTL/CMOS levels); RS-232 and RS-485 are physical electrical standards — a transceiver IC is always required between FPGA GPIO and the cable
+- RS-232 uses inverted polarity: mark = negative voltage, space = positive — direct connection at ±15V will damage FPGA I/O; always use a MAX3232 or equivalent
+- RS-485 differential signaling (A−B voltage) cancels common-mode noise (CMRR), enabling 1,200 m cable runs and 32-node multi-drop buses
+- For PC-to-FPGA debug connections, skip RS-232 entirely — use a USB-UART bridge (FT232R or CP2102) for a direct 3.3V UART interface
 
 ## Code and References
 

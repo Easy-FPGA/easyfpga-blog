@@ -18,6 +18,8 @@ tags:
 
 A hardware communication protocol for **serial communication** between two devices.
 
+UART is one of the oldest digital communication protocols still in active use. Despite being designed alongside early teletype systems, it appears in virtually every FPGA board, microcontroller, and development kit — because it needs only two wires and every terminal emulator on every operating system speaks it. This episode covers the fundamentals: what asynchronous communication really means, how baud rate works, and why clock drift is the central engineering challenge when implementing UART from scratch.
+
 ### Key Features
 
 | Feature | Description |
@@ -101,6 +103,8 @@ Receiver:     ──┬──┬──┬──┬──┬──┬── (8.69
 - **Short frames**: 10–11 bits per frame limits drift exposure
 - **Re-sync per frame**: receiver resets timing on every Start bit
 
+> **Engineering note**: Oversampling works by dividing each bit period into 16 time slots. The receiver samples at the center three slots and takes a majority vote. This tolerates both clock offset and signal transition glitches near bit edges — the reason UART reliably operates with ±2% clock tolerance between two independent oscillators.
+
 ## Clock Drift Visualization
 
 ```
@@ -162,9 +166,10 @@ RX samples (drifted): ●    ●    ●    ●    ●    ●    ●   ●
 
 ## Key Takeaways
 
-- Build UART logic with timing assumptions made explicit
-- Verify behavior with both simulation and hardware-oriented checks
-- Keep interfaces minimal and move complexity into reusable RTL blocks
+- UART is asynchronous: no shared clock — both sides must independently agree on baud rate and stay within ±2–3% frequency accuracy
+- The Start Bit falling edge resets accumulated clock drift at the start of every frame; this is why UART tolerates small clock mismatches at all
+- Oversampling (16×) divides each bit period into slots and samples the center — providing strong margin against both clock drift and line glitches
+- Cross-connecting TX→RX is the most common wiring mistake — always verify the cross-connect before debugging the RTL
 
 ## Code and References
 

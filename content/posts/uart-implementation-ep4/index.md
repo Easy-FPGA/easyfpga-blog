@@ -14,6 +14,8 @@ tags:
 ---
 # UART Implementation Methods
 
+FPGA engineers implementing UART face three choices — each suited to a different project context and level of control. Choosing the wrong approach wastes time: a vendor IP that cannot be customized, or a full processor SoC for a task that needs only a 100-line state machine. This episode provides the decision framework and maps the course structure to each approach.
+
 ## Three Approaches to UART on FPGA
 
 ```
@@ -94,6 +96,16 @@ MicroBlaze ──AXI4-Lite──► AXI UART Lite ──► TX/RX
 > **Software control needed** → Soft Processor
 > **Learning / optimization / portability** → Custom RTL
 
+### Decision Guide
+
+| Requirement | Best Method |
+|---|---|
+| Working in 30 minutes | Vendor IP (Method 1) |
+| Multi-peripheral SoC | Soft Processor (Method 2) |
+| Understand UART deeply | Custom RTL (Method 3) |
+| Vendor-agnostic, portable | Custom RTL (Method 3) |
+| Strict latency or resource limit | Custom RTL (Method 3) |
+
 ## Lecture Structure
 
 ```
@@ -119,9 +131,10 @@ Episode 15:     Final comparison and recap
 
 ## Key Takeaways
 
-- Build UART logic with timing assumptions made explicit
-- Verify behavior with both simulation and hardware-oriented checks
-- Keep interfaces minimal and move complexity into reusable RTL blocks
+- **Vendor IP** (Method 1): fastest path to a working UART, but opaque and tied to the vendor's synthesis tool
+- **Soft Processor + UART IP** (Method 2): enables C software control and AXI peripheral integration, but requires significant BRAM/LUT resources for the CPU
+- **Custom RTL** (Method 3): complete control, smallest footprint, vendor-agnostic — and the only method that builds a real understanding of UART timing and FSM design
+- This course covers both approaches (RTL in EP05–08, MicroBlaze in EP09–14) — comparing them on the same hardware is the most instructive outcome
 
 ## Code and References
 

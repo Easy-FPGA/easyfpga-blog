@@ -14,6 +14,8 @@ tags:
 ---
 # UART Frame Format
 
+Each UART transmission carries data inside a precisely defined frame. Understanding the purpose of every field — not just its name — is what separates a developer who can implement UART from scratch from one who only configures a vendor IP. This episode dissects the frame bit by bit, covering the transmission order convention, parity computation, and the overhead implications of different format choices.
+
 ## UART Frame Structure
 
 Every UART transmission is based on a fixed **Frame** structure.
@@ -80,6 +82,8 @@ TX waveform: D0 → D1 → D2 → D3 → D4 → D5 → D6 → D7
 - The **LSB (D0)** is always transmitted first
 - For 0xA5, the first bit on the wire is: **1** (LSB)
 
+> **Why LSB first?** Early UART hardware used a shift register that naturally shifted bits out from the LSB end. This is opposite to the MSB-first convention most software developers expect — so always verify bit ordering explicitly in simulation waveforms before assuming the RX design is correct.
+
 ## Parity Bit
 
 Optional field for **single-bit error detection**
@@ -101,7 +105,7 @@ parity_bit = ^tx_data;       // 1 if count of 1s is odd
 parity_bit = ~^tx_data;
 ```
 
-> Parity can only detect **1-bit errors**. 2-bit errors go undetected.
+> Parity detects single-bit errors only. **Any even number of bit errors** (2, 4, ...) cancel out and go undetected. For reliable data integrity over longer payloads, use a CRC checksum at the application layer.
 
 ## Checksum for Multi-Byte Data
 
@@ -171,9 +175,10 @@ $$\text{Effective throughput} = 115200 \times \frac{8}{10} = 92{,}160 \text{ bps
 
 ## Key Takeaways
 
-- Build UART logic with timing assumptions made explicit
-- Verify behavior with both simulation and hardware-oriented checks
-- Keep interfaces minimal and move complexity into reusable RTL blocks
+- UART frame = Start (1b, always 0) + Data (5–9b, LSB first) + Parity (1b, optional) + Stop (1–2b, always 1) — every field at exactly the right timing; missing any field causes a framing error
+- LSB-first transmission is counterintuitive for software developers — verify the bit order explicitly in simulation before signing off on the RX design
+- Even parity is the reduction XOR of all data bits: `parity = ^data[7:0]`; the receiver recalculates and compares on every received byte
+- 8N1 carries 20% overhead (2 framing bits per 10-bit frame); 8E1 adds 1 more bit but enables hardware parity error detection at the receiver
 
 ## Code and References
 
