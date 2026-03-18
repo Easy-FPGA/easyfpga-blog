@@ -1,4 +1,13 @@
-public/
+content/posts/uart-implementation-ep6/
+content/posts/uart-implementation-ep7/
+content/posts/uart-implementation-ep8/
+content/posts/uart-implementation-ep9/
+content/posts/uart-implementation-ep10/
+content/posts/uart-implementation-ep11/
+content/posts/uart-implementation-ep12/
+content/posts/uart-implementation-ep13/
+content/posts/uart-implementation-ep14/
+content/posts/uart-implementation-ep15/public/
 resources/
 .hugo_build.lock
 _wp_import.py
