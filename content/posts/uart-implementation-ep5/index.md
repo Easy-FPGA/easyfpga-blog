@@ -167,6 +167,15 @@ The loopback testbench connects TX output directly to RX input, verifying end-to
 - Parity error injection: force a wrong bit on the wire, confirm `parity_err` asserts
 - Frame error injection: hold RX low during Stop bit, confirm `frame_err` asserts
 
+## UART Frame Simulation Demo
+
+*Vivado simulation waveform demo (xsim)*
+
+<video controls preload="metadata" width="100%" style="display:block;border-radius:8px;background:#000;max-height:420px;" playsinline>
+    <source src="uart_vivado_sim.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
 ## Episode 5 Summary
 
 - **Baud Generator**: `cnt == BAUD_CNT_MAX-1` → one-cycle `baud_tick`
