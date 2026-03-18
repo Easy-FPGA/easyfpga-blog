@@ -5,6 +5,8 @@ draft: true
 description: "Step-by-step Vivado Block Design: adding MicroBlaze and UART Lite, running Block Automation and Connection Automation, assigning AXI addresses, and exporting hardware to Vitis."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

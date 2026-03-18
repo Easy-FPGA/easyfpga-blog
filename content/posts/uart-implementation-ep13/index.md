@@ -5,6 +5,8 @@ draft: true
 description: "Hardware-software co-simulation: loading compiled ELF into BRAM simulation models, writing a bit-level UART stimulus testbench, and verifying AXI bus transactions in waveforms."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

@@ -82,6 +82,11 @@ buildFuture = false
     url = '/contact/'
     weight = 50
 
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+
 [markup]
   [markup.highlight]
     style = 'monokai'

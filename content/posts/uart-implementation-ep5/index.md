@@ -1,10 +1,12 @@
 ---
 title: "Custom RTL Design: TX & RX"
 date: 2026-03-20T12:00:00+09:00
-draft: true
+draft: false
 description: "Implementing UART TX and RX entirely in SystemVerilog: baud rate generator design, TX FSM, center-sampling RX FSM, and loopback testbench strategy."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

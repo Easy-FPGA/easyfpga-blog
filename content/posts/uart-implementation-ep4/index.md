@@ -1,10 +1,12 @@
 ﻿---
 title: "UART Implementation Methods"
-date: 2026-03-16T12:00:00+09:00
-draft: true
+date: 2026-03-17T12:00:00+09:00
+draft: false
 description: "Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

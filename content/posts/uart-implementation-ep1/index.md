@@ -1,10 +1,12 @@
 ﻿---
 title: "What is UART?"
-date: 2026-03-16T12:00:00+09:00
-draft: true
+date: 2026-03-14T12:00:00+09:00
+draft: false
 description: "UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

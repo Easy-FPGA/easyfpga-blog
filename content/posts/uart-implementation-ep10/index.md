@@ -5,6 +5,8 @@ draft: true
 description: "Deep dive into AXI UART Lite: register map, UART Lite vs AXI 16550, IP Catalog configuration, and both BSP driver and direct register-access C code patterns."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

@@ -5,6 +5,8 @@ draft: true
 description: "Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

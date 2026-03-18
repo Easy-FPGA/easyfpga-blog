@@ -5,6 +5,8 @@ draft: true
 description: "Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

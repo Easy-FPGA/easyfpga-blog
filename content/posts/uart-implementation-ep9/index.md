@@ -5,6 +5,8 @@ draft: true
 description: "MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

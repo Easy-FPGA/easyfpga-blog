@@ -5,6 +5,8 @@ draft: true
 description: "Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

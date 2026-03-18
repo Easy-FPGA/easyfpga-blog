@@ -5,6 +5,8 @@ draft: true
 description: "Building uart_top: port definitions, submodule instantiation, parameterization of CLK_FREQ and BAUD_RATE, and the design principles behind clean RTL interfaces."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"
@@ -33,7 +35,7 @@ With TX and RX modules independently verified, the next step is integration: wra
     │                      ┌─────▼────┐  │
 tx_start ──────────────────►          │  │
 tx_data[7:0] ──────────────► uart_tx ├──► tx
-tx_busy ◄───────────────────┤          │  │
+tx_busy ◄──────────────────┤          │  │
     │                      └──────────┘  │
     │                      ┌──────────┐  │
 rx ─────────────────────────► uart_rx ├──► rx_data[7:0]

@@ -5,6 +5,8 @@ draft: true
 description: "End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"
@@ -66,29 +68,46 @@ Add `(* mark_debug = "true" *)` attributes to signals you want to probe in hardw
 
 ## Board-Level Wrapper (Physical Top)
 
-`uart_top` is a UART core interface (parallel control/data + serial pins). For FPGA implementation, use a board-level top module that only exposes physical I/O ports (`clk`, `rst_n`, `rx`, `tx`) and keeps `tx_data/rx_data` internal.
+`uart_top` is a UART core interface (parallel control/data + serial pins). For FPGA implementation, use a board-level top module that accepts the board's differential clock, generates an internal 50 MHz clock with PLL/MMCM, and only exposes physical I/O ports.
 
 ```systemverilog
 module uart_loopback_top (
-     input  logic clk,
-     input  logic rst_n,
-     input  logic rx,
-     output logic tx
+     input  logic clkp,
+     input  logic clkn,
+     input  logic rstn,
+     input  logic uart_rx,
+     output logic uart_tx
 );
+     logic       clk_in, clk_50m, pll_locked;
+     logic       rst_n_sync;
      logic       tx_start, tx_busy;
      logic [7:0] tx_data, rx_data;
      logic       rx_valid, parity_err, frame_err;
 
+     IBUFDS u_ibufds (
+          .I (clkp),
+          .IB(clkn),
+          .O (clk_in)
+     );
+
+     clk_wiz_0 u_clk_wiz (
+          .clk_in1 (clk_in),
+          .clk_out1(clk_50m),
+          .locked  (pll_locked)
+     );
+
+     assign rst_n_sync = rstn & pll_locked;
+
      uart_top u_uart (
-          .clk(clk), .rst_n(rst_n),
-          .tx_start(tx_start), .tx_data(tx_data), .tx_busy(tx_busy), .tx(tx),
-          .rx(rx), .rx_data(rx_data), .rx_valid(rx_valid),
+          .clk(clk_50m), .rst_n(rst_n_sync),
+          .tx_start(tx_start), .tx_data(tx_data), .tx_busy(tx_busy), .tx(uart_tx),
+          .rx(uart_rx), .rx_data(rx_data), .rx_valid(rx_valid),
           .parity_err(parity_err), .frame_err(frame_err)
      );
 
      // Loopback: retransmit each received byte when TX is idle.
-     always_ff @(posedge clk or negedge rst_n) begin
-          if (!rst_n) begin
+     always_ff @(posedge clk_50m or negedge rst_n_sync) begin
+          if (!rst_n_sync) begin
                tx_start <= 1'b0;
                tx_data  <= '0;
           end else begin
@@ -103,25 +122,25 @@ endmodule
 ```
 
 - `tx_data/rx_data` are internal bus signals in `uart_loopback_top`
-- `.xdc` constraints apply only to external top-level ports (`clk`, `rst_n`, `rx`, `tx`)
+- `.xdc` constraints apply only to external top-level ports (`clkp`, `clkn`, `rstn`, `uart_rx`, `uart_tx`)
 
-## .xdc Pin Assignment (KCU105)
+## .xdc Pin Assignment (AXU3EGB)
 
 ```tcl
-# Clock
-set_property PACKAGE_PIN <CLK_PIN> [get_ports clk]
-set_property IOSTANDARD LVCMOS33 [get_ports clk]
-create_clock -name sys_clk -period 20.000 [get_ports clk]
+set_property PACKAGE_PIN AE5 [get_ports clkp]
+set_property PACKAGE_PIN AF12 [get_ports rstn]
+set_property PACKAGE_PIN AH11 [get_ports uart_rx]
 
-# UART
-set_property PACKAGE_PIN <RX_PIN> [get_ports rx]
-set_property PACKAGE_PIN <TX_PIN> [get_ports tx]
-set_property IOSTANDARD LVCMOS33 [get_ports {rx tx}]
+set_property IOSTANDARD LVDS [get_ports clkp]
+set_property IOSTANDARD LVDS [get_ports clkn]
+set_property IOSTANDARD LVCMOS33 [get_ports rstn]
+set_property IOSTANDARD LVCMOS33 [get_ports uart_rx]
+set_property IOSTANDARD LVCMOS33 [get_ports uart_tx]
 
-# Reset
-set_property PACKAGE_PIN <RST_PIN> [get_ports rst_n]
-set_property IOSTANDARD LVCMOS33 [get_ports rst_n]
+set_property PACKAGE_PIN AH12 [get_ports uart_tx]
 ```
+
+> **Note**: On some boards/tools, `clkn` PACKAGE_PIN is auto-paired from `clkp`. Add an explicit `clkn` PACKAGE_PIN only if your flow requires it.
 
 > **Always verify pin assignments against your board schematic.** FPGA board revisions can change package pin assignments. Using the wrong `PACKAGE_PIN` may route the signal to an unconnected pad (silent failure) or to an incompatible I/O bank (DRC error during synthesis). The board's reference design `.xdc` file is the authoritative source.
 

@@ -1,10 +1,12 @@
 ﻿---
 title: "RS-232 and RS-485 for UART Systems"
 date: 2026-03-16T12:00:00+09:00
-draft: true
+draft: false
 description: "How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"

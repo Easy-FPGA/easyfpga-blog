@@ -5,6 +5,8 @@ draft: true
 description: "Writing MicroBlaze C applications in Vitis: platform creation from XSA, BSP and xparameters.h explained, loopback C code, printf routing to UART, and interrupt-driven receive."
 categories:
   - "UART"
+series:
+  - "UART on FPGA"
 tags:
   - "FPGA"
   - "UART"
