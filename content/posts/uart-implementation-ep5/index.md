@@ -34,7 +34,7 @@ Target: **50 MHz system clock, 8E1 format**
 
 **Baud counter maximum:**
 
-$$\text{BAUD\_CNT\_MAX} = \frac{50{,}000{,}000}{115{,}200} \approx 434$$
+$$\mathrm{BAUD}_{\mathrm{CNT,MAX}} = \frac{50{,}000{,}000}{115{,}200} \approx 434$$
 
 The counter counts system clock cycles. When it reaches 434, one baud period has elapsed and it resets. The resulting one-cycle pulse (`baud_tick`) drives all TX bit transitions.
 
@@ -103,7 +103,7 @@ end
 
 Sample each bit at its **center** for maximum noise margin.
 
-$$\text{Center offset} = \frac{\text{BAUD\_CNT\_MAX}}{2} \approx 217 \text{ CLK cycles}$$
+$$\text{Center offset} = \frac{\mathrm{BAUD}_{\mathrm{CNT,MAX}}}{2} \approx 217\,\text{CLK cycles}$$
 
 ```systemverilog
 typedef enum logic [2:0] { IDLE, START, DATA, PARITY, STOP } rx_state_t;
