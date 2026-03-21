@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>FPGA Implementation of RoCEv2 | EasyFPGA</title>
+<meta name="keywords" content="CMAC, ERNIC, FPGA, RoCEv2">
+<meta name="description" content="What is the RoCE v2?
+RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It&rsquo;s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.
+The link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info
+RoCEv2 Packet Format
+
+
+Ethernet Header
+
+Standard Ethernet frame header.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/fpga-implementation-of-rocev2/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/fpga-implementation-of-rocev2/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/fpga-implementation-of-rocev2/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="FPGA Implementation of RoCEv2">
+  <meta property="og:description" content="What is the RoCE v2? RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It’s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.
+The link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info
+RoCEv2 Packet Format Ethernet Header Standard Ethernet frame header.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-06-17T12:21:53+00:00">
+    <meta property="article:modified_time" content="2025-06-17T12:21:53+00:00">
+    <meta property="article:tag" content="CMAC">
+    <meta property="article:tag" content="ERNIC">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="RoCEv2">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="FPGA Implementation of RoCEv2">
+  <meta name="twitter:description" content="What is the RoCE v2? RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It’s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.
+The link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info
+RoCEv2 Packet Format Ethernet Header Standard Ethernet frame header.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "FPGA Implementation of RoCEv2",
+      "item": "https://easyfpga.blog/posts/fpga-implementation-of-rocev2/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FPGA Implementation of RoCEv2",
+  "name": "FPGA Implementation of RoCEv2",
+  "description": "What is the RoCE v2? RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It\u0026rsquo;s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.\nThe link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info\nRoCEv2 Packet Format Ethernet Header Standard Ethernet frame header.\n",
+  "keywords": [
+    "CMAC", "ERNIC", "FPGA", "RoCEv2"
+  ],
+  "articleBody": "What is the RoCE v2? RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It’s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.\nThe link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info\nRoCEv2 Packet Format Ethernet Header Standard Ethernet frame header.\nIP Header IPv4 or IPv6 depending on the network configuration.\nUDP Header Destination Port: 4791 (reserved for RoCE v2)\nInfiniBand Transport Headers BTH (Base Transport Header): Contains OpCode, packet sequence number (PSN), and other control bits.\nOptional Headers: Depending on the RDMA operation. you may see: RETH (RDMA Extended Transport Header) for RDMA READ/WRITE\nAETH (Acknowledgement Extended Header)\nDETH (Datagram Extended Transport Header)\nAtomic Headers for atomic operations\nPayload\nThe actual RDMA data being tranferred.\nICRC (Invariant CRC) Ensures data integrity across the RDMA transport layer.\nRoCE v2 Implementation Technologies 🔹 Hardware (FPGA, NIC): Mellanox (NVIDIA) ConnectX-4 and later support RoCE v2\nAMD/Xilinx FPGAs can use the ERNIC IP (RoCE Engine) for RoCE v2 implementation\n🔹 Software (Linux environment): rdma-core library (includes libibverbs and librdmacm)\nUse ibv_* APIs to create QPs (Queue Pairs) and perform data transfer\nFPGA Implementation For an FPGA Implementation, You need two IP cores: a 100G MAC and an ERNIC.\nIntegrated CMAC Block for 100 Gb/s Ethernet\nIntegrated 100G Ethernet Subsystem https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/cmac_usplus.html Supprots CAUI-10, CAUI-4, 100GAUI-2, 100GAUI-4\n100 Ethernet MAC, and RS-FEC logic + PCS Block\nERNIC (Xilinx IP) https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/ef-di-ernic.html\nRoCE v2 packet parsing/generation\nMemory interface for DMA\nUDP/IP encapsulation and decapsulation\nICRC generation/check\n",
+  "wordCount" : "273",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-06-17T12:21:53Z",
+  "dateModified": "2025-06-17T12:21:53Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/fpga-implementation-of-rocev2/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      FPGA Implementation of RoCEv2
+    </h1>
+    <div class="post-meta"><span title='2025-06-17 12:21:53 +0000 +0000'>June 17, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-the-roce-v2" aria-label="What is the RoCE v2?">What is the RoCE v2?</a></li>
+                <li>
+                    <a href="#rocev2-packet-format" aria-label="RoCEv2 Packet Format">RoCEv2 Packet Format</a></li>
+                <li>
+                    <a href="#roce-v2-implementation-technologies" aria-label="RoCE v2 Implementation Technologies">RoCE v2 Implementation Technologies</a><ul>
+                        
+                <li>
+                    <a href="#-hardware-fpga-nic" aria-label="🔹 Hardware (FPGA, NIC):">🔹 Hardware (FPGA, NIC):</a></li>
+                <li>
+                    <a href="#-software-linux-environment" aria-label="🔹 Software (Linux environment):">🔹 Software (Linux environment):</a></li></ul>
+                </li>
+                <li>
+                    <a href="#fpga-implementation" aria-label="FPGA Implementation">FPGA Implementation</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="what-is-the-roce-v2">What is the RoCE v2?<a hidden class="anchor" aria-hidden="true" href="#what-is-the-roce-v2">#</a></h2>
+<p>RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It&rsquo;s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.</p>
+<p>The link below is a lecture on RDMA. It provides a lot of useful information. <a href="https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info">https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info</a></p>
+<h2 id="rocev2-packet-format">RoCEv2 Packet Format<a hidden class="anchor" aria-hidden="true" href="#rocev2-packet-format">#</a></h2>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-13.png?w=867"></p>
+<ul>
+<li>Ethernet Header</li>
+</ul>
+<p>Standard Ethernet frame header.</p>
+<ul>
+<li>IP Header</li>
+</ul>
+<p>IPv4 or IPv6 depending on the network configuration.</p>
+<ul>
+<li>UDP Header</li>
+</ul>
+<p>Destination Port: 4791 (reserved for RoCE v2)</p>
+<ul>
+<li>InfiniBand Transport Headers</li>
+</ul>
+<p>BTH (Base Transport Header): Contains OpCode, packet sequence number (PSN), and other control bits.</p>
+<ul>
+<li>Optional Headers: Depending on the RDMA operation. you may see:</li>
+</ul>
+<p>RETH (RDMA Extended Transport Header) for RDMA READ/WRITE</p>
+<ul>
+<li>
+<p>AETH (Acknowledgement Extended Header)</p>
+</li>
+<li>
+<p>DETH (Datagram Extended Transport Header)</p>
+</li>
+<li>
+<p>Atomic Headers for atomic operations</p>
+</li>
+<li>
+<p>Payload</p>
+</li>
+</ul>
+<p>The actual RDMA data being tranferred.</p>
+<ul>
+<li>ICRC (Invariant CRC)</li>
+</ul>
+<p>Ensures data integrity across the RDMA transport layer.</p>
+<h2 id="roce-v2-implementation-technologies">RoCE v2 Implementation Technologies<a hidden class="anchor" aria-hidden="true" href="#roce-v2-implementation-technologies">#</a></h2>
+<h3 id="-hardware-fpga-nic">🔹 <strong>Hardware (FPGA, NIC):</strong><a hidden class="anchor" aria-hidden="true" href="#-hardware-fpga-nic">#</a></h3>
+<ul>
+<li>
+<p><strong>Mellanox (NVIDIA) ConnectX-4</strong> and later support RoCE v2</p>
+</li>
+<li>
+<p><strong>AMD/Xilinx FPGAs</strong> can use the <strong>ERNIC IP (RoCE Engine)</strong> for RoCE v2 implementation</p>
+</li>
+</ul>
+<h3 id="-software-linux-environment">🔹 <strong>Software (Linux environment):</strong><a hidden class="anchor" aria-hidden="true" href="#-software-linux-environment">#</a></h3>
+<ul>
+<li>
+<p><strong><code>rdma-core</code></strong> library (includes <strong>libibverbs</strong> and <strong>librdmacm</strong>)</p>
+</li>
+<li>
+<p>Use <strong><code>ibv_*</code> APIs</strong> to create QPs (Queue Pairs) and perform data transfer</p>
+</li>
+</ul>
+<h2 id="fpga-implementation">FPGA Implementation<a hidden class="anchor" aria-hidden="true" href="#fpga-implementation">#</a></h2>
+<p>For an FPGA Implementation, You need two IP cores: a 100G MAC and an ERNIC.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-14.png?w=1024"><em>Integrated CMAC Block for 100 Gb/s Ethernet</em></p>
+<ul>
+<li>Integrated 100G Ethernet Subsystem <a href="https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/cmac_usplus.html">https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/cmac_usplus.html</a></li>
+</ul>
+<p>Supprots CAUI-10, CAUI-4, 100GAUI-2, 100GAUI-4</p>
+<ul>
+<li>
+<p>100 Ethernet MAC, and RS-FEC logic + PCS Block</p>
+</li>
+<li>
+<p>ERNIC (Xilinx IP) <a href="https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/ef-di-ernic.html">https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/ef-di-ernic.html</a></p>
+</li>
+</ul>
+<p>RoCE v2 packet parsing/generation</p>
+<ul>
+<li>
+<p>Memory interface for DMA</p>
+</li>
+<li>
+<p>UDP/IP encapsulation and decapsulation</p>
+</li>
+<li>
+<p>ICRC generation/check</p>
+</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/cmac/">CMAC</a></li>
+      <li><a href="https://easyfpga.blog/tags/ernic/">ERNIC</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/rocev2/">RoCEv2</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/active-low-reset/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Understanding Active-Low Resets in HDL Design</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/skew-simulation/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Skew Simulation</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

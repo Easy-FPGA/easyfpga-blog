@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>The Role of Scrambling in High-Speed Serial Communication | EasyFPGA</title>
+<meta name="keywords" content="High Speed Interface, Scrambler, LFSR, CDR, EMI, SerDes">
+<meta name="description" content="Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="The Role of Scrambling in High-Speed Serial Communication">
+  <meta property="og:description" content="Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-08-21T05:10:32+00:00">
+    <meta property="article:modified_time" content="2025-08-21T05:10:32+00:00">
+    <meta property="article:tag" content="High Speed Interface">
+    <meta property="article:tag" content="Scrambler">
+    <meta property="article:tag" content="LFSR">
+    <meta property="article:tag" content="CDR">
+    <meta property="article:tag" content="EMI">
+    <meta property="article:tag" content="SerDes">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="The Role of Scrambling in High-Speed Serial Communication">
+  <meta name="twitter:description" content="Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "The Role of Scrambling in High-Speed Serial Communication",
+      "item": "https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Role of Scrambling in High-Speed Serial Communication",
+  "name": "The Role of Scrambling in High-Speed Serial Communication",
+  "description": "Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.",
+  "keywords": [
+    "High Speed Interface", "Scrambler", "LFSR", "CDR", "EMI", "SerDes"
+  ],
+  "articleBody": "In digital communication, data is represented as a binary bitstream of 0s and 1s. In practice, real-world data is rarely truly random — it often contains repetitive patterns, especially long runs of identical bits (e.g., ...000000... or ...111111...). At low speeds this causes no real harm, but at 1 Gbps and beyond, such patterns create critical signal integrity problems. At 1 Gbps, one bit period is just 1 nanosecond, so a run of tens or hundreds of identical bits means the signal voltage stays constant for a relatively long time.\nProblems Caused by Non-Random Data Patterns Non-random patterns create two major problems in high-speed links.\n1. Loss of signal transitions — When a long run of identical bits occurs, there are no voltage edges in the signal.\n2. Spectral peaking — The power spectral density (PSD) becomes concentrated at specific frequencies, creating sharp spikes in the frequency domain.\nThese two effects cascade into receiver performance degradation. Absent transitions starve the Clock and Data Recovery (CDR) circuit of timing references, causing it to lose synchronization. Spectral concentration increases intermodulation with adjacent channels and boosts electromagnetic interference (EMI), making it harder to comply with regulatory standards such as FCC limits.\nCDR Starvation In multi-gigabit serial links, no dedicated clock line is sent alongside the data. The receiver must extract clock information directly from the incoming data stream by detecting voltage transitions — a process performed by the CDR circuit. The CDR samples the rising and falling edges of the data to reconstruct a recovered clock, which is then used to latch each data bit at the correct moment.\nWhen long runs of identical bits cause transitions to disappear, the CDR loses its timing reference. This leads to clock instability (timing jitter), prevents the recovered clock from staying synchronized with the data, and ultimately increases the Bit Error Rate (BER). Ensuring adequate transition density in the data stream is therefore a fundamental requirement of any multi-gigabit serial system. A scrambler addresses this directly — regardless of the input data pattern, it introduces transitions to help the CDR maintain a stable lock.\nOriginal bitstream vs. scrambled bitstream — note the increased transition density after scrambling.\nPower Spectral Density and EMI Power Spectral Density (PSD) describes how signal power is distributed across frequencies. Repetitive or periodic data patterns concentrate signal energy at specific frequency bands, forming sharp spectral peaks.\nThese peaks have two serious consequences:\nThey can violate regulatory emission limits (e.g., FCC Part 15). The concentrated energy causes electromagnetic radiation that interferes with adjacent communication channels, leading to crosstalk. A scrambler statistically randomises the input data so that signal power spreads evenly across a wide frequency band. This flattens the PSD, eliminates spectral peaks, reduces EMI, and helps the system meet regulatory requirements.\nScrambling as Statistical Whitening A scrambler is not a security device — it does not make data unreadable. Its purpose is to impose useful engineering properties on the transmitted bitstream. The process is often called statistical whitening: the data stream is mathematically transformed so that it appears statistically random (pseudo-random), even if the original data is highly repetitive.\nThe most common implementation uses a Linear Feedback Shift Register (LFSR) to generate a Pseudo-Random Binary Sequence (PRBS). The PRBS is XOR’d (modulo-2 added) with the original data stream:\nscrambled[n] = data[n] XOR prbs[n] At the receiver, a descrambler applies the same PRBS with the same XOR operation to perfectly recover the original data:\nrecovered[n] = scrambled[n] XOR prbs[n] = data[n] Because the LFSR generates a deterministic sequence, the transmitter and receiver stay synchronized without any extra overhead.\nScrambling vs. Line Coding As high-speed standards have evolved, the relationship between scrambling and line coding has changed significantly.\nOlder standards (Gen1, Gen2): 8B/10B encoding maps every 8-bit data byte to a 10-bit symbol, guaranteeing sufficient transitions, DC balance, and bounded run length. Signal integrity is built into the code itself.\nThe cost: 8B/10B imposes a 25% bandwidth overhead — for every 8 bits of payload, 10 bits must be transmitted. At speeds above 1 Gbps, this overhead significantly reduces effective throughput.\nModern standards (PCIe Gen3+, USB 3.x, Ethernet 25G+): 8B/10B is replaced by a combination of scrambling and 128B/130B encoding. The overhead drops to just 2/130 ≈ 1.56%, while the scrambler ensures the statistical randomness that 8B/10B achieved through explicit line coding.\nIn summary: at multi-gigabit speeds, bandwidth efficiency is paramount, and a scrambler with near-zero overhead has become the primary mechanism for guaranteeing signal randomness.\nSummary Concern Without Scrambling With Scrambling CDR lock May lose lock on long runs Stable — transitions always present EMI / spectral peaks Problematic spectral spikes Flat PSD, EMI reduced Bandwidth overhead 0% (but line coding adds 25%) ~0% (paired with 128B/130B, ~1.56%) Implementation N/A Self-synchronous LFSR, minimal logic ",
+  "wordCount" : "791",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-08-21T05:10:32Z",
+  "dateModified": "2025-08-21T05:10:32Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      The Role of Scrambling in High-Speed Serial Communication
+    </h1>
+    <div class="post-description">
+      Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.
+    </div>
+    <div class="post-meta"><span title='2025-08-21 05:10:32 +0000 +0000'>August 21, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#problems-caused-by-non-random-data-patterns" aria-label="Problems Caused by Non-Random Data Patterns">Problems Caused by Non-Random Data Patterns</a></li>
+                <li>
+                    <a href="#cdr-starvation" aria-label="CDR Starvation">CDR Starvation</a></li>
+                <li>
+                    <a href="#power-spectral-density-and-emi" aria-label="Power Spectral Density and EMI">Power Spectral Density and EMI</a></li>
+                <li>
+                    <a href="#scrambling-as-statistical-whitening" aria-label="Scrambling as Statistical Whitening">Scrambling as Statistical Whitening</a></li>
+                <li>
+                    <a href="#scrambling-vs-line-coding" aria-label="Scrambling vs. Line Coding">Scrambling vs. Line Coding</a></li>
+                <li>
+                    <a href="#summary" aria-label="Summary">Summary</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>In digital communication, data is represented as a binary bitstream of 0s and 1s. In practice, real-world data is rarely truly random — it often contains repetitive patterns, especially long runs of identical bits (e.g., <code>...000000...</code> or <code>...111111...</code>). At low speeds this causes no real harm, but at 1 Gbps and beyond, such patterns create critical signal integrity problems. At 1 Gbps, one bit period is just 1 nanosecond, so a run of tens or hundreds of identical bits means the signal voltage stays constant for a relatively long time.</p>
+<h2 id="problems-caused-by-non-random-data-patterns">Problems Caused by Non-Random Data Patterns<a hidden class="anchor" aria-hidden="true" href="#problems-caused-by-non-random-data-patterns">#</a></h2>
+<p>Non-random patterns create two major problems in high-speed links.</p>
+<p><strong>1. Loss of signal transitions</strong> — When a long run of identical bits occurs, there are no voltage edges in the signal.</p>
+<p><strong>2. Spectral peaking</strong> — The power spectral density (PSD) becomes concentrated at specific frequencies, creating sharp spikes in the frequency domain.</p>
+<p>These two effects cascade into receiver performance degradation. Absent transitions starve the Clock and Data Recovery (CDR) circuit of timing references, causing it to lose synchronization. Spectral concentration increases intermodulation with adjacent channels and boosts electromagnetic interference (EMI), making it harder to comply with regulatory standards such as FCC limits.</p>
+<h2 id="cdr-starvation">CDR Starvation<a hidden class="anchor" aria-hidden="true" href="#cdr-starvation">#</a></h2>
+<p>In multi-gigabit serial links, no dedicated clock line is sent alongside the data. The receiver must extract clock information directly from the incoming data stream by detecting voltage transitions — a process performed by the CDR circuit. The CDR samples the rising and falling edges of the data to reconstruct a recovered clock, which is then used to latch each data bit at the correct moment.</p>
+<p>When long runs of identical bits cause transitions to disappear, the CDR loses its timing reference. This leads to clock instability (timing jitter), prevents the recovered clock from staying synchronized with the data, and ultimately increases the Bit Error Rate (BER). Ensuring adequate <strong>transition density</strong> in the data stream is therefore a fundamental requirement of any multi-gigabit serial system. A scrambler addresses this directly — regardless of the input data pattern, it introduces transitions to help the CDR maintain a stable lock.</p>
+<p><img alt="Unscrambled vs scrambled bitstream" loading="lazy" src="http://13.124.237.178/wp-content/uploads/2025/08/image-1024x336.png">
+<em>Original bitstream vs. scrambled bitstream — note the increased transition density after scrambling.</em></p>
+<h2 id="power-spectral-density-and-emi">Power Spectral Density and EMI<a hidden class="anchor" aria-hidden="true" href="#power-spectral-density-and-emi">#</a></h2>
+<p>Power Spectral Density (PSD) describes how signal power is distributed across frequencies. Repetitive or periodic data patterns concentrate signal energy at specific frequency bands, forming sharp spectral peaks.</p>
+<p>These peaks have two serious consequences:</p>
+<ul>
+<li>They can violate regulatory emission limits (e.g., FCC Part 15).</li>
+<li>The concentrated energy causes electromagnetic radiation that interferes with adjacent communication channels, leading to crosstalk.</li>
+</ul>
+<p>A scrambler statistically randomises the input data so that signal power spreads evenly across a wide frequency band. This <strong>flattens the PSD</strong>, eliminates spectral peaks, reduces EMI, and helps the system meet regulatory requirements.</p>
+<p><img alt="Power spectral density before and after scrambling" loading="lazy" src="http://13.124.237.178/wp-content/uploads/2025/08/image-1.png"></p>
+<h2 id="scrambling-as-statistical-whitening">Scrambling as Statistical Whitening<a hidden class="anchor" aria-hidden="true" href="#scrambling-as-statistical-whitening">#</a></h2>
+<p>A scrambler is <strong>not</strong> a security device — it does not make data unreadable. Its purpose is to impose useful engineering properties on the transmitted bitstream. The process is often called <strong>statistical whitening</strong>: the data stream is mathematically transformed so that it appears statistically random (pseudo-random), even if the original data is highly repetitive.</p>
+<p>The most common implementation uses a <strong>Linear Feedback Shift Register (LFSR)</strong> to generate a Pseudo-Random Binary Sequence (PRBS). The PRBS is XOR&rsquo;d (modulo-2 added) with the original data stream:</p>
+<pre tabindex="0"><code>scrambled[n] = data[n] XOR prbs[n]
+</code></pre><p>At the receiver, a descrambler applies the same PRBS with the same XOR operation to perfectly recover the original data:</p>
+<pre tabindex="0"><code>recovered[n] = scrambled[n] XOR prbs[n] = data[n]
+</code></pre><p>Because the LFSR generates a deterministic sequence, the transmitter and receiver stay synchronized without any extra overhead.</p>
+<h2 id="scrambling-vs-line-coding">Scrambling vs. Line Coding<a hidden class="anchor" aria-hidden="true" href="#scrambling-vs-line-coding">#</a></h2>
+<p>As high-speed standards have evolved, the relationship between scrambling and line coding has changed significantly.</p>
+<p><strong>Older standards (Gen1, Gen2):</strong> 8B/10B encoding maps every 8-bit data byte to a 10-bit symbol, guaranteeing sufficient transitions, DC balance, and bounded run length. Signal integrity is built into the code itself.</p>
+<p><strong>The cost:</strong> 8B/10B imposes a <strong>25% bandwidth overhead</strong> — for every 8 bits of payload, 10 bits must be transmitted. At speeds above 1 Gbps, this overhead significantly reduces effective throughput.</p>
+<p><strong>Modern standards (PCIe Gen3+, USB 3.x, Ethernet 25G+):</strong> 8B/10B is replaced by a combination of scrambling and <strong>128B/130B encoding</strong>. The overhead drops to just 2/130 ≈ <strong>1.56%</strong>, while the scrambler ensures the statistical randomness that 8B/10B achieved through explicit line coding.</p>
+<p>In summary: at multi-gigabit speeds, bandwidth efficiency is paramount, and a scrambler with near-zero overhead has become the primary mechanism for guaranteeing signal randomness.</p>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Concern</th>
+          <th>Without Scrambling</th>
+          <th>With Scrambling</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>CDR lock</td>
+          <td>May lose lock on long runs</td>
+          <td>Stable — transitions always present</td>
+      </tr>
+      <tr>
+          <td>EMI / spectral peaks</td>
+          <td>Problematic spectral spikes</td>
+          <td>Flat PSD, EMI reduced</td>
+      </tr>
+      <tr>
+          <td>Bandwidth overhead</td>
+          <td>0% (but line coding adds 25%)</td>
+          <td>~0% (paired with 128B/130B, ~1.56%)</td>
+      </tr>
+      <tr>
+          <td>Implementation</td>
+          <td>N/A</td>
+          <td>Self-synchronous LFSR, minimal logic</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/high-speed-interface/">High Speed Interface</a></li>
+      <li><a href="https://easyfpga.blog/tags/scrambler/">Scrambler</a></li>
+      <li><a href="https://easyfpga.blog/tags/lfsr/">LFSR</a></li>
+      <li><a href="https://easyfpga.blog/tags/cdr/">CDR</a></li>
+      <li><a href="https://easyfpga.blog/tags/emi/">EMI</a></li>
+      <li><a href="https://easyfpga.blog/tags/serdes/">SerDes</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>FPGA Price Surge: Design Challenges and Alternative Strategies</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/line-coding-8b-10b/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Line Coding (8B/10B)</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

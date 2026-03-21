@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Categories on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/</link>
+    <description>Recent content in Categories on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High Speed Interface</title>
+      <link>https://easyfpga.blog/categories/high-speed-interface/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/categories/high-speed-interface/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>UART</title>
+      <link>https://easyfpga.blog/categories/uart/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/categories/uart/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA</title>
+      <link>https://easyfpga.blog/categories/fpga/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/fpga/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RTL Design</title>
+      <link>https://easyfpga.blog/categories/rtl-design/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/rtl-design/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA Design Tips</title>
+      <link>https://easyfpga.blog/categories/fpga-design-tips/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/fpga-design-tips/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA Basics</title>
+      <link>https://easyfpga.blog/categories/fpga-basics/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/fpga-basics/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA Design</title>
+      <link>https://easyfpga.blog/categories/fpga-design/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/fpga-design/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CNN on FPGA</title>
+      <link>https://easyfpga.blog/categories/cnn-on-fpga/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/cnn-on-fpga/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ethernet &amp; Networking</title>
+      <link>https://easyfpga.blog/categories/ethernet--networking/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/categories/ethernet--networking/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

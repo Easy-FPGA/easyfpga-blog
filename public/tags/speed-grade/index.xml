@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Speed Grade on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/speed-grade/</link>
+    <description>Recent content in Speed Grade on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 17 Jan 2026 00:06:06 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/speed-grade/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades</title>
+      <link>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</guid>
+      <description>What speed grade, temperature range, and reliability grade mean when selecting an AMD/Xilinx FPGA, and how to read the part number.</description>
+    </item>
+  </channel>
+</rss>

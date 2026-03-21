@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Optimize on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/optimize/</link>
+    <description>Recent content in Optimize on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 19 Feb 2026 00:47:21 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/optimize/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development</title>
+      <link>https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/</guid>
+      <description>Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.</description>
+    </item>
+  </channel>
+</rss>

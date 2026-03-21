@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>MicroBlaze: Soft-Core Processor on FPGA | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, MicroBlaze, AXI, Xilinx, EasyFPGA">
+<meta name="description" content="MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep9/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep9/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep9/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="MicroBlaze: Soft-Core Processor on FPGA">
+  <meta property="og:description" content="MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-24T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-24T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="MicroBlaze">
+    <meta property="article:tag" content="AXI">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep15/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep14/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep13/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep12/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep11/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep10/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="MicroBlaze: Soft-Core Processor on FPGA">
+  <meta name="twitter:description" content="MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "MicroBlaze: Soft-Core Processor on FPGA",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep9/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MicroBlaze: Soft-Core Processor on FPGA",
+  "name": "MicroBlaze: Soft-Core Processor on FPGA",
+  "description": "MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow.",
+  "keywords": [
+    "FPGA", "UART", "MicroBlaze", "AXI", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "MicroBlaze: Soft-Core Processor on FPGA Episodes 5–8 showed UART implemented entirely in hardware. In Episodes 9–14, we take the alternative approach: a soft-core processor (MicroBlaze) drives the UART by writing C code to a register-mapped IP core. This is not just an academic exercise — soft-core processor designs appear frequently in production FPGA systems where control logic is complex enough to benefit from software expressibility and iterability.\nWhat is MicroBlaze? MicroBlaze is a configurable 32-bit RISC soft-core processor from Xilinx/AMD.\nFeature Description Type Soft-core — implemented in FPGA fabric (LUT/FF) Architecture 32-bit RISC, Harvard architecture Bus Interface AXI4 (data/instruction), AXI4-Lite (peripherals) Memory BRAM (Block RAM) for instruction and data Development C/C++ code in AMD Vitis IDE OS Support Bare-metal or FreeRTOS MicroBlaze delivers embedded CPU capability without a dedicated processor chip. The entire CPU — ALU, register file, instruction decoder, pipeline — is synthesized from FPGA LUTs and flip-flops, just like any other digital logic.\nSoft-Core vs Hard-Core Processor Item Soft-Core (MicroBlaze) Hard-Core (Zynq PS ARM) Implementation FPGA LUT/FF fabric Dedicated silicon Flexibility Fully configurable Fixed architecture Performance Lower (fabric limited) Higher (dedicated HW) Resource Cost ~800 LUTs (minimal config) Fixed silicon area Availability Any Xilinx FPGA Zynq / Zynq UltraScale only Use Case Moderate control, education High-performance embedded When to choose MicroBlaze: If your design needs a processor but you are using a non-Zynq FPGA (Artix-7, Kintex-7, UltraScale), MicroBlaze is the only option from Xilinx. For Zynq devices, the ARM hard-core (PS) is usually preferred for performance — but MicroBlaze remains useful for separate, deterministic real-time tasks that must not share an OS with general-purpose code.\nMicroBlaze Design Flow Vivado (Hardware Design)\r1. Create Block Design\r2. Add MicroBlaze IP\r3. Run Block Automation (adds BRAM, debug module, reset)\r4. Add AXI peripherals (UART Lite, GPIO, etc.)\r5. Run Connection Automation\r6. Synthesize → Implement → Bitstream\r7. Export Hardware (.xsa) — include bitstream\rVitis (Software Development)\r8. Create Platform from .xsa\r9. Create Application Project (C/C++)\r10. Write application code (XUartLite_* APIs)\r11. Build → Launch on Hardware\r12. Debug via JTAG The division between Vivado (hardware) and Vitis (software) mirrors the boundary between hardware description and C programming. The .xsa file is the handoff point — it contains the hardware memory map that Vitis uses to generate a Board Support Package (BSP) with correct base addresses.\nAXI4-Lite Interface MicroBlaze communicates with peripherals via AXI4-Lite — a simplified memory-mapped register interface.\nMicroBlaze CPU\r│\r├──AXI4-Lite Master Bus──► AXI UART Lite (0x4060_0000)\r│ ► AXI GPIO (0x4000_0000)\r│ ► AXI Timer (0x4182_0000)\r│\r└──AXI4 (instruction)───► AXI BRAM Ctrl (0x0000_0000) Address Map (example) Peripheral Base Address AXI BRAM (instruction/data) 0x0000_0000 AXI UART Lite 0x4060_0000 AXI GPIO 0x4000_0000 C-to-Hardware Execution Model C code (Vitis)\rprintf(\"Hello UART\\n\");\r│\r▼\rVitis BSP (Board Support Package)\rXUartLite_SendByte(UART_BASEADDR, ch);\r│\r▼\rMicroBlaze CPU\rSW instruction → AXI4-Lite write to UART TX_FIFO register\r│\r▼\rAXI UART Lite IP → drives uart_tx pin → Physical UART signal The BSP (xparameters.h) defines peripheral base addresses so C code is portable across hardware revisions. This is the same abstraction layer as a UART driver in Linux or an RTOS — just at bare-metal level with no OS abstraction between the C code and the register writes.\nWhy Use MicroBlaze + UART? Scenario Benefit Complex protocol logic Move state machine to software — easier to iterate Configuration at runtime Change baud rate, parity via register writes Multi-peripheral system AXI interconnect ties everything together Printf debugging Route stdout to UART — the easiest debug channel RTOS tasks FreeRTOS handles concurrency above the hardware Episode 9 Summary MicroBlaze = 32-bit RISC soft-core synthesized in FPGA fabric AXI4-Lite = lightweight memory-mapped bus for peripheral access Design flow: Vivado (HW) → export .xsa → Vitis (SW) BSP abstracts register addresses — C code uses library functions Best for: moderate control tasks, education, multi-peripheral systems Next Episode Episode 10: AXI UART Lite IP Register map, UART Lite vs 16550, IP configuration, and C driver patterns\nKey Takeaways MicroBlaze is a soft-core processor synthesized entirely in FPGA fabric; its performance is limited by LUT propagation delay, but it is available on any Xilinx FPGA regardless of device family AXI4-Lite connects the CPU to peripherals through a memory-mapped register bus; a C write instruction translates to an AXI address + data transaction on the bus The .xsa file is the handoff between Vivado (hardware) and Vitis (software); it contains the memory map that drives BSP generation and populates xparameters.h Choosing MicroBlaze trades FPGA resources (≥800 LUTs + BRAM) for the ability to update logic by recompiling C code rather than re-synthesizing HDL Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "775",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-24T12:00:00+09:00",
+  "dateModified": "2026-03-24T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep9/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      MicroBlaze: Soft-Core Processor on FPGA
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-description">
+      MicroBlaze architecture for FPGA engineers: soft-core vs hard-core comparison, AXI4-Lite peripheral bus, C-to-hardware execution model, and the Vivado-to-Vitis design flow.
+    </div>
+    <div class="post-meta"><span title='2026-03-24 12:00:00 +0900 KST'>March 24, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#microblaze-soft-core-processor-on-fpga" aria-label="MicroBlaze: Soft-Core Processor on FPGA">MicroBlaze: Soft-Core Processor on FPGA</a><ul>
+                        
+                <li>
+                    <a href="#what-is-microblaze" aria-label="What is MicroBlaze?">What is MicroBlaze?</a></li>
+                <li>
+                    <a href="#soft-core-vs-hard-core-processor" aria-label="Soft-Core vs Hard-Core Processor">Soft-Core vs Hard-Core Processor</a></li>
+                <li>
+                    <a href="#microblaze-design-flow" aria-label="MicroBlaze Design Flow">MicroBlaze Design Flow</a></li>
+                <li>
+                    <a href="#axi4-lite-interface" aria-label="AXI4-Lite Interface">AXI4-Lite Interface</a><ul>
+                        
+                <li>
+                    <a href="#address-map-example" aria-label="Address Map (example)">Address Map (example)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#c-to-hardware-execution-model" aria-label="C-to-Hardware Execution Model">C-to-Hardware Execution Model</a></li>
+                <li>
+                    <a href="#why-use-microblaze--uart" aria-label="Why Use MicroBlaze &#43; UART?">Why Use MicroBlaze + UART?</a></li>
+                <li>
+                    <a href="#episode-9-summary" aria-label="Episode 9 Summary">Episode 9 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="microblaze-soft-core-processor-on-fpga">MicroBlaze: Soft-Core Processor on FPGA<a hidden class="anchor" aria-hidden="true" href="#microblaze-soft-core-processor-on-fpga">#</a></h1>
+<p>Episodes 5–8 showed UART implemented entirely in hardware. In Episodes 9–14, we take the alternative approach: a soft-core processor (MicroBlaze) drives the UART by writing C code to a register-mapped IP core. This is not just an academic exercise — soft-core processor designs appear frequently in production FPGA systems where control logic is complex enough to benefit from software expressibility and iterability.</p>
+<h2 id="what-is-microblaze">What is MicroBlaze?<a hidden class="anchor" aria-hidden="true" href="#what-is-microblaze">#</a></h2>
+<p><strong>MicroBlaze</strong> is a configurable 32-bit RISC <strong>soft-core processor</strong> from Xilinx/AMD.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Feature</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Type</strong></td>
+          <td>Soft-core — implemented in FPGA fabric (LUT/FF)</td>
+      </tr>
+      <tr>
+          <td><strong>Architecture</strong></td>
+          <td>32-bit RISC, Harvard architecture</td>
+      </tr>
+      <tr>
+          <td><strong>Bus Interface</strong></td>
+          <td>AXI4 (data/instruction), AXI4-Lite (peripherals)</td>
+      </tr>
+      <tr>
+          <td><strong>Memory</strong></td>
+          <td>BRAM (Block RAM) for instruction and data</td>
+      </tr>
+      <tr>
+          <td><strong>Development</strong></td>
+          <td>C/C++ code in AMD Vitis IDE</td>
+      </tr>
+      <tr>
+          <td><strong>OS Support</strong></td>
+          <td>Bare-metal or FreeRTOS</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>MicroBlaze delivers embedded CPU capability without a dedicated processor chip. The entire CPU — ALU, register file, instruction decoder, pipeline — is synthesized from FPGA LUTs and flip-flops, just like any other digital logic.</p>
+</blockquote>
+<h2 id="soft-core-vs-hard-core-processor">Soft-Core vs Hard-Core Processor<a hidden class="anchor" aria-hidden="true" href="#soft-core-vs-hard-core-processor">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Soft-Core (MicroBlaze)</th>
+          <th>Hard-Core (Zynq PS ARM)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Implementation</strong></td>
+          <td>FPGA LUT/FF fabric</td>
+          <td>Dedicated silicon</td>
+      </tr>
+      <tr>
+          <td><strong>Flexibility</strong></td>
+          <td>Fully configurable</td>
+          <td>Fixed architecture</td>
+      </tr>
+      <tr>
+          <td><strong>Performance</strong></td>
+          <td>Lower (fabric limited)</td>
+          <td>Higher (dedicated HW)</td>
+      </tr>
+      <tr>
+          <td><strong>Resource Cost</strong></td>
+          <td>~800 LUTs (minimal config)</td>
+          <td>Fixed silicon area</td>
+      </tr>
+      <tr>
+          <td><strong>Availability</strong></td>
+          <td>Any Xilinx FPGA</td>
+          <td>Zynq / Zynq UltraScale only</td>
+      </tr>
+      <tr>
+          <td><strong>Use Case</strong></td>
+          <td>Moderate control, education</td>
+          <td>High-performance embedded</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>When to choose MicroBlaze</strong>: If your design needs a processor but you are using a non-Zynq FPGA (Artix-7, Kintex-7, UltraScale), MicroBlaze is the only option from Xilinx. For Zynq devices, the ARM hard-core (PS) is usually preferred for performance — but MicroBlaze remains useful for separate, deterministic real-time tasks that must not share an OS with general-purpose code.</p>
+</blockquote>
+<h2 id="microblaze-design-flow">MicroBlaze Design Flow<a hidden class="anchor" aria-hidden="true" href="#microblaze-design-flow">#</a></h2>
+<pre tabindex="0"><code>Vivado (Hardware Design)
+  1. Create Block Design
+  2. Add MicroBlaze IP
+  3. Run Block Automation (adds BRAM, debug module, reset)
+  4. Add AXI peripherals (UART Lite, GPIO, etc.)
+  5. Run Connection Automation
+  6. Synthesize → Implement → Bitstream
+  7. Export Hardware (.xsa) — include bitstream
+
+Vitis (Software Development)
+  8. Create Platform from .xsa
+  9. Create Application Project (C/C++)
+  10. Write application code (XUartLite_* APIs)
+  11. Build → Launch on Hardware
+  12. Debug via JTAG
+</code></pre><p>The division between Vivado (hardware) and Vitis (software) mirrors the boundary between hardware description and C programming. The <code>.xsa</code> file is the handoff point — it contains the hardware memory map that Vitis uses to generate a Board Support Package (BSP) with correct base addresses.</p>
+<h2 id="axi4-lite-interface">AXI4-Lite Interface<a hidden class="anchor" aria-hidden="true" href="#axi4-lite-interface">#</a></h2>
+<p>MicroBlaze communicates with peripherals via <strong>AXI4-Lite</strong> — a simplified memory-mapped register interface.</p>
+<pre tabindex="0"><code>MicroBlaze CPU
+    │
+    ├──AXI4-Lite Master Bus──►  AXI UART Lite  (0x4060_0000)
+    │                        ►  AXI GPIO       (0x4000_0000)
+    │                        ►  AXI Timer      (0x4182_0000)
+    │
+    └──AXI4 (instruction)───►  AXI BRAM Ctrl  (0x0000_0000)
+</code></pre><h3 id="address-map-example">Address Map (example)<a hidden class="anchor" aria-hidden="true" href="#address-map-example">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Peripheral</th>
+          <th>Base Address</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AXI BRAM (instruction/data)</td>
+          <td>0x0000_0000</td>
+      </tr>
+      <tr>
+          <td>AXI UART Lite</td>
+          <td>0x4060_0000</td>
+      </tr>
+      <tr>
+          <td>AXI GPIO</td>
+          <td>0x4000_0000</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="c-to-hardware-execution-model">C-to-Hardware Execution Model<a hidden class="anchor" aria-hidden="true" href="#c-to-hardware-execution-model">#</a></h2>
+<pre tabindex="0"><code>C code (Vitis)
+  printf(&#34;Hello UART\n&#34;);
+       │
+       ▼
+Vitis BSP (Board Support Package)
+  XUartLite_SendByte(UART_BASEADDR, ch);
+       │
+       ▼
+MicroBlaze CPU
+  SW instruction → AXI4-Lite write to UART TX_FIFO register
+       │
+       ▼
+AXI UART Lite IP → drives uart_tx pin → Physical UART signal
+</code></pre><p>The BSP (<code>xparameters.h</code>) defines peripheral base addresses so C code is portable across hardware revisions. This is the same abstraction layer as a UART driver in Linux or an RTOS — just at bare-metal level with no OS abstraction between the C code and the register writes.</p>
+<h2 id="why-use-microblaze--uart">Why Use MicroBlaze + UART?<a hidden class="anchor" aria-hidden="true" href="#why-use-microblaze--uart">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Scenario</th>
+          <th>Benefit</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Complex protocol logic</td>
+          <td>Move state machine to software — easier to iterate</td>
+      </tr>
+      <tr>
+          <td>Configuration at runtime</td>
+          <td>Change baud rate, parity via register writes</td>
+      </tr>
+      <tr>
+          <td>Multi-peripheral system</td>
+          <td>AXI interconnect ties everything together</td>
+      </tr>
+      <tr>
+          <td>Printf debugging</td>
+          <td>Route stdout to UART — the easiest debug channel</td>
+      </tr>
+      <tr>
+          <td>RTOS tasks</td>
+          <td>FreeRTOS handles concurrency above the hardware</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="episode-9-summary">Episode 9 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-9-summary">#</a></h2>
+<ul>
+<li><strong>MicroBlaze</strong> = 32-bit RISC soft-core synthesized in FPGA fabric</li>
+<li><strong>AXI4-Lite</strong> = lightweight memory-mapped bus for peripheral access</li>
+<li><strong>Design flow</strong>: Vivado (HW) → export .xsa → Vitis (SW)</li>
+<li><strong>BSP</strong> abstracts register addresses — C code uses library functions</li>
+<li>Best for: moderate control tasks, education, multi-peripheral systems</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 10: AXI UART Lite IP</strong>
+Register map, UART Lite vs 16550, IP configuration, and C driver patterns</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>MicroBlaze is a soft-core processor synthesized entirely in FPGA fabric; its performance is limited by LUT propagation delay, but it is available on any Xilinx FPGA regardless of device family</li>
+<li>AXI4-Lite connects the CPU to peripherals through a memory-mapped register bus; a C <code>write</code> instruction translates to an AXI address + data transaction on the bus</li>
+<li>The <code>.xsa</code> file is the handoff between Vivado (hardware) and Vitis (software); it contains the memory map that drives BSP generation and populates <code>xparameters.h</code></li>
+<li>Choosing MicroBlaze trades FPGA resources (≥800 LUTs + BRAM) for the ability to update logic by recompiling C code rather than re-synthesizing HDL</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/microblaze/">MicroBlaze</a></li>
+      <li><a href="https://easyfpga.blog/tags/axi/">AXI</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep10/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>AXI UART Lite IP</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep8/">
+    <span class="title">Next »</span>
+    <br>
+    <span>RTL Design Review &amp; Improvements</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

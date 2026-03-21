@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>MicroBlaze UART — Hardware Test | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, MicroBlaze, Vitis, Xilinx, EasyFPGA">
+<meta name="description" content="Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep14/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep14/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep14/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="MicroBlaze UART — Hardware Test">
+  <meta property="og:description" content="Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-29T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-29T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="MicroBlaze">
+    <meta property="article:tag" content="Vitis">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep15/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep13/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep12/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep11/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep10/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep9/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="MicroBlaze UART — Hardware Test">
+  <meta name="twitter:description" content="Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "MicroBlaze UART — Hardware Test",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep14/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MicroBlaze UART — Hardware Test",
+  "name": "MicroBlaze UART — Hardware Test",
+  "description": "Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough.",
+  "keywords": [
+    "FPGA", "UART", "MicroBlaze", "Vitis", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "MicroBlaze UART — Hardware Test Simulation verified correctness in software cycles. Hardware test reveals what simulation cannot: clock routing, I/O timing, power-on behavior, and physical signal integrity. This episode runs the complete MicroBlaze UART design on a real FPGA board and uses the Vitis debugger to inspect the running application.\nHardware Test Overview Vivado:\rGenerate Bitstream (with .elf embedded in BRAM init)\r│\r▼ .xsa (includes bitstream)\rVitis:\rUpdate Platform (re-import .xsa)\r│\r▼\rRun → Launch on Hardware (JTAG)\r│\r▼ FPGA programmed + ELF loaded into BRAM\rOpen Serial Terminal (115200, 8E1)\r│\r▼\rType characters → verify loopback echo Step 1: Export Hardware with Bitstream Vivado → File → Export → Export Hardware\r☑ Include bitstream\rPath: /design_1_wrapper.xsa\rClick OK Including the bitstream in the .xsa allows Vitis to program the FPGA during “Launch on Hardware” in a single step. Without the bitstream, you must manually open Vivado Hardware Manager, program the FPGA, then return to Vitis. Always include the bitstream.\nStep 2: Update Vitis Platform When the hardware design changes, the platform must be refreshed:\nVitis → Platform Project (platform_0)\rRight-click → Update Hardware Specification\rBrowse to new .xsa file\rClick OK\rThen: Right-click Platform → Build\r(Rebuilds BSP libraries with new hardware) Always rebuild the platform after updating the hardware specification. Skipping this leaves the BSP reflecting the old address map — the application may fail silently, writing to stale addresses. The rebuild also regenerates xparameters.h with any address changes.\nStep 3: Launch on Hardware Vitis → Application Project\rRight-click → Run As → Launch on Hardware (Single Application Debug)\rThis performs:\r1. Programs FPGA with bitstream from .xsa\r2. Downloads .elf to BRAM via JTAG\r3. Releases MicroBlaze reset → CPU begins execution Prerequisites:\nFPGA board connected via USB (JTAG) Xilinx cable drivers installed Board power on Step 4: Serial Terminal Setup Open terminal application (PuTTY / RealTerm / Tera Term):\rPort: COMx (check Device Manager → Ports)\rBaud Rate: 115200\rData Bits: 8\rParity: Even\rStop Bits: 1\rFlow Control: None Verify loopback:\nType any character in the terminal The same character should echo back immediately If printf is enabled: startup log messages appear before the loopback begins Step 5: Vitis Debugger Debug the C application while it runs on real FPGA hardware:\nVitis → Run → Debug As → Launch on Hardware (Single Application Debug)\rIn Debug perspective:\r- Set breakpoints: click left margin of C source line\r- Run: F8 (Resume)\r- Step: F6 (Step Over), F5 (Step Into)\r- Inspect variables: Variables view\r- Memory: Window → Show View → Memory Inspecting AXI UART Registers in Memory View Memory → Add Memory Monitor → Address: 0x40600000\rDisplays: RX_FIFO (0x00), TX_FIFO (0x04), STAT_REG (0x08), CTRL_REG (0x0C) You can watch STAT_REG live: bit[0] (RX_VALID) transitions High when a byte is in the FIFO. This confirms the AXI address mapping is correct and the hardware is responding — the fastest way to rule out an address assignment mismatch.\nRTL Design vs MicroBlaze Comparison Item Custom RTL (EP05–07) MicroBlaze + UART IP (EP09–14) Logic implementation All in Verilog HDL C software + IP core Baud rate change Recompile HDL, re-synthesize Change one constant, recompile C Protocol extension Modify RTL state machine Edit C code Resource usage Very low (~50 LUTs) High (MicroBlaze + BRAM) Latency Cycle-accurate, deterministic Software-dependent Debug ILA waveform Vitis debugger + register view Best for High performance, portability Complex control, rapid SW iteration Troubleshooting Hardware Test Symptom Likely Cause Fix FPGA not programmed JTAG cable/driver issue Check USB cable; reinstall drivers Terminal no output Wrong COM port or baud Verify COMx in Device Manager Garbled characters Parity mismatch Confirm 8E1 on both sides Program crashes BRAM overflow Increase BRAM depth in BD Breakpoint not hit .elf not rebuilt Clean + rebuild application AXI read returns 0 Wrong base address Verify XPAR_UARTLITE_0_BASEADDR Episode 14 Summary Export .xsa with bitstream: enables Vitis to program FPGA directly Update Platform: always update after hardware changes Launch on Hardware: programs FPGA + loads .elf in one step Serial terminal: 115200 8E1, No flow control Vitis Debugger: breakpoints, variable inspection, Memory view for AXI regs RTL vs MB: RTL = performance; MicroBlaze = software flexibility Next Episode Episode 15: Final Recap Two-approach summary, key concepts, what to learn next\nKey Takeaways “Update Hardware Specification” + “Build Platform” in Vitis must follow every Vivado hardware export — skipping leaves the BSP inconsistent with the actual hardware mapping The Vitis Memory view at 0x40600000 displays AXI UART Lite registers live; watching STAT_REG[0] transition is the fastest way to confirm the AXI address mapping is correct in hardware The RTL approach (~50 LUTs) is cycle-accurate and vendor-agnostic; the MicroBlaze approach (800+ LUTs + BRAM) pays in resources for protocol changes via C code edits rather than HDL re-synthesis Launching in Vitis with JTAG debug programs the FPGA, loads the ELF, and releases reset in one action — this is the standard hardware iteration loop for embedded MicroBlaze development Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "837",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-29T12:00:00+09:00",
+  "dateModified": "2026-03-29T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep14/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      MicroBlaze UART — Hardware Test
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-description">
+      Running the MicroBlaze UART design on real FPGA hardware: exporting bitstream, updating the Vitis platform, launching the application via JTAG, terminal verification, and Vitis debugger walkthrough.
+    </div>
+    <div class="post-meta"><span title='2026-03-29 12:00:00 +0900 KST'>March 29, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#microblaze-uart--hardware-test" aria-label="MicroBlaze UART — Hardware Test">MicroBlaze UART — Hardware Test</a><ul>
+                        
+                <li>
+                    <a href="#hardware-test-overview" aria-label="Hardware Test Overview">Hardware Test Overview</a></li>
+                <li>
+                    <a href="#step-1-export-hardware-with-bitstream" aria-label="Step 1: Export Hardware with Bitstream">Step 1: Export Hardware with Bitstream</a></li>
+                <li>
+                    <a href="#step-2-update-vitis-platform" aria-label="Step 2: Update Vitis Platform">Step 2: Update Vitis Platform</a></li>
+                <li>
+                    <a href="#step-3-launch-on-hardware" aria-label="Step 3: Launch on Hardware">Step 3: Launch on Hardware</a></li>
+                <li>
+                    <a href="#step-4-serial-terminal-setup" aria-label="Step 4: Serial Terminal Setup">Step 4: Serial Terminal Setup</a></li>
+                <li>
+                    <a href="#step-5-vitis-debugger" aria-label="Step 5: Vitis Debugger">Step 5: Vitis Debugger</a><ul>
+                        
+                <li>
+                    <a href="#inspecting-axi-uart-registers-in-memory-view" aria-label="Inspecting AXI UART Registers in Memory View">Inspecting AXI UART Registers in Memory View</a></li></ul>
+                </li>
+                <li>
+                    <a href="#rtl-design-vs-microblaze-comparison" aria-label="RTL Design vs MicroBlaze Comparison">RTL Design vs MicroBlaze Comparison</a></li>
+                <li>
+                    <a href="#troubleshooting-hardware-test" aria-label="Troubleshooting Hardware Test">Troubleshooting Hardware Test</a></li>
+                <li>
+                    <a href="#episode-14-summary" aria-label="Episode 14 Summary">Episode 14 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="microblaze-uart--hardware-test">MicroBlaze UART — Hardware Test<a hidden class="anchor" aria-hidden="true" href="#microblaze-uart--hardware-test">#</a></h1>
+<p>Simulation verified correctness in software cycles. Hardware test reveals what simulation cannot: clock routing, I/O timing, power-on behavior, and physical signal integrity. This episode runs the complete MicroBlaze UART design on a real FPGA board and uses the Vitis debugger to inspect the running application.</p>
+<h2 id="hardware-test-overview">Hardware Test Overview<a hidden class="anchor" aria-hidden="true" href="#hardware-test-overview">#</a></h2>
+<pre tabindex="0"><code>Vivado:
+  Generate Bitstream (with .elf embedded in BRAM init)
+         │
+         ▼ .xsa (includes bitstream)
+Vitis:
+  Update Platform (re-import .xsa)
+         │
+         ▼
+  Run → Launch on Hardware (JTAG)
+         │
+         ▼  FPGA programmed + ELF loaded into BRAM
+  Open Serial Terminal (115200, 8E1)
+         │
+         ▼
+  Type characters → verify loopback echo
+</code></pre><h2 id="step-1-export-hardware-with-bitstream">Step 1: Export Hardware with Bitstream<a hidden class="anchor" aria-hidden="true" href="#step-1-export-hardware-with-bitstream">#</a></h2>
+<pre tabindex="0"><code>Vivado → File → Export → Export Hardware
+  ☑ Include bitstream
+  Path: &lt;project&gt;/design_1_wrapper.xsa
+Click OK
+</code></pre><blockquote>
+<p>Including the bitstream in the <code>.xsa</code> allows Vitis to program the FPGA during &ldquo;Launch on Hardware&rdquo; in a single step. Without the bitstream, you must manually open Vivado Hardware Manager, program the FPGA, then return to Vitis. Always include the bitstream.</p>
+</blockquote>
+<h2 id="step-2-update-vitis-platform">Step 2: Update Vitis Platform<a hidden class="anchor" aria-hidden="true" href="#step-2-update-vitis-platform">#</a></h2>
+<p>When the hardware design changes, the platform must be refreshed:</p>
+<pre tabindex="0"><code>Vitis → Platform Project (platform_0)
+  Right-click → Update Hardware Specification
+  Browse to new .xsa file
+  Click OK
+
+Then: Right-click Platform → Build
+(Rebuilds BSP libraries with new hardware)
+</code></pre><blockquote>
+<p><strong>Always rebuild the platform after updating the hardware specification.</strong> Skipping this leaves the BSP reflecting the old address map — the application may fail silently, writing to stale addresses. The rebuild also regenerates <code>xparameters.h</code> with any address changes.</p>
+</blockquote>
+<h2 id="step-3-launch-on-hardware">Step 3: Launch on Hardware<a hidden class="anchor" aria-hidden="true" href="#step-3-launch-on-hardware">#</a></h2>
+<pre tabindex="0"><code>Vitis → Application Project
+  Right-click → Run As → Launch on Hardware (Single Application Debug)
+
+This performs:
+  1. Programs FPGA with bitstream from .xsa
+  2. Downloads .elf to BRAM via JTAG
+  3. Releases MicroBlaze reset → CPU begins execution
+</code></pre><p><strong>Prerequisites:</strong></p>
+<ul>
+<li>FPGA board connected via USB (JTAG)</li>
+<li>Xilinx cable drivers installed</li>
+<li>Board power on</li>
+</ul>
+<h2 id="step-4-serial-terminal-setup">Step 4: Serial Terminal Setup<a hidden class="anchor" aria-hidden="true" href="#step-4-serial-terminal-setup">#</a></h2>
+<pre tabindex="0"><code>Open terminal application (PuTTY / RealTerm / Tera Term):
+  Port:         COMx  (check Device Manager → Ports)
+  Baud Rate:    115200
+  Data Bits:    8
+  Parity:       Even
+  Stop Bits:    1
+  Flow Control: None
+</code></pre><p><strong>Verify loopback:</strong></p>
+<ul>
+<li>Type any character in the terminal</li>
+<li>The same character should echo back immediately</li>
+<li>If <code>printf</code> is enabled: startup log messages appear before the loopback begins</li>
+</ul>
+<h2 id="step-5-vitis-debugger">Step 5: Vitis Debugger<a hidden class="anchor" aria-hidden="true" href="#step-5-vitis-debugger">#</a></h2>
+<p>Debug the C application while it runs on real FPGA hardware:</p>
+<pre tabindex="0"><code>Vitis → Run → Debug As → Launch on Hardware (Single Application Debug)
+
+In Debug perspective:
+  - Set breakpoints: click left margin of C source line
+  - Run: F8 (Resume)
+  - Step: F6 (Step Over), F5 (Step Into)
+  - Inspect variables: Variables view
+  - Memory: Window → Show View → Memory
+</code></pre><h3 id="inspecting-axi-uart-registers-in-memory-view">Inspecting AXI UART Registers in Memory View<a hidden class="anchor" aria-hidden="true" href="#inspecting-axi-uart-registers-in-memory-view">#</a></h3>
+<pre tabindex="0"><code>Memory → Add Memory Monitor → Address: 0x40600000
+Displays: RX_FIFO (0x00), TX_FIFO (0x04), STAT_REG (0x08), CTRL_REG (0x0C)
+</code></pre><p>You can watch <code>STAT_REG</code> live: bit[0] (<code>RX_VALID</code>) transitions High when a byte is in the FIFO. This confirms the AXI address mapping is correct and the hardware is responding — the fastest way to rule out an address assignment mismatch.</p>
+<h2 id="rtl-design-vs-microblaze-comparison">RTL Design vs MicroBlaze Comparison<a hidden class="anchor" aria-hidden="true" href="#rtl-design-vs-microblaze-comparison">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Custom RTL (EP05–07)</th>
+          <th>MicroBlaze + UART IP (EP09–14)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Logic implementation</strong></td>
+          <td>All in Verilog HDL</td>
+          <td>C software + IP core</td>
+      </tr>
+      <tr>
+          <td><strong>Baud rate change</strong></td>
+          <td>Recompile HDL, re-synthesize</td>
+          <td>Change one constant, recompile C</td>
+      </tr>
+      <tr>
+          <td><strong>Protocol extension</strong></td>
+          <td>Modify RTL state machine</td>
+          <td>Edit C code</td>
+      </tr>
+      <tr>
+          <td><strong>Resource usage</strong></td>
+          <td>Very low (~50 LUTs)</td>
+          <td>High (MicroBlaze + BRAM)</td>
+      </tr>
+      <tr>
+          <td><strong>Latency</strong></td>
+          <td>Cycle-accurate, deterministic</td>
+          <td>Software-dependent</td>
+      </tr>
+      <tr>
+          <td><strong>Debug</strong></td>
+          <td>ILA waveform</td>
+          <td>Vitis debugger + register view</td>
+      </tr>
+      <tr>
+          <td><strong>Best for</strong></td>
+          <td>High performance, portability</td>
+          <td>Complex control, rapid SW iteration</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="troubleshooting-hardware-test">Troubleshooting Hardware Test<a hidden class="anchor" aria-hidden="true" href="#troubleshooting-hardware-test">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Symptom</th>
+          <th>Likely Cause</th>
+          <th>Fix</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>FPGA not programmed</td>
+          <td>JTAG cable/driver issue</td>
+          <td>Check USB cable; reinstall drivers</td>
+      </tr>
+      <tr>
+          <td>Terminal no output</td>
+          <td>Wrong COM port or baud</td>
+          <td>Verify COMx in Device Manager</td>
+      </tr>
+      <tr>
+          <td>Garbled characters</td>
+          <td>Parity mismatch</td>
+          <td>Confirm 8E1 on both sides</td>
+      </tr>
+      <tr>
+          <td>Program crashes</td>
+          <td>BRAM overflow</td>
+          <td>Increase BRAM depth in BD</td>
+      </tr>
+      <tr>
+          <td>Breakpoint not hit</td>
+          <td>.elf not rebuilt</td>
+          <td>Clean + rebuild application</td>
+      </tr>
+      <tr>
+          <td>AXI read returns 0</td>
+          <td>Wrong base address</td>
+          <td>Verify <code>XPAR_UARTLITE_0_BASEADDR</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="episode-14-summary">Episode 14 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-14-summary">#</a></h2>
+<ul>
+<li><strong>Export .xsa with bitstream</strong>: enables Vitis to program FPGA directly</li>
+<li><strong>Update Platform</strong>: always update after hardware changes</li>
+<li><strong>Launch on Hardware</strong>: programs FPGA + loads .elf in one step</li>
+<li><strong>Serial terminal</strong>: 115200 8E1, No flow control</li>
+<li><strong>Vitis Debugger</strong>: breakpoints, variable inspection, Memory view for AXI regs</li>
+<li><strong>RTL vs MB</strong>: RTL = performance; MicroBlaze = software flexibility</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 15: Final Recap</strong>
+Two-approach summary, key concepts, what to learn next</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>&ldquo;Update Hardware Specification&rdquo; + &ldquo;Build Platform&rdquo; in Vitis must follow every Vivado hardware export — skipping leaves the BSP inconsistent with the actual hardware mapping</li>
+<li>The Vitis Memory view at <code>0x40600000</code> displays AXI UART Lite registers live; watching <code>STAT_REG[0]</code> transition is the fastest way to confirm the AXI address mapping is correct in hardware</li>
+<li>The RTL approach (~50 LUTs) is cycle-accurate and vendor-agnostic; the MicroBlaze approach (800+ LUTs + BRAM) pays in resources for protocol changes via C code edits rather than HDL re-synthesis</li>
+<li>Launching in Vitis with JTAG debug programs the FPGA, loads the ELF, and releases reset in one action — this is the standard hardware iteration loop for embedded MicroBlaze development</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/microblaze/">MicroBlaze</a></li>
+      <li><a href="https://easyfpga.blog/tags/vitis/">Vitis</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep15/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Final Recap — UART on FPGA</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep13/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Co-Simulation</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

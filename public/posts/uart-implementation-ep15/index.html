@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Final Recap — UART on FPGA | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, MicroBlaze, AXI, Xilinx, EasyFPGA">
+<meta name="description" content="Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep15/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep15/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep15/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Final Recap — UART on FPGA">
+  <meta property="og:description" content="Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-30T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-30T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="MicroBlaze">
+    <meta property="article:tag" content="AXI">
+    <meta property="article:tag" content="Xilinx">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep14/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep13/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep12/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep11/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep10/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep9/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Final Recap — UART on FPGA">
+  <meta name="twitter:description" content="Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Final Recap — UART on FPGA",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep15/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Final Recap — UART on FPGA",
+  "name": "Final Recap — UART on FPGA",
+  "description": "Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "MicroBlaze", "AXI", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "Final Recap — UART on FPGA You have now implemented UART on FPGA in two fundamentally different ways — as pure RTL hardware, and as software running on a soft-core processor. This final episode consolidates the most important concepts from all 15 episodes and maps them to the next topics worth exploring.\nCourse Structure Overview Episode Topic Approach 01 What is UART? Fundamentals 02 Frame Format Fundamentals 03 RS-232 \u0026 RS-485 Fundamentals 04 Implementation Methods Overview 05 Custom RTL Design RTL 06 Top Module Integration RTL 07 FPGA Implementation \u0026 Test RTL 08 RTL Review \u0026 Improvements RTL 09 MicroBlaze Architecture MicroBlaze 10 AXI UART Lite IP MicroBlaze 11 Block Design Construction MicroBlaze 12 Vitis C Code MicroBlaze 13 Co-Simulation MicroBlaze 14 Hardware Test MicroBlaze 15 Final Recap Summary Approach 1 — Custom RTL (Episodes 5–8) Implement UART entirely in Verilog/SystemVerilog\nWhat You Built baud_gen: CLK_FREQ / BAUD_RATE integer division → one-cycle baud_tick pulse uart_tx: FSM (IDLE→START→DATA→PARITY→STOP), LSB-first, even parity via ^data uart_rx: Start Bit edge detection, half-period wait, center sampling, parity and frame error detection uart_top: single integration point with CLK_FREQ/BAUD_RATE parameters EP08 improvements: FIFO buffering, dynamic baud rate, multi-byte framing, break detection, interrupt outputs Key Skills FSM design in SystemVerilog (typedef enum, state register, next-state logic) Clock domain timing and constraint-driven design (.xdc) ILA signal probing with mark_debug attribute Systematic hardware debugging (COM port → baud → ILA waveform) Approach 2 — MicroBlaze + AXI UART Lite (Episodes 9–14) Connect AXI UART IP to a soft-core processor\nWhat You Built Vivado Block Design: MicroBlaze + AXI Interconnect + UART Lite + BRAM Vitis Platform from .xsa + auto-generated BSP (xparameters.h) Loopback C application using XUartLite_* APIs Co-simulation: compiled .elf + RTL UART IP simulated together Hardware test: Launch on Hardware + Vitis Memory view register inspection Key Skills AXI4-Lite peripheral integration via Block Design automation BSP (Board Support Package) architecture and xparameters.h portability Vitis embedded software development and JTAG debugging Hardware/software co-simulation with ELF association Two Approaches — When to Use Which Criteria Custom RTL MicroBlaze + UART IP Protocol complexity Simple, fixed Complex, changeable Timing requirements Strict, cycle-accurate Relaxed, software-managed Resource constraints Very tight (~50 LUTs) Moderate or higher (800+ LUTs + BRAM) Development speed Slower Faster for SW engineers Target platform Any FPGA Xilinx only Learning goal RTL, FSM, timing SoC, AXI, embedded SW Maintenance HDL changes needed Software update only In practice: most production FPGA designs use both approaches — a hard-coded RTL UART for low-level, deterministic communication and a processor-SoC for high-level protocol handling. The boundary is determined by latency requirements and update cadence.\nKey Concepts Consolidated UART Protocol Frame: Start(0) + Data[8] LSB-first + Parity + Stop(1); 11 bits total for 8E1 Baud rate: BAUD_CNT_MAX = CLK_FREQ / BAUD_RATE — integer division is accurate enough within one frame Center sampling: offset = BAUD_CNT_MAX / 2 — maximum margin against clock drift and edge noise Even parity: ^data[7:0] (reduction XOR) — one gate in hardware, one character in Verilog FPGA/RTL Design Clock management: derive baud_tick from the system clock; never use asynchronous logic for baud timing ILA: mark_debug attribute → real-time internal signal probing without stopping the design Parameterization: CLK_FREQ/BAUD_RATE parameters propagated through the hierarchy make the design portable MicroBlaze SoC BSP: xparameters.h maps hardware register addresses to C constants — the .xsa handoff drives this AXI4-Lite: memory-mapped register bus; C write → AXI AWADDR/WDATA transaction → peripheral register Co-simulation: .elf loaded into BRAM simulation model; software and hardware execute in the same simulator Debug: Vitis JTAG debugger + Memory view for AXI register inspection at runtime Learning Roadmap — What’s Next? UART Fundamentals (✓ This course)\r│\r├──► SPI \u0026 I2C on FPGA\r│ (synchronous serial, master/slave, multi-device addressing)\r│\r├──► AXI Bus Deep Dive\r│ (AXI4-Full burst transactions, AXI Stream, AXI DMA)\r│\r├──► Zynq SoC\r│ (ARM hard-core PS + programmable logic PL, unified memory map)\r│\r├──► High-Speed SerDes\r│ (LVDS, PCIe, USB 3.0, JESD204B, 8b10b/64b66b line encoding)\r│\r└──► FPGA DSP\r(FIR filters, FFT, fixed-point arithmetic, IP cores) Resources Resource Link RTL source code https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube channel https://www.youtube.com/@easy-fpga Vivado / Vitis download https://www.xilinx.com/support/download.html MicroBlaze reference UG984 (MicroBlaze Processor Reference Guide) AXI UART Lite product guide PG142 (AXI UART Lite Product Guide) Thank You! What you built in this series:\nA complete custom UART TX/RX core in SystemVerilog — baud generator, TX FSM, center-sampling RX FSM, even parity, frame and parity error detection (~150 lines of synthesizable code) A full MicroBlaze SoC on FPGA with AXI UART Lite, C loopback application, and co-simulation testbench Both designs verified in simulation and tested on real FPGA hardware The most important takeaway: the two approaches are not competing — they complement each other. Understanding how to implement a protocol in RTL gives you the depth to debug it when it fails in a processor-driven system. Understanding how to drive it from C code gives you the flexibility to extend it when specifications change.\nSubscribe at https://www.youtube.com/@easy-fpga for more FPGA tutorials.\nKey Takeaways UART is a foundation protocol — the frame format, baud timing, and error detection patterns here reappear in SPI, I²C, and more complex serial standards; the mental model transfers Custom RTL (EP05–08): baud_gen + uart_tx FSM + uart_rx center sampling is the complete minimal UART in roughly 150 lines of SystemVerilog — know every line MicroBlaze (EP09–14): Block Design + Vitis C code is the complete minimal SoC — the .xsa handoff and BSP generation are the workflow patterns you will repeat for every AXI peripheral you add Next steps: SPI and I²C extend the same RTL concepts to synchronous protocols; AXI Bus Deep Dive extends the MicroBlaze patterns to high-performance burst transfers Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "951",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-30T12:00:00+09:00",
+  "dateModified": "2026-03-30T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep15/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Final Recap — UART on FPGA
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-description">
+      Complete course recap: custom RTL vs MicroBlaze approaches compared side by side, key UART, FPGA, and AXI concepts consolidated, and a learning roadmap for the next topics.
+    </div>
+    <div class="post-meta"><span title='2026-03-30 12:00:00 +0900 KST'>March 30, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#final-recap--uart-on-fpga" aria-label="Final Recap — UART on FPGA">Final Recap — UART on FPGA</a><ul>
+                        
+                <li>
+                    <a href="#course-structure-overview" aria-label="Course Structure Overview">Course Structure Overview</a></li>
+                <li>
+                    <a href="#approach-1--custom-rtl-episodes-58" aria-label="Approach 1 — Custom RTL (Episodes 5–8)">Approach 1 — Custom RTL (Episodes 5–8)</a><ul>
+                        
+                <li>
+                    <a href="#what-you-built" aria-label="What You Built">What You Built</a></li>
+                <li>
+                    <a href="#key-skills" aria-label="Key Skills">Key Skills</a></li></ul>
+                </li>
+                <li>
+                    <a href="#approach-2--microblaze--axi-uart-lite-episodes-914" aria-label="Approach 2 — MicroBlaze &#43; AXI UART Lite (Episodes 9–14)">Approach 2 — MicroBlaze + AXI UART Lite (Episodes 9–14)</a><ul>
+                        
+                <li>
+                    <a href="#what-you-built-1" aria-label="What You Built">What You Built</a></li>
+                <li>
+                    <a href="#key-skills-1" aria-label="Key Skills">Key Skills</a></li></ul>
+                </li>
+                <li>
+                    <a href="#two-approaches--when-to-use-which" aria-label="Two Approaches — When to Use Which">Two Approaches — When to Use Which</a></li>
+                <li>
+                    <a href="#key-concepts-consolidated" aria-label="Key Concepts Consolidated">Key Concepts Consolidated</a><ul>
+                        
+                <li>
+                    <a href="#uart-protocol" aria-label="UART Protocol">UART Protocol</a></li>
+                <li>
+                    <a href="#fpgartl-design" aria-label="FPGA/RTL Design">FPGA/RTL Design</a></li>
+                <li>
+                    <a href="#microblaze-soc" aria-label="MicroBlaze SoC">MicroBlaze SoC</a></li></ul>
+                </li>
+                <li>
+                    <a href="#learning-roadmap--whats-next" aria-label="Learning Roadmap — What&rsquo;s Next?">Learning Roadmap — What&rsquo;s Next?</a></li>
+                <li>
+                    <a href="#resources" aria-label="Resources">Resources</a></li>
+                <li>
+                    <a href="#thank-you" aria-label="Thank You!">Thank You!</a></li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="final-recap--uart-on-fpga">Final Recap — UART on FPGA<a hidden class="anchor" aria-hidden="true" href="#final-recap--uart-on-fpga">#</a></h1>
+<p>You have now implemented UART on FPGA in two fundamentally different ways — as pure RTL hardware, and as software running on a soft-core processor. This final episode consolidates the most important concepts from all 15 episodes and maps them to the next topics worth exploring.</p>
+<h2 id="course-structure-overview">Course Structure Overview<a hidden class="anchor" aria-hidden="true" href="#course-structure-overview">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Episode</th>
+          <th>Topic</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>01</strong></td>
+          <td>What is UART?</td>
+          <td>Fundamentals</td>
+      </tr>
+      <tr>
+          <td><strong>02</strong></td>
+          <td>Frame Format</td>
+          <td>Fundamentals</td>
+      </tr>
+      <tr>
+          <td><strong>03</strong></td>
+          <td>RS-232 &amp; RS-485</td>
+          <td>Fundamentals</td>
+      </tr>
+      <tr>
+          <td><strong>04</strong></td>
+          <td>Implementation Methods</td>
+          <td>Overview</td>
+      </tr>
+      <tr>
+          <td><strong>05</strong></td>
+          <td>Custom RTL Design</td>
+          <td>RTL</td>
+      </tr>
+      <tr>
+          <td><strong>06</strong></td>
+          <td>Top Module Integration</td>
+          <td>RTL</td>
+      </tr>
+      <tr>
+          <td><strong>07</strong></td>
+          <td>FPGA Implementation &amp; Test</td>
+          <td>RTL</td>
+      </tr>
+      <tr>
+          <td><strong>08</strong></td>
+          <td>RTL Review &amp; Improvements</td>
+          <td>RTL</td>
+      </tr>
+      <tr>
+          <td><strong>09</strong></td>
+          <td>MicroBlaze Architecture</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>10</strong></td>
+          <td>AXI UART Lite IP</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>11</strong></td>
+          <td>Block Design Construction</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>12</strong></td>
+          <td>Vitis C Code</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>13</strong></td>
+          <td>Co-Simulation</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>14</strong></td>
+          <td>Hardware Test</td>
+          <td>MicroBlaze</td>
+      </tr>
+      <tr>
+          <td><strong>15</strong></td>
+          <td>Final Recap</td>
+          <td>Summary</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="approach-1--custom-rtl-episodes-58">Approach 1 — Custom RTL (Episodes 5–8)<a hidden class="anchor" aria-hidden="true" href="#approach-1--custom-rtl-episodes-58">#</a></h2>
+<p><strong>Implement UART entirely in Verilog/SystemVerilog</strong></p>
+<h3 id="what-you-built">What You Built<a hidden class="anchor" aria-hidden="true" href="#what-you-built">#</a></h3>
+<ul>
+<li><code>baud_gen</code>: <code>CLK_FREQ / BAUD_RATE</code> integer division → one-cycle <code>baud_tick</code> pulse</li>
+<li><code>uart_tx</code>: FSM (IDLE→START→DATA→PARITY→STOP), LSB-first, even parity via <code>^data</code></li>
+<li><code>uart_rx</code>: Start Bit edge detection, half-period wait, center sampling, parity and frame error detection</li>
+<li><code>uart_top</code>: single integration point with <code>CLK_FREQ</code>/<code>BAUD_RATE</code> parameters</li>
+<li>EP08 improvements: FIFO buffering, dynamic baud rate, multi-byte framing, break detection, interrupt outputs</li>
+</ul>
+<h3 id="key-skills">Key Skills<a hidden class="anchor" aria-hidden="true" href="#key-skills">#</a></h3>
+<ul>
+<li>FSM design in SystemVerilog (<code>typedef enum</code>, state register, next-state logic)</li>
+<li>Clock domain timing and constraint-driven design (<code>.xdc</code>)</li>
+<li>ILA signal probing with <code>mark_debug</code> attribute</li>
+<li>Systematic hardware debugging (COM port → baud → ILA waveform)</li>
+</ul>
+<h2 id="approach-2--microblaze--axi-uart-lite-episodes-914">Approach 2 — MicroBlaze + AXI UART Lite (Episodes 9–14)<a hidden class="anchor" aria-hidden="true" href="#approach-2--microblaze--axi-uart-lite-episodes-914">#</a></h2>
+<p><strong>Connect AXI UART IP to a soft-core processor</strong></p>
+<h3 id="what-you-built-1">What You Built<a hidden class="anchor" aria-hidden="true" href="#what-you-built-1">#</a></h3>
+<ul>
+<li>Vivado Block Design: MicroBlaze + AXI Interconnect + UART Lite + BRAM</li>
+<li>Vitis Platform from <code>.xsa</code> + auto-generated BSP (<code>xparameters.h</code>)</li>
+<li>Loopback C application using <code>XUartLite_*</code> APIs</li>
+<li>Co-simulation: compiled <code>.elf</code> + RTL UART IP simulated together</li>
+<li>Hardware test: Launch on Hardware + Vitis Memory view register inspection</li>
+</ul>
+<h3 id="key-skills-1">Key Skills<a hidden class="anchor" aria-hidden="true" href="#key-skills-1">#</a></h3>
+<ul>
+<li>AXI4-Lite peripheral integration via Block Design automation</li>
+<li>BSP (Board Support Package) architecture and <code>xparameters.h</code> portability</li>
+<li>Vitis embedded software development and JTAG debugging</li>
+<li>Hardware/software co-simulation with ELF association</li>
+</ul>
+<h2 id="two-approaches--when-to-use-which">Two Approaches — When to Use Which<a hidden class="anchor" aria-hidden="true" href="#two-approaches--when-to-use-which">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Criteria</th>
+          <th>Custom RTL</th>
+          <th>MicroBlaze + UART IP</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Protocol complexity</strong></td>
+          <td>Simple, fixed</td>
+          <td>Complex, changeable</td>
+      </tr>
+      <tr>
+          <td><strong>Timing requirements</strong></td>
+          <td>Strict, cycle-accurate</td>
+          <td>Relaxed, software-managed</td>
+      </tr>
+      <tr>
+          <td><strong>Resource constraints</strong></td>
+          <td>Very tight (~50 LUTs)</td>
+          <td>Moderate or higher (800+ LUTs + BRAM)</td>
+      </tr>
+      <tr>
+          <td><strong>Development speed</strong></td>
+          <td>Slower</td>
+          <td>Faster for SW engineers</td>
+      </tr>
+      <tr>
+          <td><strong>Target platform</strong></td>
+          <td>Any FPGA</td>
+          <td>Xilinx only</td>
+      </tr>
+      <tr>
+          <td><strong>Learning goal</strong></td>
+          <td>RTL, FSM, timing</td>
+          <td>SoC, AXI, embedded SW</td>
+      </tr>
+      <tr>
+          <td><strong>Maintenance</strong></td>
+          <td>HDL changes needed</td>
+          <td>Software update only</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>In practice</strong>: most production FPGA designs use both approaches — a hard-coded RTL UART for low-level, deterministic communication and a processor-SoC for high-level protocol handling. The boundary is determined by latency requirements and update cadence.</p>
+</blockquote>
+<h2 id="key-concepts-consolidated">Key Concepts Consolidated<a hidden class="anchor" aria-hidden="true" href="#key-concepts-consolidated">#</a></h2>
+<h3 id="uart-protocol">UART Protocol<a hidden class="anchor" aria-hidden="true" href="#uart-protocol">#</a></h3>
+<ul>
+<li><strong>Frame</strong>: Start(0) + Data[8] LSB-first + Parity + Stop(1); 11 bits total for 8E1</li>
+<li><strong>Baud rate</strong>: <code>BAUD_CNT_MAX = CLK_FREQ / BAUD_RATE</code> — integer division is accurate enough within one frame</li>
+<li><strong>Center sampling</strong>: offset = <code>BAUD_CNT_MAX / 2</code> — maximum margin against clock drift and edge noise</li>
+<li><strong>Even parity</strong>: <code>^data[7:0]</code> (reduction XOR) — one gate in hardware, one character in Verilog</li>
+</ul>
+<h3 id="fpgartl-design">FPGA/RTL Design<a hidden class="anchor" aria-hidden="true" href="#fpgartl-design">#</a></h3>
+<ul>
+<li><strong>Clock management</strong>: derive <code>baud_tick</code> from the system clock; never use asynchronous logic for baud timing</li>
+<li><strong>ILA</strong>: <code>mark_debug</code> attribute → real-time internal signal probing without stopping the design</li>
+<li><strong>Parameterization</strong>: <code>CLK_FREQ</code>/<code>BAUD_RATE</code> parameters propagated through the hierarchy make the design portable</li>
+</ul>
+<h3 id="microblaze-soc">MicroBlaze SoC<a hidden class="anchor" aria-hidden="true" href="#microblaze-soc">#</a></h3>
+<ul>
+<li><strong>BSP</strong>: <code>xparameters.h</code> maps hardware register addresses to C constants — the <code>.xsa</code> handoff drives this</li>
+<li><strong>AXI4-Lite</strong>: memory-mapped register bus; C <code>write</code> → AXI AWADDR/WDATA transaction → peripheral register</li>
+<li><strong>Co-simulation</strong>: <code>.elf</code> loaded into BRAM simulation model; software and hardware execute in the same simulator</li>
+<li><strong>Debug</strong>: Vitis JTAG debugger + Memory view for AXI register inspection at runtime</li>
+</ul>
+<h2 id="learning-roadmap--whats-next">Learning Roadmap — What&rsquo;s Next?<a hidden class="anchor" aria-hidden="true" href="#learning-roadmap--whats-next">#</a></h2>
+<pre tabindex="0"><code>UART Fundamentals (✓ This course)
+      │
+      ├──► SPI &amp; I2C on FPGA
+      │     (synchronous serial, master/slave, multi-device addressing)
+      │
+      ├──► AXI Bus Deep Dive
+      │     (AXI4-Full burst transactions, AXI Stream, AXI DMA)
+      │
+      ├──► Zynq SoC
+      │     (ARM hard-core PS + programmable logic PL, unified memory map)
+      │
+      ├──► High-Speed SerDes
+      │     (LVDS, PCIe, USB 3.0, JESD204B, 8b10b/64b66b line encoding)
+      │
+      └──► FPGA DSP
+            (FIR filters, FFT, fixed-point arithmetic, IP cores)
+</code></pre><h2 id="resources">Resources<a hidden class="anchor" aria-hidden="true" href="#resources">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Resource</th>
+          <th>Link</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>RTL source code</strong></td>
+          <td><a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></td>
+      </tr>
+      <tr>
+          <td><strong>YouTube channel</strong></td>
+          <td><a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></td>
+      </tr>
+      <tr>
+          <td><strong>Vivado / Vitis download</strong></td>
+          <td><a href="https://www.xilinx.com/support/download.html">https://www.xilinx.com/support/download.html</a></td>
+      </tr>
+      <tr>
+          <td><strong>MicroBlaze reference</strong></td>
+          <td>UG984 (MicroBlaze Processor Reference Guide)</td>
+      </tr>
+      <tr>
+          <td><strong>AXI UART Lite product guide</strong></td>
+          <td>PG142 (AXI UART Lite Product Guide)</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="thank-you">Thank You!<a hidden class="anchor" aria-hidden="true" href="#thank-you">#</a></h2>
+<p><strong>What you built in this series:</strong></p>
+<ul>
+<li>A complete custom UART TX/RX core in SystemVerilog — baud generator, TX FSM, center-sampling RX FSM, even parity, frame and parity error detection (~150 lines of synthesizable code)</li>
+<li>A full MicroBlaze SoC on FPGA with AXI UART Lite, C loopback application, and co-simulation testbench</li>
+<li>Both designs verified in simulation and tested on real FPGA hardware</li>
+</ul>
+<p><strong>The most important takeaway</strong>: the two approaches are not competing — they complement each other. Understanding how to implement a protocol in RTL gives you the depth to debug it when it fails in a processor-driven system. Understanding how to drive it from C code gives you the flexibility to extend it when specifications change.</p>
+<blockquote>
+<p>Subscribe at <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a> for more FPGA tutorials.</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>UART is a foundation protocol — the frame format, baud timing, and error detection patterns here reappear in SPI, I²C, and more complex serial standards; the mental model transfers</li>
+<li>Custom RTL (EP05–08): <code>baud_gen</code> + <code>uart_tx</code> FSM + <code>uart_rx</code> center sampling is the complete minimal UART in roughly 150 lines of SystemVerilog — know every line</li>
+<li>MicroBlaze (EP09–14): Block Design + Vitis C code is the complete minimal SoC — the <code>.xsa</code> handoff and BSP generation are the workflow patterns you will repeat for every AXI peripheral you add</li>
+<li>Next steps: SPI and I²C extend the same RTL concepts to synchronous protocols; AXI Bus Deep Dive extends the MicroBlaze patterns to high-performance burst transfers</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/microblaze/">MicroBlaze</a></li>
+      <li><a href="https://easyfpga.blog/tags/axi/">AXI</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep14/">
+    <span class="title">Next »</span>
+    <br>
+    <span>MicroBlaze UART — Hardware Test</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

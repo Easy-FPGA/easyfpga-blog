@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>What is FPGA? | EasyFPGA</title>
+<meta name="keywords" content="FPGA, HDL">
+<meta name="description" content="The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/fpga%ea%b0%80-%eb%ac%b4%ec%97%87%ec%9d%b8%ea%b0%80/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/fpga%ea%b0%80-%eb%ac%b4%ec%97%87%ec%9d%b8%ea%b0%80/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://easyfpga.blog/posts/fpga%ea%b0%80-%eb%ac%b4%ec%97%87%ec%9d%b8%ea%b0%80/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="What is FPGA?">
+  <meta property="og:description" content="The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-03-19T04:07:35+00:00">
+    <meta property="article:modified_time" content="2025-03-19T04:07:35+00:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="HDL">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="What is FPGA?">
+  <meta name="twitter:description" content="The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "What is FPGA?",
+      "item": "https://easyfpga.blog/posts/fpga%ea%b0%80-%eb%ac%b4%ec%97%87%ec%9d%b8%ea%b0%80/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What is FPGA?",
+  "name": "What is FPGA?",
+  "description": "The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b",
+  "keywords": [
+    "FPGA", "HDL"
+  ],
+  "articleBody": "FPGA: Field Programmable Gate Array\nTo take the Bread Board as an example… Bread Board (https://en.wikipedia.org/wiki/Breadboard#/media/File:Ultrasound-PreAmp-Breadboard.jpg)\nThe photo above shows a breadboard. Breadboards are used to temporarily test prototypes. They usually have strips on both sides to extend power lines. The interior is divided into abcde and fghij sections where components or wires can be connected. This allows you to implement desired functions and test them with frequent changes.\nYou can think of the components plugged into the breadboard as modules designed in HDL. The wires connecting them can be viewed as wire declarations in HDL. The placement of the components is similar to the Placement process in FPGA Implementation. Connecting the wires is akin to the Routing process.\nHardware described in HDL You can think of FPGA as describing the process of connecting ICs on a breadboard. It uses wires and HDL (Hardware Description Language). The difference, though, is that FPGAs already have many CLBs (Configuration Logic Blocks) and Interconnect resources inside. They implement functions by programming these resources.\nIn addition, several components are available. These include Input/output block circuitry (IOBs) and Clock Management Tiles (CMTs). There is also Block RAM and DSP slices. Additionally, there are Gigabit Transceivers that are capable of high-speed serial data transmission. SoC products with ARM CPUs built-in are included too. Although there are various internal blocks, you can think of them as basically consisting of programmable blocks and routing resources.\nYou can check the content related to the FPGA structure in the links below.\nhttps://docs.amd.com/r/en-US/ug1291-viv/FPGA-Architecture\nhttps://docs.amd.com/r/2024.1-English/ug1393-vitis-application-acceleration/Understanding-an-FPGA-Architecture\nhttps://docs.amd.com/r/en-US/ug574-ultrascale-clb/Differences-from-Previous-Generations\n",
+  "wordCount" : "254",
+  "inLanguage": "en",
+  "datePublished": "2025-03-19T04:07:35Z",
+  "dateModified": "2025-03-19T04:07:35Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/fpga%ea%b0%80-%eb%ac%b4%ec%97%87%ec%9d%b8%ea%b0%80/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      What is FPGA?
+    </h1>
+    <div class="post-description">
+      The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b
+    </div>
+    <div class="post-meta"><span title='2025-03-19 04:07:35 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#to-take-the-bread-board-as-an-example" aria-label="To take the Bread Board as an example…">To take the Bread Board as an example…</a></li>
+                <li>
+                    <a href="#hardware-described-in-hdl" aria-label="Hardware described in HDL">Hardware described in HDL</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>FPGA: Field Programmable Gate Array</p>
+<h3 id="to-take-the-bread-board-as-an-example">To take the Bread Board as an example…<a hidden class="anchor" aria-hidden="true" href="#to-take-the-bread-board-as-an-example">#</a></h3>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-14.png?w=1024"><em>Bread Board (<a href="https://en.wikipedia.org/wiki/Breadboard#/media/File:Ultrasound-PreAmp-Breadboard.jpg">https://en.wikipedia.org/wiki/Breadboard#/media/File:Ultrasound-PreAmp-Breadboard.jpg</a>)</em></p>
+<p>The photo above shows a breadboard. Breadboards are used to temporarily test prototypes. They usually have strips on both sides to extend power lines. The interior is divided into abcde and fghij sections where components or wires can be connected. This allows you to implement desired functions and test them with frequent changes.</p>
+<p>You can think of the components plugged into the breadboard as modules designed in <strong>HDL</strong>. The wires connecting them can be viewed as wire declarations in HDL. The placement of the components is similar to the <strong>Placement</strong> process in FPGA Implementation. Connecting the wires is akin to the <strong>Routing</strong> process.</p>
+<h3 id="hardware-described-in-hdl">Hardware described in HDL<a hidden class="anchor" aria-hidden="true" href="#hardware-described-in-hdl">#</a></h3>
+<p>You can think of FPGA as describing the process of connecting ICs on a breadboard. It uses wires and HDL (Hardware Description Language). The difference, though, is that FPGAs already have many CLBs (Configuration Logic Blocks) and Interconnect resources inside. They implement functions by programming these resources.</p>
+<p>In addition, several components are available. These include Input/output block circuitry (IOBs) and Clock Management Tiles (CMTs). There is also Block RAM and DSP slices. Additionally, there are Gigabit Transceivers that are capable of high-speed serial data transmission. SoC products with ARM CPUs built-in are included too. Although there are various internal blocks, you can think of them as basically consisting of programmable blocks and routing resources.</p>
+<p>You can check the content related to the FPGA structure in the links below.</p>
+<p><a href="https://docs.amd.com/r/en-US/ug1291-viv/FPGA-Architecture">https://docs.amd.com/r/en-US/ug1291-viv/FPGA-Architecture</a></p>
+<p><a href="https://docs.amd.com/r/2024.1-English/ug1393-vitis-application-acceleration/Understanding-an-FPGA-Architecture">https://docs.amd.com/r/2024.1-English/ug1393-vitis-application-acceleration/Understanding-an-FPGA-Architecture</a></p>
+<p><a href="https://docs.amd.com/r/en-US/ug574-ultrascale-clb/Differences-from-Previous-Generations">https://docs.amd.com/r/en-US/ug574-ultrascale-clb/Differences-from-Previous-Generations</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/hdl/">HDL</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/fpga-vs-asic/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>FPGA vs ASIC: Key Differences Explained</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

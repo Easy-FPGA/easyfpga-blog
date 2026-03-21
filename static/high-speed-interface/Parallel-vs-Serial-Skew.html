@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Parallel vs Serial Skew (Animation)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body { height:100%; margin:0; padding:0; overflow:hidden }
+    body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, Roboto, Arial; }
+    .wrap { padding:18px; box-sizing:border-box }
+    .row { display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap }
+    .panel { flex:1 1 48%; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px; background: rgba(15,23,42,0.6); overflow:hidden }
+    svg { width:100%; height:200px; display:block }
+    .label { font-weight:700; margin-bottom:8px; color:#bfdbfe; font-size:18px }
+    .lane { stroke:#94a3b8; stroke-width:2; }
+    .pulse { fill:#60a5fa }
+    .pulse.neg { fill:#f87171 }
+    .desc { color:#cbd5e1; font-size:15px; margin-bottom:8px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <div class="panel">
+        <div class="label">Parallel (8-bit) — inter-lane skew</div>
+        <div class="desc">Multiple parallel lanes show slightly staggered pulses to illustrate inter-lane skew and routing difficulty.</div>
+        <svg viewBox="0 0 1000 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <g id="parallel">
+            <g id="lanes"></g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <div class="label">Serial (Differential Pair) — intra-pair skew</div>
+        <div class="desc">A differential pair with complementary pulses aligned closely (small intra-pair skew).</div>
+        <svg viewBox="0 0 1000 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <g id="serial"><g id="pair"></g></g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Build parallel lanes and serial pair using a single animation loop
+    const pSVG = document.querySelector('#parallel');
+    const sSVG = document.querySelector('#serial');
+
+    const allRects = []; // {el, delay, y, lane, k}
+    const laneCount = 8;
+    const pulsesPerLane = 3;
+    const dur = 3.0;
+    const baseX = 60, span = 860;
+
+    function makeParallel(){
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      for(let i=0;i<laneCount;i++){
+        const y = 28 + i*20;
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',40); line.setAttribute('x2',960); line.setAttribute('y1',y); line.setAttribute('y2',y);
+        line.setAttribute('class','lane'); g.appendChild(line);
+
+        for(let k=0;k<pulsesPerLane;k++){
+          const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          rect.setAttribute('width',26); rect.setAttribute('height',12); rect.setAttribute('y',y-6);
+          rect.setAttribute('fill','#60a5fa'); rect.setAttribute('opacity','0.95');
+          // initial x so they are visible immediately
+          rect.setAttribute('x', baseX);
+          g.appendChild(rect);
+          // increase per-lane delay factor to make inter-lane skew visible
+          const delay = (i*0.03 + k*0.28);
+          allRects.push({el:rect, delay, y, lane:i, k});
+        }
+      }
+      // create arrow annotations for each pulse index k to show measured skew
+      const svgRoot = pSVG.ownerSVGElement || document.querySelector('#parallel').closest('svg');
+      if (svgRoot && !svgRoot.querySelector('#arrow-defs')){
+        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+        defs.id = 'arrow-defs';
+        const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
+        marker.setAttribute('id','arrowhead');
+        marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','8'); marker.setAttribute('refX','6'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d','M0,0 L6,3 L0,6 L2,3 z'); path.setAttribute('fill','#fbbf24');
+        marker.appendChild(path); defs.appendChild(marker); svgRoot.appendChild(defs);
+      }
+      // annotations array stored separately
+      const annotations = [];
+      for(let k=0;k<pulsesPerLane;k++){
+        const ag = document.createElementNS('http://www.w3.org/2000/svg','g');
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('stroke','#fbbf24'); line.setAttribute('stroke-width','2'); line.setAttribute('opacity','0.95');
+        line.setAttribute('marker-start','url(#arrowhead)'); line.setAttribute('marker-end','url(#arrowhead)');
+        // initial values to keep visible
+        line.setAttribute('x1', baseX); line.setAttribute('y1', 28); line.setAttribute('x2', baseX); line.setAttribute('y2', 28);
+        ag.appendChild(line);
+        const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+        txt.setAttribute('fill','#fde68a'); txt.setAttribute('font-size','16'); txt.setAttribute('font-weight','700'); txt.setAttribute('text-anchor','middle');
+        txt.textContent = '...'; txt.setAttribute('x', baseX); txt.setAttribute('y', 20);
+        ag.appendChild(txt);
+        g.appendChild(ag);
+        annotations.push({ag,line,txt,k});
+      }
+      // attach annotations array to g for access in update loop
+      g._annotations = annotations;
+      pSVG.appendChild(g);
+    }
+
+    function makeSerial(){
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const y1 = 64, y2 = 134;
+      const l1 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      l1.setAttribute('x1',40); l1.setAttribute('x2',960); l1.setAttribute('y1',y1); l1.setAttribute('y2',y1); l1.setAttribute('class','lane'); g.appendChild(l1);
+      const l2 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      l2.setAttribute('x1',40); l2.setAttribute('x2',960); l2.setAttribute('y1',y2); l2.setAttribute('y2',y2); l2.setAttribute('class','lane'); g.appendChild(l2);
+
+      // serial pulses: small intra-pair skew (very small per-lane factor)
+      for(let k=0;k<4;k++){
+        const r1 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        r1.setAttribute('width',34); r1.setAttribute('height',14); r1.setAttribute('y',y1-7); r1.setAttribute('fill','#60a5fa'); r1.setAttribute('x', baseX); g.appendChild(r1);
+        const r2 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        r2.setAttribute('width',34); r2.setAttribute('height',14); r2.setAttribute('y',y2-7); r2.setAttribute('fill','#fb7185'); r2.setAttribute('x', baseX); g.appendChild(r2);
+        const delay = k*0.6;
+        // tiny additional jitter to show intra-pair skew but keep pulses near-aligned
+        allRects.push({el:r1, delay: delay + 0.002, y:y1, lane: 's1', k});
+        allRects.push({el:r2, delay: delay - 0.002, y:y2, lane: 's2', k});
+      }
+      // add TX+/TX- labels on the left
+      const tx1 = document.createElementNS('http://www.w3.org/2000/svg','text');
+      tx1.setAttribute('x',20); tx1.setAttribute('y',y1+6); tx1.setAttribute('fill','#bfdbfe'); tx1.setAttribute('font-weight','800'); tx1.setAttribute('font-size','16'); tx1.textContent = 'TX+'; g.appendChild(tx1);
+      const tx2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+      tx2.setAttribute('x',20); tx2.setAttribute('y',y2+6); tx2.setAttribute('fill','#fb7185'); tx2.setAttribute('font-weight','800'); tx2.setAttribute('font-size','16'); tx2.textContent = 'TX-'; g.appendChild(tx2);
+      sSVG.appendChild(g);
+    }
+
+    function updateAll(){
+      const now = performance.now()/1000;
+      // update rect positions
+      for(const entry of allRects){
+        if(entry.isPoly) continue;
+        const t = (now - entry.delay) % dur;
+        const x = baseX + ( (t+dur) % dur )/dur * span;
+        entry.el.setAttribute('x', x);
+      }
+      // update annotations per pulse index k (draw arrow between top and bottom lane pulses and label with approximate skew)
+      // find the group we appended earlier (the last appended child of pSVG should be the group)
+      const g = pSVG.querySelector('g');
+      if (g && g._annotations){
+        const annotations = g._annotations;
+        const skewPerLanePs = 20; // assume 20 ps skew per lane for display purposes
+        for(const ann of annotations){
+          const k = ann.k;
+          // collect entries for this k across lanes
+          const laneEntries = allRects.filter(r => !r.isPoly && r.k === k && typeof r.lane === 'number');
+          if(laneEntries.length === 0) continue;
+          // find top (min lane) and bottom (max lane)
+          laneEntries.sort((a,b)=>a.lane-b.lane);
+          const top = laneEntries[0];
+          const bottom = laneEntries[laneEntries.length-1];
+          const x1 = parseFloat(top.el.getAttribute('x')) || 0;
+          const y1 = top.y;
+          const x2 = parseFloat(bottom.el.getAttribute('x')) || 0;
+          const y2 = bottom.y;
+          ann.line.setAttribute('x1', x1); ann.line.setAttribute('y1', y1);
+          ann.line.setAttribute('x2', x2); ann.line.setAttribute('y2', y2);
+          // label midpoint
+          const mx = (x1 + x2)/2; const my = (y1 + y2)/2 - 8;
+          const skew_ps = Math.round((bottom.lane - top.lane) * skewPerLanePs);
+          ann.txt.textContent = `≈ ${skew_ps} ps`;
+          ann.txt.setAttribute('x', mx); ann.txt.setAttribute('y', my);
+        }
+      }
+      requestAnimationFrame(updateAll);
+    }
+
+    makeParallel(); makeSerial();
+    requestAnimationFrame(updateAll);
+  </script>
+</body>
+</html>

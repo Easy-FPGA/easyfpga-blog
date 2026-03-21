@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Scope on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/scope/</link>
+    <description>Recent content in Scope on EasyFPGA</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 13 Feb 2026 12:11:04 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/scope/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FPGA 엔지니어에 필요한 보드 레벨 이해 및 디버깅</title>
+      <link>https://easyfpga.blog/posts/fpga-%ec%97%94%ec%a7%80%eb%8b%88%ec%96%b4%ea%b0%80-%ed%95%84%ec%9a%94%ed%95%9c-%eb%b3%b4%eb%93%9c-%eb%a0%88%eb%b2%a8-%ec%9d%b4%ed%95%b4-%eb%b0%8f-%eb%94%94%eb%b2%84%ea%b9%85/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-%ec%97%94%ec%a7%80%eb%8b%88%ec%96%b4%ea%b0%80-%ed%95%84%ec%9a%94%ed%95%9c-%eb%b3%b4%eb%93%9c-%eb%a0%88%eb%b2%a8-%ec%9d%b4%ed%95%b4-%eb%b0%8f-%eb%94%94%eb%b2%84%ea%b9%85/</guid>
+      <description>&lt;p&gt;FPGA는 단순히 칩 내부의 로직만 잘 짠다고 작동하는 것이 아니라, 외부 환경(전원, 노이즈, 통신 규격)과 완벽하게 맞물려야 합니다. 따라서, FPGA 엔지니어는 보드 제작 전/후로 설계한 로직이 잘 동작하는 외부 환경이 구성되도록 확인하고 측정할 수 있는 능력이 필요합니다.&lt;/p&gt;
+&lt;h2 id=&#34;1-회로도schematic와-데이터시트-분석&#34;&gt;1. 회로도(Schematic)와 데이터시트 분석&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Pin Mapping:&lt;/strong&gt;  회로 설계 전 사용할 FPGA의 데이터시트를 보고 사용할 핀 맵(Pin Map)을 설정해야 합니다. 또한 FPGA의 수백 개 핀 중 어떤 핀이 I2C의 SCL/SDA인지, 어떤 핀이 LVDS 차동 신호인지 회로도를 보고 &lt;code&gt;Constraint(XDC/SDC)&lt;/code&gt; 파일에 정확히 맵핑해야 합니다. 외부 Clock, Reset이 전용핀에 정확히 맵핑되었는지 확인합니다.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

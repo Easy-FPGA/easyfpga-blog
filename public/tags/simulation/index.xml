@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Simulation on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/simulation/</link>
+    <description>Recent content in Simulation on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Mar 2026 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/simulation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Co-Simulation</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep13/</link>
+      <pubDate>Sat, 28 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep13/</guid>
+      <description>Hardware-software co-simulation: loading compiled ELF into BRAM simulation models, writing a bit-level UART stimulus testbench, and verifying AXI bus transactions in waveforms.</description>
+    </item>
+  </channel>
+</rss>

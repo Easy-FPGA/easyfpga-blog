@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>FPGA Price Surge: Design Challenges and Alternative Strategies | EasyFPGA</title>
+<meta name="keywords" content="FPGA, Cost, BOM, ASIC, Lattice, Efinix">
+<meta name="description" content="How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="FPGA Price Surge: Design Challenges and Alternative Strategies">
+  <meta property="og:description" content="How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-09-01T00:52:45+00:00">
+    <meta property="article:modified_time" content="2025-09-01T00:52:45+00:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Cost">
+    <meta property="article:tag" content="BOM">
+    <meta property="article:tag" content="ASIC">
+    <meta property="article:tag" content="Lattice">
+    <meta property="article:tag" content="Efinix">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="FPGA Price Surge: Design Challenges and Alternative Strategies">
+  <meta name="twitter:description" content="How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "FPGA Price Surge: Design Challenges and Alternative Strategies",
+      "item": "https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FPGA Price Surge: Design Challenges and Alternative Strategies",
+  "name": "FPGA Price Surge: Design Challenges and Alternative Strategies",
+  "description": "How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.",
+  "keywords": [
+    "FPGA", "Cost", "BOM", "ASIC", "Lattice", "Efinix"
+  ],
+  "articleBody": "What Happened to FPGA Prices? Between 2020 and 2022, the semiconductor industry experienced what analysts called “chipflation” — a sustained, broad-based price increase driven by pandemic-related demand spikes, supply chain disruptions, and surging investment in AI and 5G infrastructure.\nFPGA manufacturers were not immune. AMD (Xilinx) and Intel (Altera) both cited rising TSMC wafer costs as justification for significant list-price increases — in some cases close to double the pre-pandemic price. Unlike commodity memory or microcontroller price spikes that eventually normalised, elevated FPGA prices have proven sticky.\nA concrete example: the ZCU216 Zynq UltraScale+ RFSoC evaluation kit is currently listed at $16,995 USD (approximately ₩23,000,000 KRW). Even mid-range development kits that once cost a few hundred dollars now routinely exceed $1,000–2,000.\nBeyond unit pricing, lead times stretched from the typical few weeks to 26–52 weeks or more in peak shortage periods — and they have not fully recovered.\nThe Impact on Product Design Historically, FPGAs were considered the “best of both worlds” for product design: faster time-to-market than a custom ASIC, more flexibility than a fixed-function DSP or MCU. The economics looked straightforward — pay a premium per unit for the flexibility, skip the NRE (non-recurring engineering) cost of ASIC tape-out.\nThat trade-off has shifted.\nBOM cost pressure: A typical product BOM might contain hundreds of components. If a single FPGA costs $200–500+ in production quantities, it can dominate the total BOM cost and make the product uncompetitive at its target price point.\nInventory risk: Long lead times force procurement teams to order many months in advance. This creates excess inventory risk if the product misses its sales forecast — FPGAs are generally not returnable.\nSupply predictability: Even if you are willing to pay the premium, delivery dates are uncertain. This complicates production scheduling and capacity planning.\nAlternative Strategies Engineers Are Using 1. Low-Cost FPGA Vendors Lattice Semiconductor and Efinix occupy the low-power, low-cost FPGA segment that AMD and Intel largely abandoned as they moved upmarket. Lattice’s iCE40 and ECP5 families, and Efinix’s Trion/Titanium families, offer:\nSignificantly lower unit prices ($5–50 range for many parts) Lower power consumption Reasonable lead times Sufficient logic for many mid-complexity designs If your design does not need the high-speed transceivers or large DSP blocks of a Virtex or Stratix, a Lattice or Efinix part may be functionally equivalent at a fraction of the cost.\n2. FPGA for Prototyping, ASIC / MCU for Production The classic “FPGA-to-ASIC” migration path has become more attractive:\nDesign and validate the hardware algorithm on an FPGA (fast, flexible, debuggable). Once the design is frozen, tape out a custom ASIC or structured ASIC. Alternatively, if the throughput requirements allow, migrate to a high-performance MCU or fixed-function DSP. The break-even volume is lower than it used to be, because FPGA unit costs have risen while ASIC NRE costs have not increased proportionally for mature process nodes (28 nm, 40 nm).\n3. Hybrid Design Rather than replacing the FPGA entirely, some teams partition the design:\nAn MCU handles control-plane functions (protocol management, configuration, host interface). A small, cheap FPGA handles real-time data-plane functions that the MCU cannot process fast enough. This hybrid approach can cut BOM cost significantly while retaining the flexibility benefits of programmable logic for the most timing-critical paths.\nWill FPGAs Disappear from Volume Products? FPGAs are and will remain indispensable for applications that require:\nUltra-high parallelism (1000+ parallel operations) Custom protocols or non-standard interfaces Reconfigurability after deployment Rapid iteration during system development But the era of “put a high-end FPGA in every product” appears to be over for cost-sensitive, high-volume designs. The market is bifurcating: premium FPGAs dominate defence, aerospace, high-frequency trading, and data-centre acceleration, while mid-volume industrial and consumer products are increasingly moving toward ASIC or hybrid approaches.\nFor FPGA engineers, this means the ability to optimise designs for low-resource-count targets and understand the ASIC migration path is becoming a core career skill.\n",
+  "wordCount" : "645",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-09-01T00:52:45Z",
+  "dateModified": "2025-09-01T00:52:45Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      FPGA Price Surge: Design Challenges and Alternative Strategies
+    </h1>
+    <div class="post-description">
+      How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.
+    </div>
+    <div class="post-meta"><span title='2025-09-01 00:52:45 +0000 +0000'>September 1, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-happened-to-fpga-prices" aria-label="What Happened to FPGA Prices?">What Happened to FPGA Prices?</a></li>
+                <li>
+                    <a href="#the-impact-on-product-design" aria-label="The Impact on Product Design">The Impact on Product Design</a></li>
+                <li>
+                    <a href="#alternative-strategies-engineers-are-using" aria-label="Alternative Strategies Engineers Are Using">Alternative Strategies Engineers Are Using</a><ul>
+                        
+                <li>
+                    <a href="#1-low-cost-fpga-vendors" aria-label="1. Low-Cost FPGA Vendors">1. Low-Cost FPGA Vendors</a></li>
+                <li>
+                    <a href="#2-fpga-for-prototyping-asic--mcu-for-production" aria-label="2. FPGA for Prototyping, ASIC / MCU for Production">2. FPGA for Prototyping, ASIC / MCU for Production</a></li>
+                <li>
+                    <a href="#3-hybrid-design" aria-label="3. Hybrid Design">3. Hybrid Design</a></li></ul>
+                </li>
+                <li>
+                    <a href="#will-fpgas-disappear-from-volume-products" aria-label="Will FPGAs Disappear from Volume Products?">Will FPGAs Disappear from Volume Products?</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="what-happened-to-fpga-prices">What Happened to FPGA Prices?<a hidden class="anchor" aria-hidden="true" href="#what-happened-to-fpga-prices">#</a></h2>
+<p>Between 2020 and 2022, the semiconductor industry experienced what analysts called <strong>&ldquo;chipflation&rdquo;</strong> — a sustained, broad-based price increase driven by pandemic-related demand spikes, supply chain disruptions, and surging investment in AI and 5G infrastructure.</p>
+<p>FPGA manufacturers were not immune. AMD (Xilinx) and Intel (Altera) both cited rising TSMC wafer costs as justification for significant list-price increases — in some cases close to <strong>double</strong> the pre-pandemic price. Unlike commodity memory or microcontroller price spikes that eventually normalised, elevated FPGA prices have proven sticky.</p>
+<p>A concrete example: the <strong>ZCU216 Zynq UltraScale+ RFSoC evaluation kit</strong> is currently listed at <strong>$16,995 USD</strong> (approximately ₩23,000,000 KRW). Even mid-range development kits that once cost a few hundred dollars now routinely exceed $1,000–2,000.</p>
+<p>Beyond unit pricing, <strong>lead times</strong> stretched from the typical few weeks to 26–52 weeks or more in peak shortage periods — and they have not fully recovered.</p>
+<p><img alt="FPGA price increase example" loading="lazy" src="http://13.124.237.178/wp-content/uploads/2025/09/image-1024x424.png"></p>
+<h2 id="the-impact-on-product-design">The Impact on Product Design<a hidden class="anchor" aria-hidden="true" href="#the-impact-on-product-design">#</a></h2>
+<p>Historically, FPGAs were considered the &ldquo;best of both worlds&rdquo; for product design: faster time-to-market than a custom ASIC, more flexibility than a fixed-function DSP or MCU. The economics looked straightforward — pay a premium per unit for the flexibility, skip the NRE (non-recurring engineering) cost of ASIC tape-out.</p>
+<p>That trade-off has shifted.</p>
+<p><strong>BOM cost pressure:</strong> A typical product BOM might contain hundreds of components. If a single FPGA costs $200–500+ in production quantities, it can dominate the total BOM cost and make the product uncompetitive at its target price point.</p>
+<p><strong>Inventory risk:</strong> Long lead times force procurement teams to order many months in advance. This creates excess inventory risk if the product misses its sales forecast — FPGAs are generally not returnable.</p>
+<p><strong>Supply predictability:</strong> Even if you are willing to pay the premium, delivery dates are uncertain. This complicates production scheduling and capacity planning.</p>
+<h2 id="alternative-strategies-engineers-are-using">Alternative Strategies Engineers Are Using<a hidden class="anchor" aria-hidden="true" href="#alternative-strategies-engineers-are-using">#</a></h2>
+<h3 id="1-low-cost-fpga-vendors">1. Low-Cost FPGA Vendors<a hidden class="anchor" aria-hidden="true" href="#1-low-cost-fpga-vendors">#</a></h3>
+<p><strong>Lattice Semiconductor</strong> and <strong>Efinix</strong> occupy the low-power, low-cost FPGA segment that AMD and Intel largely abandoned as they moved upmarket. Lattice&rsquo;s iCE40 and ECP5 families, and Efinix&rsquo;s Trion/Titanium families, offer:</p>
+<ul>
+<li>Significantly lower unit prices ($5–50 range for many parts)</li>
+<li>Lower power consumption</li>
+<li>Reasonable lead times</li>
+<li>Sufficient logic for many mid-complexity designs</li>
+</ul>
+<p>If your design does not need the high-speed transceivers or large DSP blocks of a Virtex or Stratix, a Lattice or Efinix part may be functionally equivalent at a fraction of the cost.</p>
+<h3 id="2-fpga-for-prototyping-asic--mcu-for-production">2. FPGA for Prototyping, ASIC / MCU for Production<a hidden class="anchor" aria-hidden="true" href="#2-fpga-for-prototyping-asic--mcu-for-production">#</a></h3>
+<p>The classic &ldquo;FPGA-to-ASIC&rdquo; migration path has become more attractive:</p>
+<ol>
+<li>Design and validate the hardware algorithm on an FPGA (fast, flexible, debuggable).</li>
+<li>Once the design is frozen, tape out a custom ASIC or structured ASIC.</li>
+<li>Alternatively, if the throughput requirements allow, migrate to a high-performance MCU or fixed-function DSP.</li>
+</ol>
+<p>The break-even volume is lower than it used to be, because FPGA unit costs have risen while ASIC NRE costs have not increased proportionally for mature process nodes (28 nm, 40 nm).</p>
+<h3 id="3-hybrid-design">3. Hybrid Design<a hidden class="anchor" aria-hidden="true" href="#3-hybrid-design">#</a></h3>
+<p>Rather than replacing the FPGA entirely, some teams partition the design:</p>
+<ul>
+<li>An MCU handles control-plane functions (protocol management, configuration, host interface).</li>
+<li>A small, cheap FPGA handles real-time data-plane functions that the MCU cannot process fast enough.</li>
+</ul>
+<p>This hybrid approach can cut BOM cost significantly while retaining the flexibility benefits of programmable logic for the most timing-critical paths.</p>
+<h2 id="will-fpgas-disappear-from-volume-products">Will FPGAs Disappear from Volume Products?<a hidden class="anchor" aria-hidden="true" href="#will-fpgas-disappear-from-volume-products">#</a></h2>
+<p>FPGAs are and will remain indispensable for applications that require:</p>
+<ul>
+<li>Ultra-high parallelism (1000+ parallel operations)</li>
+<li>Custom protocols or non-standard interfaces</li>
+<li>Reconfigurability after deployment</li>
+<li>Rapid iteration during system development</li>
+</ul>
+<p>But the era of &ldquo;put a high-end FPGA in every product&rdquo; appears to be over for cost-sensitive, high-volume designs. The market is bifurcating: premium FPGAs dominate defence, aerospace, high-frequency trading, and data-centre acceleration, while mid-volume industrial and consumer products are increasingly moving toward ASIC or hybrid approaches.</p>
+<p>For FPGA engineers, this means the ability to <strong>optimise designs for low-resource-count targets</strong> and <strong>understand the ASIC migration path</strong> is becoming a core career skill.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/cost/">Cost</a></li>
+      <li><a href="https://easyfpga.blog/tags/bom/">BOM</a></li>
+      <li><a href="https://easyfpga.blog/tags/asic/">ASIC</a></li>
+      <li><a href="https://easyfpga.blog/tags/lattice/">Lattice</a></li>
+      <li><a href="https://easyfpga.blog/tags/efinix/">Efinix</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/ddr-memory-interface-fpga/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Implementing a DDR Memory Interface on FPGA with Xilinx MIG</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/">
+    <span class="title">Next »</span>
+    <br>
+    <span>The Role of Scrambling in High-Speed Serial Communication</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

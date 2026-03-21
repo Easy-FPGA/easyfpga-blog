@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>FPGA의 Speed Grade와 등급 | EasyFPGA</title>
+<meta name="keywords" content="AMD, FPGA, Speed Grade, Temperature Range, Xilinx">
+<meta name="description" content="FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.
+AMD UltraScale&#43; Device Ordering Information (https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide)
+Speed Grade란?
+Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).
+동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/fpga%ec%9d%98-speed-grade%ec%99%80-%eb%93%b1%ea%b8%89/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/fpga%ec%9d%98-speed-grade%ec%99%80-%eb%93%b1%ea%b8%89/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://easyfpga.blog/posts/fpga%ec%9d%98-speed-grade%ec%99%80-%eb%93%b1%ea%b8%89/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="FPGA의 Speed Grade와 등급">
+  <meta property="og:description" content="FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.
+AMD UltraScale&#43; Device Ordering Information (https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide)
+Speed Grade란? Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).
+동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-01-17T00:06:06+00:00">
+    <meta property="article:modified_time" content="2026-01-17T00:06:06+00:00">
+    <meta property="article:tag" content="AMD">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Speed Grade">
+    <meta property="article:tag" content="Temperature Range">
+    <meta property="article:tag" content="Xilinx">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FPGA의 Speed Grade와 등급">
+  <meta name="twitter:description" content="FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.
+AMD UltraScale&#43; Device Ordering Information (https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide)
+Speed Grade란? Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).
+동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "FPGA의 Speed Grade와 등급",
+      "item": "https://easyfpga.blog/posts/fpga%ec%9d%98-speed-grade%ec%99%80-%eb%93%b1%ea%b8%89/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FPGA의 Speed Grade와 등급",
+  "name": "FPGA의 Speed Grade와 등급",
+  "description": "FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.\nAMD UltraScale+ Device Ordering Information (https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide)\nSpeed Grade란? Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).\n동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.\n",
+  "keywords": [
+    "AMD", "FPGA", "Speed Grade", "Temperature Range", "Xilinx"
+  ],
+  "articleBody": "FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.\nAMD UltraScale+ Device Ordering Information (https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide)\nSpeed Grade란? Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).\n동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.\nSpeed Grade에 따른 로직 성능의 차이를 확인하려면, 각 디바이스의 “DC and AC Switching Characteristics”문서에서 특히, AC Switching Characteristics를 참고해야 합니다. (https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus, kintex ultrascale+)\n주로, IO Block, Clocking, DSP, RAM, Transceiver에서의 Speed Grade에 따른 차이를 볼 수 있습니다. Xilinx의 경우 숫자가 클수록 빠른 디바이스를 나타냅니다. 높은 Speed Grade일수록 가격이 높아지기 때문에, 최적화를 통해, 낮은 Speed Grade에서도 타이밍을 만족시키는 것이 필요합니다.\n디바이스 선정에서는 먼저, 요구되는 사양에 맞는 Speed Grade를 정하고, 설계한 디자인의 타이밍 제약과 타이밍 리포트를 통해, 최종적으로 적합한 디바이스를 선정하는 과정이 필요합니다.\nBlock RAM 동작 속도 차이\nTemperature Range FPGA가 동작을 보증하는 온도 범위입니다. FPGA는 고속 스위칭을 하기 때문에 자체 발열이 심합니다. 외부 온다가 낮더라도 칩 내부의 접합 온도는 훨씬 높을 수 있습니다.\n온도가 높아질수록 트랜지스터는 느려집니다. Industrial 등급에서는 commercial 등급보다 더 넓은 범위의 온도 조건에서 타이밍을 보장해야 합니다.\n또한, 상위 등급은 추가로 고온/저온 번인 테스트, 온도 사이클 테스트, 극한 환경에서의 타이밍 안정성 검증이 이뤄지기 때문에 가격이 더 비쌉니다. 즉, 사용되는 온도 범위에 따라 적합한 제품을 선택해야 합니다.\nKintex UltraScale 제품군의 동작 온도 (https://docs.amd.com/api/khub/documents/Oxoo8YTGAXVmh~EL2xjgGw/content)\nKintex UltraScale+는 C(Commercial) 등급은 제공되지 않고, E(Extended와 I(Industrial) 등급을 제공합니다. 즉, 자동차, 통신 기지국, 고온 환경 등의 고성능/고신뢰성 시장을 겨냥한 제품군으로 볼 수 있습니다.\nKintex UltraScale+ 제품군의 동작 온도 (https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus/Recommended-Operating-Conditions)\n",
+  "wordCount" : "286",
+  "inLanguage": "en",
+  "datePublished": "2026-01-17T00:06:06Z",
+  "dateModified": "2026-01-17T00:06:06Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/fpga%ec%9d%98-speed-grade%ec%99%80-%eb%93%b1%ea%b8%89/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      FPGA의 Speed Grade와 등급
+    </h1>
+    <div class="post-meta"><span title='2026-01-17 00:06:06 +0000 +0000'>January 17, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#speed-grade%eb%9e%80" aria-label="Speed Grade란?">Speed Grade란?</a></li>
+                <li>
+                    <a href="#temperature-range" aria-label="Temperature Range">Temperature Range</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>FPGA를 선정할 때 로직 사이즈와 메모리, Gigabit Transceiver의 속도와 더불어, Speed Grade(속도 등급)와 Temperature Range(온도 범위), Reliability Grade(신뢰성 등급)를 정해야 합니다.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2026/01/image-3.png?w=1024"><em>AMD UltraScale+ Device Ordering Information (<a href="https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide">https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide</a>)</em></p>
+<h2 id="speed-grade란">Speed Grade란?<a hidden class="anchor" aria-hidden="true" href="#speed-grade란">#</a></h2>
+<p>Speed Grade는 FPGA 제조 공정 후, 칩의 동작 속도 성능에 따라 분류(Binning)한 등급을 말합니다. 같은 웨이퍼에서 나온 칩이라도 수율에 따라 어떤 것은 더 빠른 주파수에서 동작하고, 어떤 것은 그렇지 못합니다(공정 편차, Process Variation).</p>
+<p>동작 클럭은 미리 정해진 것이 아니라, 내부 트랜지스터의 스위칭 속도와 배선 지연에 대한 타이밍 마진을 의미합니다. 이 타이밍 마진에 따라 어떤 칩은 더 빠르게 동작할 수 있고, 이것을 Speed Grade로 구분합니다.</p>
+<p>Speed Grade에 따른 로직 성능의 차이를 확인하려면, 각 디바이스의 “DC and AC Switching Characteristics”문서에서 특히, AC Switching Characteristics를 참고해야 합니다. (<a href="https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus">https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus</a>, kintex ultrascale+)</p>
+<p>주로, IO Block, Clocking, DSP, RAM, Transceiver에서의 Speed Grade에 따른 차이를 볼 수 있습니다. Xilinx의 경우 숫자가 클수록 빠른 디바이스를 나타냅니다. 높은 Speed Grade일수록 가격이 높아지기 때문에, 최적화를 통해, 낮은 Speed Grade에서도 타이밍을 만족시키는 것이 필요합니다.</p>
+<p>디바이스 선정에서는 먼저, 요구되는 사양에 맞는 Speed Grade를 정하고, 설계한 디자인의 타이밍 제약과 타이밍 리포트를 통해, 최종적으로 적합한 디바이스를 선정하는 과정이 필요합니다.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2026/01/image-2.png?w=940"><em>Block RAM 동작 속도 차이</em></p>
+<h2 id="temperature-range">Temperature Range<a hidden class="anchor" aria-hidden="true" href="#temperature-range">#</a></h2>
+<p>FPGA가 동작을 보증하는 온도 범위입니다. FPGA는 고속 스위칭을 하기 때문에 자체 발열이 심합니다. 외부 온다가 낮더라도 칩 내부의 접합 온도는 훨씬 높을 수 있습니다.</p>
+<p>온도가 높아질수록 트랜지스터는 느려집니다. Industrial 등급에서는 commercial 등급보다 더 넓은 범위의 온도 조건에서 타이밍을 보장해야 합니다.</p>
+<p>또한, 상위 등급은 추가로 고온/저온 번인 테스트, 온도 사이클 테스트, 극한 환경에서의 타이밍 안정성 검증이 이뤄지기 때문에 가격이 더 비쌉니다. 즉, 사용되는 온도 범위에 따라 적합한 제품을 선택해야 합니다.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2026/01/image-6.png?w=1024"><em>Kintex UltraScale 제품군의 동작 온도 (<a href="https://docs.amd.com/api/khub/documents/Oxoo8YTGAXVmh~EL2xjgGw/content">https://docs.amd.com/api/khub/documents/Oxoo8YTGAXVmh~EL2xjgGw/content</a>)</em></p>
+<p>Kintex UltraScale+는 C(Commercial) 등급은 제공되지 않고, E(Extended와 I(Industrial) 등급을 제공합니다. 즉, 자동차, 통신 기지국, 고온 환경 등의 고성능/고신뢰성 시장을 겨냥한 제품군으로 볼 수 있습니다.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2026/01/image-7.png?w=1024"><em>Kintex UltraScale+ 제품군의 동작 온도 (<a href="https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus/Recommended-Operating-Conditions">https://docs.amd.com/r/en-US/ds922-kintex-ultrascale-plus/Recommended-Operating-Conditions</a>)</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/amd/">AMD</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/speed-grade/">Speed Grade</a></li>
+      <li><a href="https://easyfpga.blog/tags/temperature-range/">Temperature Range</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/fpga-%ec%97%94%ec%a7%80%eb%8b%88%ec%96%b4%ea%b0%80-%ed%95%84%ec%9a%94%ed%95%9c-%eb%b3%b4%eb%93%9c-%eb%a0%88%eb%b2%a8-%ec%9d%b4%ed%95%b4-%eb%b0%8f-%eb%94%94%eb%b2%84%ea%b9%85/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>FPGA 엔지니어에 필요한 보드 레벨 이해 및 디버깅</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/critical-path%ec%99%80-pipelining/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Critical path와 Pipelining</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

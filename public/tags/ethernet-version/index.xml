@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Ethernet Version on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/ethernet-version/</link>
+    <description>Recent content in Ethernet Version on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Sep 2025 14:42:35 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/ethernet-version/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ethernet II vs IEEE 802.3: Key Differences Explained</title>
+      <link>https://easyfpga.blog/posts/ethernet-version-1-vs-2/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/ethernet-version-1-vs-2/</guid>
+      <description>The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.</description>
+    </item>
+  </channel>
+</rss>

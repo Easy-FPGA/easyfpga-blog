@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>FPGA Basics on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/fpga-basics/</link>
+    <description>Recent content in FPGA Basics on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 17 Jan 2026 00:06:06 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/fpga-basics/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades</title>
+      <link>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</guid>
+      <description>What speed grade, temperature range, and reliability grade mean when selecting an AMD/Xilinx FPGA, and how to read the part number.</description>
+    </item>
+    <item>
+      <title>FPGA product lines</title>
+      <link>https://easyfpga.blog/posts/fpga-product-lines/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-product-lines/</guid>
+      <description>AMD&amp;#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res</description>
+    </item>
+    <item>
+      <title>FPGA Manufacturers</title>
+      <link>https://easyfpga.blog/posts/fpga-manufacturers/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-manufacturers/</guid>
+      <description>The major FPGA manufacturers include AMD, Intel, Lattice Semiconductor, Microchip, and Efinix. AMD acquired Xilinx, Intel acquired Altera, and Microch</description>
+    </item>
+    <item>
+      <title>FPGA Applications</title>
+      <link>https://easyfpga.blog/posts/fpga-applications/</link>
+      <pubDate>Wed, 19 Mar 2025 04:15:08 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-applications/</guid>
+      <description>FPGA applications span several industries including industrial, automotive, medical, defense, aerospace, network equipment, and video applications, as</description>
+    </item>
+    <item>
+      <title>FPGA Advantages</title>
+      <link>https://easyfpga.blog/posts/fpga-advantages/</link>
+      <pubDate>Wed, 19 Mar 2025 04:12:25 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-advantages/</guid>
+      <description>FPGAs offer significant advantages such as reduced development time and costs compared to ASICs, enabling faster market release. They support parallel</description>
+    </item>
+    <item>
+      <title>FPGA vs ASIC: Key Differences Explained</title>
+      <link>https://easyfpga.blog/posts/fpga-vs-asic/</link>
+      <pubDate>Wed, 19 Mar 2025 04:09:07 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-vs-asic/</guid>
+      <description>FPGAs and ASICs are compared using breadboards and PCBs, respectively. FPGAs allow for on-the-spot modifications, offering design flexibility but at l</description>
+    </item>
+    <item>
+      <title>What is FPGA?</title>
+      <link>https://easyfpga.blog/posts/what-is-fpga/</link>
+      <pubDate>Wed, 19 Mar 2025 04:07:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/what-is-fpga/</guid>
+      <description>The content explains the concept of Field Programmable Gate Arrays (FPGA) using a breadboard analogy for prototyping. It details how components on a b</description>
+    </item>
+  </channel>
+</rss>

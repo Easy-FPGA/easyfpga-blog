@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Understanding Active-Low Resets in HDL Design | EasyFPGA</title>
+<meta name="keywords" content="Active-low reset, FPGA, HDL, Verilog">
+<meta name="description" content="In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:
+1. Electrical Stability
+
+
+Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).
+
+
+During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/active-low-reset/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/active-low-reset/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/active-low-reset/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Understanding Active-Low Resets in HDL Design">
+  <meta property="og:description" content="In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:
+1. Electrical Stability Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).
+During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-06-30T12:33:48+00:00">
+    <meta property="article:modified_time" content="2025-06-30T12:33:48+00:00">
+    <meta property="article:tag" content="Active-Low Reset">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="HDL">
+    <meta property="article:tag" content="Verilog">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Understanding Active-Low Resets in HDL Design">
+  <meta name="twitter:description" content="In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:
+1. Electrical Stability Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).
+During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Understanding Active-Low Resets in HDL Design",
+      "item": "https://easyfpga.blog/posts/active-low-reset/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Understanding Active-Low Resets in HDL Design",
+  "name": "Understanding Active-Low Resets in HDL Design",
+  "description": "In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:\n1. Electrical Stability Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).\nDuring power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.\n",
+  "keywords": [
+    "Active-low reset", "FPGA", "HDL", "Verilog"
+  ],
+  "articleBody": "In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:\n1. Electrical Stability Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).\nDuring power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.\n2. Better Noise Immunity External signals (like buttons or long PCB traces) are often susceptible to electrical noise.\nAn active-low signal is less likely to be falsely triggered by noise, especially when combined with pull-up resistors.\n3. Compatibility with Open-Drain/Open-Collector Designs Active-low resets work well with open-drain or open-collector outputs, which can safely pull the line low.\nThis allows multiple devices to share the same reset line and assert reset without conflict.\n4. Industry Convention Many standard IP cores, microcontrollers, and FPGAs use active-low resets by convention.\nUsing active-low ensures compatibility and consistency across designs.\n5. Synthesis and Tool Support Most EDA tools and synthesis libraries expect or recommend using active-low reset (reset_n).\nMany templates, standard cells, and FPGA primitives are optimized for this.\nExample in Verilog `always @(posedge clk or negedge reset_n) begin\rif (!reset_n)\rstate \u003c= IDLE;\relse\rstate \u003c= next_state;\rend` Here, the reset signal reset_n is active when low, and resets the system when it is 0.\nSummary Active-low reset is used because it is more electrically stable, noise-immune, compatible with shared lines, and widely supported in the industry.\n",
+  "wordCount" : "274",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-06-30T12:33:48Z",
+  "dateModified": "2025-06-30T12:33:48Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/active-low-reset/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Understanding Active-Low Resets in HDL Design
+    </h1>
+    <div class="post-meta"><span title='2025-06-30 12:33:48 +0000 +0000'>June 30, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul><ul>
+                <li>
+                    <a href="#1-electrical-stability" aria-label="1. Electrical Stability">1. Electrical Stability</a></li>
+                <li>
+                    <a href="#2-better-noise-immunity" aria-label="2. Better Noise Immunity">2. Better Noise Immunity</a></li>
+                <li>
+                    <a href="#3-compatibility-with-open-drainopen-collector-designs" aria-label="3. Compatibility with Open-Drain/Open-Collector Designs">3. Compatibility with Open-Drain/Open-Collector Designs</a></li>
+                <li>
+                    <a href="#4-industry-convention" aria-label="4. Industry Convention">4. Industry Convention</a></li>
+                <li>
+                    <a href="#5-synthesis-and-tool-support" aria-label="5. Synthesis and Tool Support">5. Synthesis and Tool Support</a></li></ul>
+                    
+                <li>
+                    <a href="#example-in-verilog" aria-label="Example in Verilog">Example in Verilog</a></li>
+                <li>
+                    <a href="#summary" aria-label="Summary">Summary</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>In HDL design (such as Verilog or VHDL), an <strong>active-low reset</strong> means the reset signal is <strong>enabled when it is low (logic 0)</strong>. It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:</p>
+<h3 id="1-electrical-stability">1. <strong>Electrical Stability</strong><a hidden class="anchor" aria-hidden="true" href="#1-electrical-stability">#</a></h3>
+<ul>
+<li>
+<p>Logic low (0 volts, GND) is generally <strong>more stable and noise-immune</strong> than logic high (VCC).</p>
+</li>
+<li>
+<p>During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.</p>
+</li>
+</ul>
+<h3 id="2-better-noise-immunity">2. <strong>Better Noise Immunity</strong><a hidden class="anchor" aria-hidden="true" href="#2-better-noise-immunity">#</a></h3>
+<ul>
+<li>
+<p>External signals (like buttons or long PCB traces) are often susceptible to electrical noise.</p>
+</li>
+<li>
+<p>An active-low signal is <strong>less likely to be falsely triggered</strong> by noise, especially when combined with pull-up resistors.</p>
+</li>
+</ul>
+<h3 id="3-compatibility-with-open-drainopen-collector-designs">3. <strong>Compatibility with Open-Drain/Open-Collector Designs</strong><a hidden class="anchor" aria-hidden="true" href="#3-compatibility-with-open-drainopen-collector-designs">#</a></h3>
+<ul>
+<li>
+<p>Active-low resets work well with <strong>open-drain or open-collector outputs</strong>, which can safely pull the line low.</p>
+</li>
+<li>
+<p>This allows multiple devices to share the same reset line and assert reset without conflict.</p>
+</li>
+</ul>
+<h3 id="4-industry-convention">4. <strong>Industry Convention</strong><a hidden class="anchor" aria-hidden="true" href="#4-industry-convention">#</a></h3>
+<ul>
+<li>
+<p>Many standard IP cores, microcontrollers, and FPGAs use <strong>active-low resets by convention</strong>.</p>
+</li>
+<li>
+<p>Using active-low ensures compatibility and consistency across designs.</p>
+</li>
+</ul>
+<h3 id="5-synthesis-and-tool-support">5. <strong>Synthesis and Tool Support</strong><a hidden class="anchor" aria-hidden="true" href="#5-synthesis-and-tool-support">#</a></h3>
+<ul>
+<li>
+<p>Most EDA tools and synthesis libraries expect or recommend using active-low reset (<code>reset_n</code>).</p>
+</li>
+<li>
+<p>Many templates, standard cells, and FPGA primitives are optimized for this.</p>
+</li>
+</ul>
+<h2 id="example-in-verilog"><strong>Example in Verilog</strong><a hidden class="anchor" aria-hidden="true" href="#example-in-verilog">#</a></h2>
+<pre tabindex="0"><code>`always @(posedge clk or negedge reset_n) begin
+  if (!reset_n)
+    state &lt;= IDLE;
+  else
+    state &lt;= next_state;
+end`
+</code></pre><p>Here, the reset signal <code>reset_n</code> is <strong>active when low</strong>, and resets the system when it is 0.</p>
+<h2 id="summary"><strong>Summary</strong><a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>Active-low reset is used because it is more electrically stable, noise-immune, compatible with shared lines, and widely supported in the industry.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/active-low-reset/">Active-Low Reset</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/hdl/">HDL</a></li>
+      <li><a href="https://easyfpga.blog/tags/verilog/">Verilog</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Why AMD(Xilinx) Recommends Synchronous Resets</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga-implementation-of-rocev2/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA Implementation of RoCEv2</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

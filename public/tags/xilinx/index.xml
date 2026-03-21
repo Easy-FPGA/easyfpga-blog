@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Xilinx on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/xilinx/</link>
+    <description>Recent content in Xilinx on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Mar 2026 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/xilinx/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Custom RTL Design: TX &amp; RX</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep5/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep5/</guid>
+      <description>Implementing UART TX and RX entirely in SystemVerilog: baud rate generator design, TX FSM, center-sampling RX FSM, and loopback testbench strategy.</description>
+    </item>
+    <item>
+      <title>UART Implementation Methods</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep4/</link>
+      <pubDate>Tue, 17 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep4/</guid>
+      <description>Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.</description>
+    </item>
+    <item>
+      <title>RS-232 and RS-485 for UART Systems</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep3/</link>
+      <pubDate>Mon, 16 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep3/</guid>
+      <description>How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.</description>
+    </item>
+    <item>
+      <title>UART Frame Format</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep2/</link>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep2/</guid>
+      <description>A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.</description>
+    </item>
+    <item>
+      <title>What is UART?</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep1/</link>
+      <pubDate>Sat, 14 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep1/</guid>
+      <description>UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.</description>
+    </item>
+    <item>
+      <title>Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades</title>
+      <link>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/understanding-fpga-speed-grades/</guid>
+      <description>What speed grade, temperature range, and reliability grade mean when selecting an AMD/Xilinx FPGA, and how to read the part number.</description>
+    </item>
+    <item>
+      <title>Implementing a DDR Memory Interface on FPGA with Xilinx MIG</title>
+      <link>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</guid>
+      <description>Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.</description>
+    </item>
+    <item>
+      <title>Why AMD(Xilinx) Recommends Synchronous Resets</title>
+      <link>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</link>
+      <pubDate>Mon, 30 Jun 2025 12:52:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&#34;&gt;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;advantages-of-synchronous-resets&#34;&gt;Advantages of Synchronous Resets&lt;/h2&gt;
+&lt;p&gt;BenefitExplanation&lt;strong&gt;Better Resource Mapping&lt;/strong&gt;Synchronous resets can be mapped directly to more FPGA resources (e.g., flip-flops inside DSPs, BRAMs).&lt;strong&gt;Improved Logic Performance&lt;/strong&gt;Asynchronous resets can negatively affect general logic timing paths and increase routing complexity.&lt;strong&gt;Simpler Routing&lt;/strong&gt;A global asynchronous reset might not increase control sets but does require routing reset wires to many elements, which can become complex.&lt;strong&gt;Protects Memory Structures&lt;/strong&gt;Asynchronous resets may corrupt the contents of BRAMs, LUTRAMs, and SRLs during reset assertion—especially if those resources are driven by asynchronously reset registers.&lt;strong&gt;Placement Flexibility&lt;/strong&gt;With synchronous resets, the logic can be more easily remapped during implementation for better packing and performance.&lt;strong&gt;Compatibility with Dedicated Blocks&lt;/strong&gt;Some blocks like DSP48s and BRAMs only support synchronous resets, so using asynchronous resets can prevent proper inference into those blocks.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>AXI with FPGA and SoC</title>
+      <link>https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/</link>
+      <pubDate>Tue, 27 May 2025 05:10:47 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/</guid>
+      <description>AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include</description>
+    </item>
+    <item>
+      <title>Trigger At StartUp</title>
+      <link>https://easyfpga.blog/posts/trigger-at-startup/</link>
+      <pubDate>Fri, 28 Mar 2025 08:44:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/trigger-at-startup/</guid>
+      <description>The Trigger at Start up feature is used to configure the trigger settings of an ILA core in a design programming file (.bit or .pdi) so that it is pre</description>
+    </item>
+    <item>
+      <title>Gigabit Ethernet with Xilinx FPGA and TEMAC IP</title>
+      <link>https://easyfpga.blog/posts/gigabit-ethernet-with-xilinx-fpga-and-temac-ip/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/gigabit-ethernet-with-xilinx-fpga-and-temac-ip/</guid>
+      <description>provides an overview of implementing Gigabit Ethernet using Xilinx FPGAs and the TEMAC IP core.</description>
+    </item>
+    <item>
+      <title>Vivado’s Text Editor</title>
+      <link>https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/</link>
+      <pubDate>Wed, 19 Mar 2025 21:38:24 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/</guid>
+      <description>The Vivado IDE&amp;#39;s Text Editor is less favored for coding compared to Vim and Visual Studio Code, which excel in shortcuts for tasks like find/replace a</description>
+    </item>
+    <item>
+      <title>Implementation of UART with Xilinx FPGA and AXI Uartlite IP</title>
+      <link>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</link>
+      <pubDate>Wed, 19 Mar 2025 21:25:52 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</guid>
+      <description>UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with</description>
+    </item>
+    <item>
+      <title>FPGA product lines</title>
+      <link>https://easyfpga.blog/posts/fpga-product-lines/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-product-lines/</guid>
+      <description>AMD&amp;#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res</description>
+    </item>
+    <item>
+      <title>FPGA Manufacturers</title>
+      <link>https://easyfpga.blog/posts/fpga-manufacturers/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-manufacturers/</guid>
+      <description>The major FPGA manufacturers include AMD, Intel, Lattice Semiconductor, Microchip, and Efinix. AMD acquired Xilinx, Intel acquired Altera, and Microch</description>
+    </item>
+  </channel>
+</rss>

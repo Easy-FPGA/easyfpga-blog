@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Differential Pair Field Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%;margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,Segoe UI,Roboto,Arial;overflow:hidden}
+    .wrap{padding:16px;box-sizing:border-box}
+    .panel{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.04);padding:16px;border-radius:8px}
+    svg{width:100%;height:240px;display:block}
+    .trace{stroke:#94a3b8;stroke-width:3}
+    .label{fill:#bfdbfe;font-weight:700;font-size:15px}
+    .explain{color:#cbd5e1;margin-top:8px;font-size:14px}
+    .field-line{fill:none;stroke-width:2;opacity:0.9}
+    .field-vec{stroke-width:2;marker-end:url(#arr)}
+    .rad-label{fill:#fef3c7;font-weight:700;font-size:13px;stroke:rgba(0,0,0,0.6);stroke-width:0.8;paint-order:stroke}
+    .radiation-ring{fill:none;stroke:#fb923c;stroke-opacity:0.0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+      <div class="panel">
+      <div style="font-weight:700;color:#bfdbfe;margin-bottom:6px">Differential Signal — Field Cancellation</div>
+      <div class="explain">TX+ and TX- carry equal and opposite currents; their near magnetic fields oppose and largely cancel, reducing radiated EMI.</div>
+      <svg viewBox="0 0 900 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 L2,3 z" fill="#fef08a"></path>
+          </marker>
+        </defs>
+        <!-- traces -->
+        <line x1="40" y1="45" x2="860" y2="45" class="trace" />
+        <line x1="40" y1="95" x2="860" y2="95" class="trace" />
+        <!-- labels -->
+        <text x="18" y="49" class="label">TX+</text>
+        <text x="18" y="99" class="label" fill="#fb7185">TX-</text>
+
+        <!-- pulses group -->
+        <g id="pulses"></g>
+
+        <!-- field groups (above/below traces) -->
+        <g id="fields"></g>
+
+        <!-- cancellation overlay (visualizes net field) -->
+        <g id="net"></g>
+
+        <!-- visual radiation indicator (ring + label) -->
+        <g id="radiation">
+          <circle id="radCircle" cx="450" cy="70" r="30" class="radiation-ring" stroke-width="2"></circle>
+            <text id="radLabel" x="560" y="10" class="rad-label" text-anchor="end">Radiation: Low</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const svg = document.querySelector('svg');
+    const pulsesG = document.getElementById('pulses');
+    const fieldsG = document.getElementById('fields');
+
+    // create moving pulses on both traces
+    const pairCount = 5;
+    const baseX = 60, span = 760;
+    const dur = 3.0;
+
+    const pulses = [];
+    for(let i=0;i<pairCount;i++){
+      const bx = baseX + i*(span/(pairCount));
+      // tx+ pulse (blue)
+      const r1 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      r1.setAttribute('width',26); r1.setAttribute('height',12); r1.setAttribute('y',45-6); r1.setAttribute('fill','#60a5fa'); r1.setAttribute('x',bx);
+      pulsesG.appendChild(r1);
+      // tx- pulse (red), slightly offset x to simulate jitter (small)
+      const r2 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      r2.setAttribute('width',26); r2.setAttribute('height',12); r2.setAttribute('y',95-6); r2.setAttribute('fill','#fb7185'); r2.setAttribute('x',bx+6);
+      pulsesG.appendChild(r2);
+
+      // field circles (upper for tx+, lower for tx-)
+      const f1 = document.createElementNS('http://www.w3.org/2000/svg','g');
+      // field arcs above
+      const arc1 = document.createElementNS('http://www.w3.org/2000/svg','path');
+      arc1.setAttribute('d', `M ${bx+13-22} 28 Q ${bx+13} 4 ${bx+13+22} 28`);
+      arc1.setAttribute('class','field-line'); arc1.setAttribute('stroke','#60a5fa'); arc1.setAttribute('opacity',0.8);
+      f1.appendChild(arc1);
+      // vector arrow in middle
+      const v1 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      v1.setAttribute('x1', bx+13-6); v1.setAttribute('y1',18); v1.setAttribute('x2', bx+13+6); v1.setAttribute('y2',18); v1.setAttribute('stroke','#60a5fa'); v1.setAttribute('class','field-vec');
+      f1.appendChild(v1);
+      fieldsG.appendChild(f1);
+      const f2 = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const arc2 = document.createElementNS('http://www.w3.org/2000/svg','path');
+      arc2.setAttribute('d', `M ${bx+13-22} 112 Q ${bx+13} 136 ${bx+13+22} 112`);
+      arc2.setAttribute('class','field-line'); arc2.setAttribute('stroke','#fb7185'); arc2.setAttribute('opacity',0.8);
+      f2.appendChild(arc2);
+      const v2 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      v2.setAttribute('x1', bx+13+6); v2.setAttribute('y1',122); v2.setAttribute('x2', bx+13-6); v2.setAttribute('y2',122); v2.setAttribute('stroke','#fb7185'); v2.setAttribute('class','field-vec');
+      f2.appendChild(v2);
+      fieldsG.appendChild(f2);
+
+      pulses.push({r1,r2,f1,f2,offset:i*(dur/pairCount),i});
+    }
+
+    // combined overlay to show cancellation when pulses overlap
+    const overlay = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    overlay.setAttribute('x',0); overlay.setAttribute('y',0); overlay.setAttribute('width',900); overlay.setAttribute('height',140);
+    overlay.setAttribute('fill','none'); overlay.setAttribute('pointer-events','none');
+    svg.appendChild(overlay);
+
+    const radCircle = document.getElementById('radCircle');
+    const radLabel = document.getElementById('radLabel');
+
+    // position helper: keep radLabel and annot anchored to right edge
+    function updateRadLabelPos(){
+      try{
+        const vbw = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) ? svg.viewBox.baseVal.width : 900;
+        if(radLabel) radLabel.setAttribute('x', vbw - 20);
+        const annot = svg.querySelector('#annot');
+        if(annot) annot.setAttribute('x', vbw - 20);
+      }catch(e){ /* ignore */ }
+    }
+    updateRadLabelPos();
+    window.addEventListener('resize', updateRadLabelPos);
+
+    // phase cycle: 0=normal, 1=skew/discontinuity (common-mode), 2=separated pair (larger loop area)
+    const phaseDur = 4.0;
+    function update(){
+      const now = performance.now()/1000;
+      const phase = Math.floor((now/phaseDur) % 3);
+      // annotation element (create once)
+      let annot = svg.querySelector('#annot');
+      if(!annot){
+        annot = document.createElementNS('http://www.w3.org/2000/svg','text');
+        annot.id = 'annot';
+        annot.setAttribute('text-anchor','end');
+        annot.setAttribute('y',30);
+        annot.setAttribute('fill','#fef3c7');
+        annot.setAttribute('font-size','14');
+        annot.setAttribute('font-weight','700');
+        svg.appendChild(annot);
+        updateRadLabelPos();
+      }
+      for(const p of pulses){
+        // move pulses rightwards cyclically
+        const t = (now + p.offset) % dur;
+        const x = baseX + (t/dur) * span;
+        p.r1.setAttribute('x', x);
+        // default small jitter
+        let x2 = x + 6;
+        let y1 = 45, y2 = 95;
+        // adjust visuals per phase
+        if(phase === 1){
+          // introduce a discontinuity/skew: TX- delayed -> common-mode increases
+          x2 = x + 60; // large misalignment
+          annot.textContent = 'Discontinuity → common‑mode ↑ (EMI increases)';
+        } else if(phase === 2){
+          // separated pair: increase loop area (worse radiation)
+          y2 = 125; // move TX- further away
+          annot.textContent = 'Pair separation → larger loop area → more radiation';
+        } else {
+          annot.textContent = 'Normal: opposing fields cancel → low EMI';
+        }
+        p.r2.setAttribute('x', x2);
+        p.r1.setAttribute('y', y1-6);
+        p.r2.setAttribute('y', y2-6);
+        // update arcs and vectors inside f1/f2 groups
+        const arc1 = p.f1.childNodes[0]; const v1 = p.f1.childNodes[1];
+        const arc2 = p.f2.childNodes[0]; const v2 = p.f2.childNodes[1];
+        // recompute arc d based on center x and desired y positions
+        const cx = x + 13;
+        arc1.setAttribute('d', `M ${cx-22} ${y1-17} Q ${cx} ${y1-41} ${cx+22} ${y1-17}`);
+        v1.setAttribute('x1', cx-6); v1.setAttribute('x2', cx+6); v1.setAttribute('y1', y1-27); v1.setAttribute('y2', y1-27);
+        arc2.setAttribute('d', `M ${cx-22} ${y2+17} Q ${cx} ${y2+41} ${cx+22} ${y2+17}`);
+        v2.setAttribute('x1', cx+6); v2.setAttribute('x2', cx-6); v2.setAttribute('y1', y2+27); v2.setAttribute('y2', y2+27);
+
+        // compute overlap: when cx distances small, fields cancel more
+        // compute overlap by distance between centers
+        // instead compute misalignment between r1 and r2
+        const rx1 = parseFloat(p.r1.getAttribute('x')) || 0;
+        const rx2 = parseFloat(p.r2.getAttribute('x')) || 0;
+        const mis = Math.abs(rx1 - rx2);
+        const overlap = Math.max(0, 1 - (mis / 80));
+        // set opacity: when overlap high, reduce combined visible field to illustrate cancellation
+        // change stroke opacity for arcs and vectors to show cancellation
+        const o = Math.max(0.15, 0.9 * (1 - overlap*0.95));
+        // f1 and f2 are groups; update children opacity
+        for(const c of p.f1.childNodes){ if(c.setAttribute) c.setAttribute('opacity', o); }
+        for(const c of p.f2.childNodes){ if(c.setAttribute) c.setAttribute('opacity', o); }
+
+        // draw net cancellation marker: when overlapped strongly, draw a pale band between traces
+        const net = document.getElementById('net');
+        if(net){
+          // create/update a translucent rect at midpoint for visible cancellation effect
+          // use integer index p.i for stable element ids (avoid dots in ids/selectors)
+          let band = net.querySelector(`#band${p.i}`);
+          if(!band){
+            band = document.createElementNS('http://www.w3.org/2000/svg','rect');
+            band.id = `band${p.i}`;
+            band.setAttribute('y',50);
+            band.setAttribute('height',40);
+            band.setAttribute('fill','#fef3c7');
+            band.setAttribute('opacity',0);
+            net.appendChild(band);
+          }
+          const bxPos = (rx1 + rx2)/2 + 8;
+          band.setAttribute('x', bxPos - 30);
+          band.setAttribute('width', 60);
+          // increase band visibility when phase indicates problem
+          let bandOpacity = Math.min(0.85, (1-overlap)*0.85);
+          if(phase === 1) bandOpacity = Math.max(bandOpacity, 0.6);
+          if(phase === 2) bandOpacity = Math.max(bandOpacity, 0.5);
+          band.setAttribute('opacity', bandOpacity);
+        }
+
+        // update global radiation indicator based on misalignment & phase
+        if(radCircle){
+          // radiation approx: base on misalignment and phase
+          const phaseBias = (phase === 0) ? 0 : (phase === 1 ? 0.6 : 0.5);
+          const radStrength = Math.min(1, Math.max(0, (1 - overlap) * 1.2 + phaseBias * 0.6));
+          // scale ring radius and stroke/opacity
+          const r = 18 + radStrength * 80;
+          radCircle.setAttribute('r', r);
+          radCircle.setAttribute('stroke-opacity', Math.min(0.9, 0.15 + radStrength * 0.85));
+          radCircle.setAttribute('stroke-width', 2 + radStrength * 10);
+          // label
+          if(radLabel){
+            const lvl = radStrength < 0.25 ? 'Low' : (radStrength < 0.6 ? 'Medium' : 'High');
+            radLabel.textContent = `Radiation: ${lvl}`;
+            radLabel.setAttribute('fill', radStrength < 0.6 ? '#fef3c7' : '#fecaca');
+          }
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>High-Speed on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/high-speed/</link>
+    <description>Recent content in High-Speed on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 12 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/high-speed/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High-Speed Parallel Interface Design: Principles, Limitations, and Practice</title>
+      <link>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</link>
+      <pubDate>Thu, 12 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</guid>
+      <description>A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.</description>
+    </item>
+  </channel>
+</rss>

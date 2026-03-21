@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>PHY on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/phy/</link>
+    <description>Recent content in PHY on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 21 Mar 2025 03:21:36 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/phy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gigabit Ethernet with Xilinx FPGA and TEMAC IP</title>
+      <link>https://easyfpga.blog/posts/gigabit-ethernet-with-xilinx-fpga-and-temac-ip/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/gigabit-ethernet-with-xilinx-fpga-and-temac-ip/</guid>
+      <description>provides an overview of implementing Gigabit Ethernet using Xilinx FPGAs and the TEMAC IP core.</description>
+    </item>
+  </channel>
+</rss>

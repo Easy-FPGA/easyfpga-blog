@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>What is UART? | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, Xilinx, EasyFPGA">
+<meta name="description" content="UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep1/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep1/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="What is UART?">
+  <meta property="og:description" content="UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-14T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-14T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep5/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep4/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep3/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep2/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="What is UART?">
+  <meta name="twitter:description" content="UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "What is UART?",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What is UART?",
+  "name": "What is UART?",
+  "description": "UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "What is UART? UART — Universal Asynchronous Receiver/Transmitter\nA hardware communication protocol for serial communication between two devices.\nUART is one of the oldest digital communication protocols still in active use. Despite being designed alongside early teletype systems, it appears in virtually every FPGA board, microcontroller, and development kit — because it needs only two wires and every terminal emulator on every operating system speaks it. This episode covers the fundamentals: what asynchronous communication really means, how baud rate works, and why clock drift is the central engineering challenge when implementing UART from scratch.\nKey Features Feature Description Asynchronous No dedicated clock signal between devices Simple Interface Only TX (Transmit) and RX (Receive) pins needed Full-Duplex Can send and receive data simultaneously Configurable Baud Rate Adjust transmission speed for different applications Synchronous vs Asynchronous Communication Synchronous Communication Clock ──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──\r└─┘ └─┘ └─┘ └─┘ └─┘ └─┘\rData ───X 0 X 1 X 1 X 0 X 1 X── Transmitter and receiver share the same clock Data sampled on each clock edge → reliable and fast Asynchronous Communication (UART) TX/RX ─────┐S│D0│D1│D2│D3│D4│D5│D6│D7│P│E┌─\r└─────────────────────────────┘\rStart Data Bits Stop Each device uses its own internal clock Receiver detects the start bit (falling edge) to synchronize Simple Hardware Interface Only 2 signal wires needed — TX and RX\n┌──────────────────┐ ┌──────────────────┐\r│ FPGA │ │ MCU │\r│ │ │ │\r│ UART_TX ├─────────────►│ UART_RX │\r│ │ │ │\r│ UART_RX │◄─────────────┤ UART_TX │\r│ │ │ │\r└──────────────────┘ └──────────────────┘ TX connects to RX: cross-connect Common GND is required Optional: CTS/RTS for hardware flow control Baud Rate Baud Rate — the number of signal changes (symbols) per second\n$$\\text{Bit Duration} = \\frac{1}{\\text{Baud Rate}}$$\nBaud Rate Bit Duration Typical Use 9,600 104.2 µs Sensors, legacy devices 115,200 8.68 µs PC debugging, common default 460,800 2.17 µs High-speed embedded 1,000,000 1.00 µs Industrial, short distance 115,200 bps is the most commonly used default baud rate.\nWhy is UART Considered Low-Speed? Clock Drift Problem Each device uses an independent clock, causing frequency offset to accumulate over time.\nTransmitter: ──┬──┬──┬──┬──┬──┬── (8.68 µs intervals — ideal)\rReceiver: ──┬──┬──┬──┬──┬──┬── (8.69 µs intervals — 1% off)\r↑ Sampling drift Accumulated drift → wrong bit sampled → framing error Maximum clock tolerance: typically ±2–3% Solutions Oversampling (16× or 8×): sample at the center of each bit Short frames: 10–11 bits per frame limits drift exposure Re-sync per frame: receiver resets timing on every Start bit Engineering note: Oversampling works by dividing each bit period into 16 time slots. The receiver samples at the center three slots and takes a majority vote. This tolerates both clock offset and signal transition glitches near bit edges — the reason UART reliably operates with ±2% clock tolerance between two independent oscillators.\nClock Drift Visualization TX sends: S D0 D1 D2 D3 D4 D5 D6 D7 P E\r↓\rFalling edge → RX resets timing\rRX samples (ideal): ● ● ● ● ● ● ● ●\rD0 D1 D2 D3 D4 D5 D6 D7\rRX samples (drifted): ● ● ● ● ● ● ● ●\rD0 D1 D2 D3 D4 D5 D6 [D7 → wrong!] Even a small clock mismatch can shift the sampling point into the wrong bit window The receiver re-synchronizes its timing on every Start Bit Clock Drift — Animated Visualization 0x55 frame (alternating bits) — watch sample points drift into the wrong bit window as offset accumulates\nUART vs SPI vs I²C Feature UART SPI I²C Type Asynchronous Synchronous Synchronous Data Lines 2 (TX, RX) 4 (MOSI, MISO, SCLK, SS) 2 (SDA, SCL) Speed Up to ~1 Mbps Tens of Mbps Up to 3.4 Mbps Multi-device Peer-to-peer Master-Slave (SS per device) Multi-master/slave Wiring Simplest Moderate Simplest for multi-device Use Case Debug, GPS, BT Flash, ADC, displays Sensors, EEPROM UART Applications Common Use Cases Category Examples Embedded Debug MCU/FPGA serial console (printf, log output) Wireless Modules Bluetooth (HC-05), Wi-Fi (ESP8266), GPS PC Connection USB-to-UART bridge (FT232, CP2102) Industrial RS-232 (15 m), RS-485 (1200 m) physical layer Sensor Interface LIDAR, IMU, GNSS modules Episode 1 Summary UART = Universal Asynchronous Receiver/Transmitter Asynchronous: no shared clock — only TX and RX lines required Baud Rate sets transmission speed (115200 bps most common) Clock Drift makes UART unsuitable for high-speed, long-distance links Oversampling (16×) improves receiver sampling reliability Simpler than SPI/I²C but limited to point-to-point communication Next Episode Episode 2: UART Frame Format Start bit, Data bits, Parity bit, Stop bit — detailed frame structure\nKey Takeaways UART is asynchronous: no shared clock — both sides must independently agree on baud rate and stay within ±2–3% frequency accuracy The Start Bit falling edge resets accumulated clock drift at the start of every frame; this is why UART tolerates small clock mismatches at all Oversampling (16×) divides each bit period into slots and samples the center — providing strong margin against both clock drift and line glitches Cross-connecting TX→RX is the most common wiring mistake — always verify the cross-connect before debugging the RTL Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "839",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-14T12:00:00+09:00",
+  "dateModified": "2026-03-14T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      What is UART?
+    </h1>
+    <div class="post-description">
+      UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.
+    </div>
+    <div class="post-meta"><span title='2026-03-14 12:00:00 +0900 KST'>March 14, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-uart" aria-label="What is UART?">What is UART?</a><ul>
+                        <ul>
+                        
+                <li>
+                    <a href="#key-features" aria-label="Key Features">Key Features</a></li></ul>
+                    
+                <li>
+                    <a href="#synchronous-vs-asynchronous-communication" aria-label="Synchronous vs Asynchronous Communication">Synchronous vs Asynchronous Communication</a><ul>
+                        
+                <li>
+                    <a href="#synchronous-communication" aria-label="Synchronous Communication">Synchronous Communication</a></li>
+                <li>
+                    <a href="#asynchronous-communication-uart" aria-label="Asynchronous Communication (UART)">Asynchronous Communication (UART)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#simple-hardware-interface" aria-label="Simple Hardware Interface">Simple Hardware Interface</a></li>
+                <li>
+                    <a href="#baud-rate" aria-label="Baud Rate">Baud Rate</a></li>
+                <li>
+                    <a href="#why-is-uart-considered-low-speed" aria-label="Why is UART Considered Low-Speed?">Why is UART Considered Low-Speed?</a><ul>
+                        
+                <li>
+                    <a href="#clock-drift-problem" aria-label="Clock Drift Problem">Clock Drift Problem</a></li>
+                <li>
+                    <a href="#solutions" aria-label="Solutions">Solutions</a></li></ul>
+                </li>
+                <li>
+                    <a href="#clock-drift-visualization" aria-label="Clock Drift Visualization">Clock Drift Visualization</a></li>
+                <li>
+                    <a href="#clock-drift--animated-visualization" aria-label="Clock Drift — Animated Visualization">Clock Drift — Animated Visualization</a></li>
+                <li>
+                    <a href="#uart-vs-spi-vs-ic" aria-label="UART vs SPI vs I²C">UART vs SPI vs I²C</a></li>
+                <li>
+                    <a href="#uart-applications" aria-label="UART Applications">UART Applications</a><ul>
+                        
+                <li>
+                    <a href="#common-use-cases" aria-label="Common Use Cases">Common Use Cases</a></li></ul>
+                </li>
+                <li>
+                    <a href="#episode-1-summary" aria-label="Episode 1 Summary">Episode 1 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="what-is-uart">What is UART?<a hidden class="anchor" aria-hidden="true" href="#what-is-uart">#</a></h1>
+<p><strong>UART — Universal Asynchronous Receiver/Transmitter</strong></p>
+<p>A hardware communication protocol for <strong>serial communication</strong> between two devices.</p>
+<p>UART is one of the oldest digital communication protocols still in active use. Despite being designed alongside early teletype systems, it appears in virtually every FPGA board, microcontroller, and development kit — because it needs only two wires and every terminal emulator on every operating system speaks it. This episode covers the fundamentals: what asynchronous communication really means, how baud rate works, and why clock drift is the central engineering challenge when implementing UART from scratch.</p>
+<h3 id="key-features">Key Features<a hidden class="anchor" aria-hidden="true" href="#key-features">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Feature</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Asynchronous</strong></td>
+          <td>No dedicated clock signal between devices</td>
+      </tr>
+      <tr>
+          <td><strong>Simple Interface</strong></td>
+          <td>Only TX (Transmit) and RX (Receive) pins needed</td>
+      </tr>
+      <tr>
+          <td><strong>Full-Duplex</strong></td>
+          <td>Can send and receive data simultaneously</td>
+      </tr>
+      <tr>
+          <td><strong>Configurable Baud Rate</strong></td>
+          <td>Adjust transmission speed for different applications</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="synchronous-vs-asynchronous-communication">Synchronous vs Asynchronous Communication<a hidden class="anchor" aria-hidden="true" href="#synchronous-vs-asynchronous-communication">#</a></h2>
+<h3 id="synchronous-communication">Synchronous Communication<a hidden class="anchor" aria-hidden="true" href="#synchronous-communication">#</a></h3>
+<pre tabindex="0"><code>Clock  ──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──┐ ┌──
+         └─┘  └─┘  └─┘  └─┘  └─┘  └─┘
+Data   ───X 0  X 1  X 1  X 0  X 1  X──
+</code></pre><ul>
+<li>Transmitter and receiver share the <strong>same clock</strong></li>
+<li>Data sampled on each clock edge → <strong>reliable and fast</strong></li>
+</ul>
+<h3 id="asynchronous-communication-uart">Asynchronous Communication (UART)<a hidden class="anchor" aria-hidden="true" href="#asynchronous-communication-uart">#</a></h3>
+<pre tabindex="0"><code>TX/RX  ─────┐S│D0│D1│D2│D3│D4│D5│D6│D7│P│E┌─
+            └─────────────────────────────┘
+             Start    Data Bits        Stop
+</code></pre><ul>
+<li>Each device uses its <strong>own internal clock</strong></li>
+<li>Receiver detects the <strong>start bit</strong> (falling edge) to synchronize</li>
+</ul>
+<h2 id="simple-hardware-interface">Simple Hardware Interface<a hidden class="anchor" aria-hidden="true" href="#simple-hardware-interface">#</a></h2>
+<p>Only <strong>2 signal wires</strong> needed — TX and RX</p>
+<pre tabindex="0"><code>┌──────────────────┐              ┌──────────────────┐
+│       FPGA       │              │       MCU        │
+│                  │              │                  │
+│         UART_TX  ├─────────────►│  UART_RX         │
+│                  │              │                  │
+│         UART_RX  │◄─────────────┤  UART_TX         │
+│                  │              │                  │
+└──────────────────┘              └──────────────────┘
+</code></pre><ul>
+<li>TX connects to RX: <strong>cross-connect</strong></li>
+<li>Common <strong>GND</strong> is required</li>
+<li>Optional: CTS/RTS for hardware flow control</li>
+</ul>
+<h2 id="baud-rate">Baud Rate<a hidden class="anchor" aria-hidden="true" href="#baud-rate">#</a></h2>
+<p><strong>Baud Rate</strong> — the number of signal changes (symbols) per second</p>
+<p>$$\text{Bit Duration} = \frac{1}{\text{Baud Rate}}$$</p>
+<table>
+  <thead>
+      <tr>
+          <th>Baud Rate</th>
+          <th>Bit Duration</th>
+          <th>Typical Use</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>9,600</td>
+          <td>104.2 µs</td>
+          <td>Sensors, legacy devices</td>
+      </tr>
+      <tr>
+          <td>115,200</td>
+          <td>8.68 µs</td>
+          <td>PC debugging, common default</td>
+      </tr>
+      <tr>
+          <td>460,800</td>
+          <td>2.17 µs</td>
+          <td>High-speed embedded</td>
+      </tr>
+      <tr>
+          <td>1,000,000</td>
+          <td>1.00 µs</td>
+          <td>Industrial, short distance</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>115,200 bps</strong> is the most commonly used default baud rate.</p>
+</blockquote>
+<h2 id="why-is-uart-considered-low-speed">Why is UART Considered Low-Speed?<a hidden class="anchor" aria-hidden="true" href="#why-is-uart-considered-low-speed">#</a></h2>
+<h3 id="clock-drift-problem">Clock Drift Problem<a hidden class="anchor" aria-hidden="true" href="#clock-drift-problem">#</a></h3>
+<p>Each device uses an <strong>independent clock</strong>, causing <strong>frequency offset</strong> to accumulate over time.</p>
+<pre tabindex="0"><code>Transmitter:  ──┬──┬──┬──┬──┬──┬── (8.68 µs intervals — ideal)
+Receiver:     ──┬──┬──┬──┬──┬──┬── (8.69 µs intervals — 1% off)
+                                          ↑ Sampling drift
+</code></pre><ul>
+<li>Accumulated drift → wrong bit sampled → <strong>framing error</strong></li>
+<li>Maximum clock tolerance: typically <strong>±2–3%</strong></li>
+</ul>
+<h3 id="solutions">Solutions<a hidden class="anchor" aria-hidden="true" href="#solutions">#</a></h3>
+<ul>
+<li><strong>Oversampling</strong> (16× or 8×): sample at the center of each bit</li>
+<li><strong>Short frames</strong>: 10–11 bits per frame limits drift exposure</li>
+<li><strong>Re-sync per frame</strong>: receiver resets timing on every Start bit</li>
+</ul>
+<blockquote>
+<p><strong>Engineering note</strong>: Oversampling works by dividing each bit period into 16 time slots. The receiver samples at the center three slots and takes a majority vote. This tolerates both clock offset and signal transition glitches near bit edges — the reason UART reliably operates with ±2% clock tolerance between two independent oscillators.</p>
+</blockquote>
+<h2 id="clock-drift-visualization">Clock Drift Visualization<a hidden class="anchor" aria-hidden="true" href="#clock-drift-visualization">#</a></h2>
+<pre tabindex="0"><code>TX sends:   S  D0  D1  D2  D3  D4  D5  D6  D7  P  E
+            ↓
+            Falling edge → RX resets timing
+
+RX samples (ideal):   ●    ●    ●    ●    ●    ●    ●    ●
+                      D0   D1   D2   D3   D4   D5   D6   D7
+
+RX samples (drifted): ●    ●    ●    ●    ●    ●    ●   ●
+                      D0   D1   D2   D3   D4   D5   D6  [D7 → wrong!]
+</code></pre><ul>
+<li>Even a small clock mismatch can shift the sampling point into the wrong bit window</li>
+<li>The receiver re-synchronizes its timing on <strong>every Start Bit</strong></li>
+</ul>
+<h2 id="clock-drift--animated-visualization">Clock Drift — Animated Visualization<a hidden class="anchor" aria-hidden="true" href="#clock-drift--animated-visualization">#</a></h2>
+<p><em>0x55 frame (alternating bits) — watch sample points drift into the wrong bit window as offset accumulates</em></p>
+<iframe src="/uart-html/UART Clock Drift.html" width="100%" height="450" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
+<h2 id="uart-vs-spi-vs-ic">UART vs SPI vs I²C<a hidden class="anchor" aria-hidden="true" href="#uart-vs-spi-vs-ic">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Feature</th>
+          <th>UART</th>
+          <th>SPI</th>
+          <th>I²C</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Type</strong></td>
+          <td>Asynchronous</td>
+          <td>Synchronous</td>
+          <td>Synchronous</td>
+      </tr>
+      <tr>
+          <td><strong>Data Lines</strong></td>
+          <td>2 (TX, RX)</td>
+          <td>4 (MOSI, MISO, SCLK, SS)</td>
+          <td>2 (SDA, SCL)</td>
+      </tr>
+      <tr>
+          <td><strong>Speed</strong></td>
+          <td>Up to ~1 Mbps</td>
+          <td>Tens of Mbps</td>
+          <td>Up to 3.4 Mbps</td>
+      </tr>
+      <tr>
+          <td><strong>Multi-device</strong></td>
+          <td>Peer-to-peer</td>
+          <td>Master-Slave (SS per device)</td>
+          <td>Multi-master/slave</td>
+      </tr>
+      <tr>
+          <td><strong>Wiring</strong></td>
+          <td>Simplest</td>
+          <td>Moderate</td>
+          <td>Simplest for multi-device</td>
+      </tr>
+      <tr>
+          <td><strong>Use Case</strong></td>
+          <td>Debug, GPS, BT</td>
+          <td>Flash, ADC, displays</td>
+          <td>Sensors, EEPROM</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="uart-applications">UART Applications<a hidden class="anchor" aria-hidden="true" href="#uart-applications">#</a></h2>
+<h3 id="common-use-cases">Common Use Cases<a hidden class="anchor" aria-hidden="true" href="#common-use-cases">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Category</th>
+          <th>Examples</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Embedded Debug</strong></td>
+          <td>MCU/FPGA serial console (printf, log output)</td>
+      </tr>
+      <tr>
+          <td><strong>Wireless Modules</strong></td>
+          <td>Bluetooth (HC-05), Wi-Fi (ESP8266), GPS</td>
+      </tr>
+      <tr>
+          <td><strong>PC Connection</strong></td>
+          <td>USB-to-UART bridge (FT232, CP2102)</td>
+      </tr>
+      <tr>
+          <td><strong>Industrial</strong></td>
+          <td>RS-232 (15 m), RS-485 (1200 m) physical layer</td>
+      </tr>
+      <tr>
+          <td><strong>Sensor Interface</strong></td>
+          <td>LIDAR, IMU, GNSS modules</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="episode-1-summary">Episode 1 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-1-summary">#</a></h2>
+<ul>
+<li><strong>UART</strong> = Universal Asynchronous Receiver/Transmitter</li>
+<li><strong>Asynchronous</strong>: no shared clock — only TX and RX lines required</li>
+<li><strong>Baud Rate</strong> sets transmission speed (115200 bps most common)</li>
+<li><strong>Clock Drift</strong> makes UART unsuitable for high-speed, long-distance links</li>
+<li><strong>Oversampling</strong> (16×) improves receiver sampling reliability</li>
+<li>Simpler than SPI/I²C but limited to <strong>point-to-point</strong> communication</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 2: UART Frame Format</strong>
+Start bit, Data bits, Parity bit, Stop bit — detailed frame structure</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>UART is asynchronous: no shared clock — both sides must independently agree on baud rate and stay within ±2–3% frequency accuracy</li>
+<li>The Start Bit falling edge resets accumulated clock drift at the start of every frame; this is why UART tolerates small clock mismatches at all</li>
+<li>Oversampling (16×) divides each bit period into slots and samples the center — providing strong margin against both clock drift and line glitches</li>
+<li>Cross-connecting TX→RX is the most common wiring mistake — always verify the cross-connect before debugging the RTL</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep2/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>UART Frame Format</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/crc-calculator-guide/">
+    <span class="title">Next »</span>
+    <br>
+    <span>CRC Calculator &amp; RTL Generator: Complete Guide</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

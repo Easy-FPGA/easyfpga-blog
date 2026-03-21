@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>BOM on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/bom/</link>
+    <description>Recent content in BOM on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 01 Sep 2025 00:52:45 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/bom/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FPGA Price Surge: Design Challenges and Alternative Strategies</title>
+      <link>https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/</guid>
+      <description>How post-pandemic chipflation hit FPGA pricing, what it means for product design, and what strategies engineers are using to cope.</description>
+    </item>
+  </channel>
+</rss>

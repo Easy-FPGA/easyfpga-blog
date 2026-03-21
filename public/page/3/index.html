@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head>
+	<meta name="generator" content="Hugo 0.157.0"><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>EasyFPGA</title>
+
+<meta name="description" content="FPGA Tutorials, RTL Design, and IP Cores">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://easyfpga.blog/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="EasyFPGA">
+  <meta property="og:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="EasyFPGA">
+  <meta name="twitter:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "EasyFPGA",
+  "url": "https://easyfpga.blog/",
+  "description": "FPGA Tutorials, RTL Design, and IP Cores",
+  "logo": "https://easyfpga.blog/favicon.ico",
+  "sameAs": [
+      "https://www.youtube.com/@easy-fpga", "https://github.com/Easy-FPGA"
+  ]
+}
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Line Coding (8B/10B)
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>디지털 데이터는 본질적으로 이진 비트(0과 1)의 집합이지만, 이를 실제 물리적 전송 매체(구리선, 광섬유 등)를 통해 송수신하려면 전기적 또는 광학적 신호로 변환하는 과정이 필수적이다. 이 변환 과정은 단순히 비트를 전압 레벨로 바꾸는 것 이상의 복잡한 기술적 과제를 수반한다. 가장 주요한 두 가지 과제는 DC 성분(직류 성분)의 축적과 수신기 클럭 동기화이다. 동일한 비트(예: ‘00000…’ 또는 ‘11111…’)가 장시간 연속되면 전압이 한쪽 극성으로만 유지되어 신호에 직류 성분이 누적된다. 또한, 신호의 전이(transition)가 사라져 수신기 측의 위상 동기 루프(Phase-Locked Loop, PLL) 회로가 클럭을 추출하지 못해 데이터 비트의 경계를 식별하는 데 실패한다. 이러한 문제들은 데이터 전송의 신뢰성과 무결성을 심각하게 저해한다.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-08-21 05:10:17 +0000 +0000'>August 21, 2025</span>&nbsp;·&nbsp;<span>11 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Line Coding (8B/10B)" href="https://easyfpga.blog/posts/line-coding-8b-10b/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">From Parallel Bus to High-Speed SERDES and Gigabit Transceivers
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>The Limits of Parallel Buses Traditional parallel data buses were efficient at low clock rates, but as clock frequencies increased they ran into fundamental physical barriers. The core problem is timing skew: with many parallel data lanes plus a separate clock lane, each signal travels a slightly different path length on the PCB and through the package, arriving at the receiver at slightly different times. As the clock period shrinks, even a small skew becomes a significant fraction of a bit period, and data errors follow.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-08-21 02:41:58 +0000 +0000'>August 21, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to From Parallel Bus to High-Speed SERDES and Gigabit Transceivers" href="https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UART Parity Bit and Frame Structure
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>UART Frame Format UART (Universal Asynchronous Receiver/Transmitter) sends data in a structured frame that includes the following components:
+Start Bit: Always 0; indicates the beginning of the frame.
+Data Bits: The actual payload, typically 5 to 8 bits.
+Parity Bit (optional): Used for simple error detection.
+Stop Bit(s): One or two bits set to 1; mark the end of the frame.
+Parity Bit Modes Even Parity: The parity bit is set such that the total number of 1s (including the parity bit) is even.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-07-16 12:02:34 +0000 +0000'>July 16, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to UART Parity Bit and Frame Structure" href="https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Why AMD(Xilinx) Recommends Synchronous Resets
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset
+Advantages of Synchronous Resets BenefitExplanationBetter Resource MappingSynchronous resets can be mapped directly to more FPGA resources (e.g., flip-flops inside DSPs, BRAMs).Improved Logic PerformanceAsynchronous resets can negatively affect general logic timing paths and increase routing complexity.Simpler RoutingA global asynchronous reset might not increase control sets but does require routing reset wires to many elements, which can become complex.Protects Memory StructuresAsynchronous resets may corrupt the contents of BRAMs, LUTRAMs, and SRLs during reset assertion—especially if those resources are driven by asynchronously reset registers.Placement FlexibilityWith synchronous resets, the logic can be more easily remapped during implementation for better packing and performance.Compatibility with Dedicated BlocksSome blocks like DSP48s and BRAMs only support synchronous resets, so using asynchronous resets can prevent proper inference into those blocks.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-30 12:52:30 +0000 +0000'>June 30, 2025</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Why AMD(Xilinx) Recommends Synchronous Resets" href="https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Understanding Active-Low Resets in HDL Design
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>In HDL design (such as Verilog or VHDL), an active-low reset means the reset signal is enabled when it is low (logic 0). It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:
+1. Electrical Stability Logic low (0 volts, GND) is generally more stable and noise-immune than logic high (VCC).
+During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-30 12:33:48 +0000 +0000'>June 30, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Understanding Active-Low Resets in HDL Design" href="https://easyfpga.blog/posts/active-low-reset/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA Implementation of RoCEv2
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What is the RoCE v2? RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It’s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.
+The link below is a lecture on RDMA. It provides a lot of useful information. https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info
+RoCEv2 Packet Format Ethernet Header Standard Ethernet frame header.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-17 12:21:53 +0000 +0000'>June 17, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA Implementation of RoCEv2" href="https://easyfpga.blog/posts/fpga-implementation-of-rocev2/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Skew Simulation
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What is Skew? Skew refers to the timing difference in signal arrival between multiple paths that are supposed to be synchronized.
+shows a skewed waveform between data lines.
+Why Skew Simulation Is Necessary If you simulate your design assuming everything is perfectly aligned, you may encounter issues during actual testing. In real PCBs, skew naturally exists, which is why techniques like length matching are necessary.
+However, even with length matching, the impact of skew becomes more significant as signal speed increases. Therefore, it’s important to address skew issues during simulation.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-16 23:09:38 +0000 +0000'>June 16, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Skew Simulation" href="https://easyfpga.blog/posts/skew-simulation/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Virtual Input/Output
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/vio.html
+When debugging an FPGA, there are times when you need to modify settings or parameters and monitor internal signals in real time. Setting up communication interfaces, such as receiving input from switches and keys or using UART, can be a complex process. However, AMD FPGAs offer a solution with the Virtual I/O IP, which allows these tasks to be easily performed via JTAG.
+https://docs.amd.com/v/u/en-US/pg159-vio
+Xilinx Virtual Input/Output (VIO) is a soft IP core provided by Xilinx that allows you to monitor and control internal FPGA signals in real time using the Vivado Integrated Logic Analyzer (ILA) without needing physical I/O pins.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-10 01:09:32 +0000 +0000'>June 10, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Virtual Input/Output" href="https://easyfpga.blog/posts/virtual-input-output/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">High Speed Serial Communication with AMD&#39;s Gigabit Transceiver
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What is the High Speed Serial Communication? High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability
+1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0
+10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-05 07:45:04 +0000 +0000'>June 5, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to High Speed Serial Communication with AMD&#39;s Gigabit Transceiver" href="https://easyfpga.blog/posts/high-speed-serial-communication/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">AXI with FPGA and SoC
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>AXI stands for Advanced eXtensible Interface. It is a part of the AMBA (Advanced Microcontroller Bus Architecture) protocol family, developed by ARM. AXI is designed for high-performance, high-frequency system designs and is widely adopted in FPGAs and SoCs.
+Zynq SoC connects between Processing System (PS) and Programmable Logic (PL)
+Interconnection between Xilinx IP cores (e.g., Block RAM, DMA, TEMAC)
+Communication with MicroBlaze processor
+AXI Interconnect to connect multiple master/slave devices
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-05-27 05:10:47 +0000 +0000'>May 27, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to AXI with FPGA and SoC" href="https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="https://easyfpga.blog/page/2/">
+      «&nbsp;Prev&nbsp;
+    </a>
+    <a class="next" href="https://easyfpga.blog/page/4/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

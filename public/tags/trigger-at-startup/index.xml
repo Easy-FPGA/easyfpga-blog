@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Trigger at StartUp on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/trigger-at-startup/</link>
+    <description>Recent content in Trigger at StartUp on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Mar 2025 08:44:30 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/trigger-at-startup/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Trigger At StartUp</title>
+      <link>https://easyfpga.blog/posts/trigger-at-startup/</link>
+      <pubDate>Fri, 28 Mar 2025 08:44:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/trigger-at-startup/</guid>
+      <description>The Trigger at Start up feature is used to configure the trigger settings of an ILA core in a design programming file (.bit or .pdi) so that it is pre</description>
+    </item>
+  </channel>
+</rss>

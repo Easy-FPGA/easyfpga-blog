@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>FPGA Implementation &amp; Hardware Test | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, SystemVerilog, Vivado, Xilinx, EasyFPGA">
+<meta name="description" content="End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep7/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep7/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep7/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="FPGA Implementation & Hardware Test">
+  <meta property="og:description" content="End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-22T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-22T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="SystemVerilog">
+    <meta property="article:tag" content="Vivado">
+    <meta property="article:tag" content="Xilinx">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep15/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep14/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep13/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep12/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep11/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep10/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep9/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="FPGA Implementation & Hardware Test">
+  <meta name="twitter:description" content="End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "FPGA Implementation \u0026 Hardware Test",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep7/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FPGA Implementation \u0026 Hardware Test",
+  "name": "FPGA Implementation \u0026 Hardware Test",
+  "description": "End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "SystemVerilog", "Vivado", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "FPGA Implementation \u0026 Hardware Test Simulation confirms logical correctness. FPGA implementation confirms whether the design meets timing, fits on real hardware, and behaves correctly when signals propagate through physical I/O. This episode covers the full path from RTL files to a running loopback test on an FPGA board: synthesis, ILA probing, XDC pin constraints, and a debugging workflow for when the terminal shows nothing.\nImplementation Flow RTL Design (.sv)\r│\r▼\rSynthesis (Vivado)\r─ Logic mapping to LUT/FF\r─ Resource report (LUT count, FF count)\r│\r▼\rImplementation\r─ Placement \u0026 Routing\r─ Timing report (check WNS/WHS)\r│\r▼\rBitstream Generation\r│\r▼\rProgram FPGA (JTAG)\r│\r▼\rHardware Verification\r─ ILA capture (internal signals at full clock speed)\r─ Terminal (PuTTY / Tera Term) ILA (Integrated Logic Analyzer) Insertion Add (* mark_debug = \"true\" *) attributes to signals you want to probe in hardware.\n1 2 3 4 5 6 // In uart_loopback_top.sv — mark internal signals for ILA (* mark_debug = \"true\" *) logic [7:0] rx_data; (* mark_debug = \"true\" *) logic rx_valid; (* mark_debug = \"true\" *) logic tx_busy; (* mark_debug = \"true\" *) logic parity_err; (* mark_debug = \"true\" *) logic frame_err; Vivado automatically inserts an ILA core during implementation After bitstream programming: open Vivado Hardware Manager → set trigger on rx_valid == 1 Inspect captured waveforms for RX data, parity, and frame validity at full clock speed ILA vs printf: In FPGA design, you cannot add print statements to RTL. The ILA is the equivalent — it captures hardware signal waveforms in on-chip BRAM with a configurable trigger, at full system clock speed, with zero impact on timing. Use ILA for any signal you would want to $display in simulation.\nBoard-Level Wrapper (Physical Top) uart_top is a UART core interface (parallel control/data + serial pins). For FPGA implementation, use a board-level top module that accepts the board’s differential clock, generates an internal 50 MHz clock with PLL/MMCM, and only exposes physical I/O ports.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 module uart_loopback_top ( input logic clkp, input logic clkn, input logic rstn, input logic uart_rx, output logic uart_tx ); logic clk_in, clk_50m, pll_locked; logic rst_n_sync; logic tx_start, tx_busy; logic [7:0] tx_data, rx_data; logic rx_valid, parity_err, frame_err; IBUFDS u_ibufds ( .I (clkp), .IB(clkn), .O (clk_in) ); clk_wiz_0 u_clk_wiz ( .clk_in1 (clk_in), .clk_out1(clk_50m), .locked (pll_locked) ); assign rst_n_sync = rstn \u0026 pll_locked; uart_top u_uart ( .clk(clk_50m), .rst_n(rst_n_sync), .tx_start(tx_start), .tx_data(tx_data), .tx_busy(tx_busy), .tx(uart_tx), .rx(uart_rx), .rx_data(rx_data), .rx_valid(rx_valid), .parity_err(parity_err), .frame_err(frame_err) ); // Loopback: retransmit each received byte when TX is idle. always_ff @(posedge clk_50m or negedge rst_n_sync) begin if (!rst_n_sync) begin tx_start \u003c= 1'b0; tx_data \u003c= '0; end else begin tx_start \u003c= 1'b0; if (rx_valid \u0026\u0026 !tx_busy) begin tx_data \u003c= rx_data; tx_start \u003c= 1'b1; end end end endmodule tx_data/rx_data are internal bus signals in uart_loopback_top .xdc constraints apply only to external top-level ports (clkp, clkn, rstn, uart_rx, uart_tx) .xdc Pin Assignment (AXU3EGB) 1 2 3 4 5 6 7 8 9 10 11 set_property PACKAGE_PIN AE5 [get_ports clkp] set_property PACKAGE_PIN AF12 [get_ports rstn] set_property PACKAGE_PIN AH11 [get_ports uart_rx] set_property IOSTANDARD LVDS [get_ports clkp] set_property IOSTANDARD LVDS [get_ports clkn] set_property IOSTANDARD LVCMOS33 [get_ports rstn] set_property IOSTANDARD LVCMOS33 [get_ports uart_rx] set_property IOSTANDARD LVCMOS33 [get_ports uart_tx] set_property PACKAGE_PIN AH12 [get_ports uart_tx] Note: On some boards/tools, clkn PACKAGE_PIN is auto-paired from clkp. Add an explicit clkn PACKAGE_PIN only if your flow requires it.\nAlways verify pin assignments against your board schematic. FPGA board revisions can change package pin assignments. Using the wrong PACKAGE_PIN may route the signal to an unconnected pad (silent failure) or to an incompatible I/O bank (DRC error during synthesis). The board’s reference design .xdc file is the authoritative source.\nPuTTY / Tera Term Setup Connection settings:\r┌─────────────────────────────────────────┐\r│ Serial Port: COMx (check Device Mgr) │\r│ Baud Rate: 115200 │\r│ Data Bits: 8 │\r│ Parity: Even │\r│ Stop Bits: 1 │\r│ Flow Control: None │\r└─────────────────────────────────────────┘ Type characters → the same character should echo back immediately (loopback design) If nothing appears: follow the troubleshooting guide below Troubleshooting Guide Symptom Likely Cause Fix No output at all Wrong COM port or baud rate Check Device Manager; match baud Garbled characters Baud rate mismatch Verify BAUD_CNT_MAX calculation Characters shifted/wrong Wrong parity setting Match 8E1 in both FPGA and terminal Timeout / lock-up Reset polarity or pin mismatch Confirm rst_n is mapped correctly and released High ILA no trigger Wrong trigger signal Check mark_debug attribute placement First char dropped TX starts too early Check tx_busy / flow control logic Systematic debugging order: (1) Confirm the COM port and baud rate in Device Manager. (2) Arm the ILA and trigger on rx_valid. (3) If rx_valid never triggers, the problem is at the RX input (pin, Start Bit detection, or baud rate). If it triggers but the byte value is wrong, the problem is bit ordering or parity. Start physical, work inward.\nTiming Closure Tips After Place \u0026 Route, open the Timing Report (Report Timing Summary):\nWNS (Worst Negative Slack) \u003e= 0.0 ns → PASS\rWHS (Worst Hold Slack) \u003e= 0.0 ns → PASS For a simple UART core at 50 MHz, timing closure is straightforward. Problems arise when:\nThe UART module is part of a larger design with a faster system clock Long combinational paths exist in the FSM next-state logic Reset synchronization is absent (metastability on rst_n assertion) Common fixes:\nUse pipelining to break long combinational paths Add set_max_delay / set_false_path constraints for Clock Domain Crossing (CDC) signals Reduce clock frequency if WNS is severely negative Episode 7 Summary Implementation flow: Synthesis → P\u0026R → Bitstream → Test ILA: mark_debug attribute → probe internal signals in hardware at full clock speed .xdc: correct PACKAGE_PIN and IOSTANDARD are critical PuTTY setup: 115200, 8E1, No flow control Troubleshooting: check baud rate, parity, reset, and pin assignments Next Episode Episode 8: RTL Design Review \u0026 Improvements FIFO buffering, dynamic baud rate, multi-byte framing protocol\nKey Takeaways The ILA (mark_debug attribute) is the FPGA engineer’s equivalent of a print statement — it captures hardware signal waveforms in BRAM post-trigger without affecting timing Pin assignments in .xdc are unforgiving: the wrong PACKAGE_PIN produces silent failure; always cross-reference the board’s reference design or schematic Start hardware debugging at the physical layer: COM port → baud rate → parity → then examine ILA waveforms; resist the urge to assume the RTL is wrong before proving the hardware connection works WNS \u003e= 0 and WHS \u003e= 0 in the timing report are pass/fail gates; a design with negative WNS is not timing-closed and will produce intermittent failures Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "1139",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-22T12:00:00+09:00",
+  "dateModified": "2026-03-22T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep7/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      FPGA Implementation &amp; Hardware Test
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-description">
+      End-to-end FPGA implementation: Vivado synthesis flow, ILA signal probing with mark_debug, XDC pin constraints, PuTTY terminal setup, and a systematic hardware troubleshooting guide.
+    </div>
+    <div class="post-meta"><span title='2026-03-22 12:00:00 +0900 KST'>March 22, 2026</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#fpga-implementation--hardware-test" aria-label="FPGA Implementation &amp; Hardware Test">FPGA Implementation &amp; Hardware Test</a><ul>
+                        
+                <li>
+                    <a href="#implementation-flow" aria-label="Implementation Flow">Implementation Flow</a></li>
+                <li>
+                    <a href="#ila-integrated-logic-analyzer-insertion" aria-label="ILA (Integrated Logic Analyzer) Insertion">ILA (Integrated Logic Analyzer) Insertion</a></li>
+                <li>
+                    <a href="#board-level-wrapper-physical-top" aria-label="Board-Level Wrapper (Physical Top)">Board-Level Wrapper (Physical Top)</a></li>
+                <li>
+                    <a href="#xdc-pin-assignment-axu3egb" aria-label=".xdc Pin Assignment (AXU3EGB)">.xdc Pin Assignment (AXU3EGB)</a></li>
+                <li>
+                    <a href="#putty--tera-term-setup" aria-label="PuTTY / Tera Term Setup">PuTTY / Tera Term Setup</a></li>
+                <li>
+                    <a href="#troubleshooting-guide" aria-label="Troubleshooting Guide">Troubleshooting Guide</a></li>
+                <li>
+                    <a href="#timing-closure-tips" aria-label="Timing Closure Tips">Timing Closure Tips</a></li>
+                <li>
+                    <a href="#episode-7-summary" aria-label="Episode 7 Summary">Episode 7 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="fpga-implementation--hardware-test">FPGA Implementation &amp; Hardware Test<a hidden class="anchor" aria-hidden="true" href="#fpga-implementation--hardware-test">#</a></h1>
+<p>Simulation confirms logical correctness. FPGA implementation confirms whether the design meets timing, fits on real hardware, and behaves correctly when signals propagate through physical I/O. This episode covers the full path from RTL files to a running loopback test on an FPGA board: synthesis, ILA probing, XDC pin constraints, and a debugging workflow for when the terminal shows nothing.</p>
+<h2 id="implementation-flow">Implementation Flow<a hidden class="anchor" aria-hidden="true" href="#implementation-flow">#</a></h2>
+<pre tabindex="0"><code>RTL Design (.sv)
+      │
+      ▼
+ Synthesis (Vivado)
+ ─ Logic mapping to LUT/FF
+ ─ Resource report (LUT count, FF count)
+      │
+      ▼
+ Implementation
+ ─ Placement &amp; Routing
+ ─ Timing report (check WNS/WHS)
+      │
+      ▼
+ Bitstream Generation
+      │
+      ▼
+ Program FPGA (JTAG)
+      │
+      ▼
+ Hardware Verification
+ ─ ILA capture (internal signals at full clock speed)
+ ─ Terminal (PuTTY / Tera Term)
+</code></pre><h2 id="ila-integrated-logic-analyzer-insertion">ILA (Integrated Logic Analyzer) Insertion<a hidden class="anchor" aria-hidden="true" href="#ila-integrated-logic-analyzer-insertion">#</a></h2>
+<p>Add <code>(* mark_debug = &quot;true&quot; *)</code> attributes to signals you want to probe in hardware.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#75715e">// In uart_loopback_top.sv — mark internal signals for ILA
+</span></span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span> mark_debug <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">*</span>) <span style="color:#66d9ef">logic</span> [<span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] rx_data;
+</span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span> mark_debug <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">*</span>) <span style="color:#66d9ef">logic</span>       rx_valid;
+</span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span> mark_debug <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">*</span>) <span style="color:#66d9ef">logic</span>       tx_busy;
+</span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span> mark_debug <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">*</span>) <span style="color:#66d9ef">logic</span>       parity_err;
+</span></span><span style="display:flex;"><span>(<span style="color:#f92672">*</span> mark_debug <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">*</span>) <span style="color:#66d9ef">logic</span>       frame_err;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>Vivado automatically inserts an ILA core during implementation</li>
+<li>After bitstream programming: open <strong>Vivado Hardware Manager</strong> → set trigger on <code>rx_valid == 1</code></li>
+<li>Inspect captured waveforms for RX data, parity, and frame validity at full clock speed</li>
+</ul>
+<blockquote>
+<p><strong>ILA vs printf</strong>: In FPGA design, you cannot add print statements to RTL. The ILA is the equivalent — it captures hardware signal waveforms in on-chip BRAM with a configurable trigger, at full system clock speed, with zero impact on timing. Use ILA for any signal you would want to <code>$display</code> in simulation.</p>
+</blockquote>
+<h2 id="board-level-wrapper-physical-top">Board-Level Wrapper (Physical Top)<a hidden class="anchor" aria-hidden="true" href="#board-level-wrapper-physical-top">#</a></h2>
+<p><code>uart_top</code> is a UART core interface (parallel control/data + serial pins). For FPGA implementation, use a board-level top module that accepts the board&rsquo;s differential clock, generates an internal 50 MHz clock with PLL/MMCM, and only exposes physical I/O ports.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#66d9ef">module</span> uart_loopback_top (
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span> clkp,
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span> clkn,
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span> rstn,
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span> uart_rx,
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> uart_tx
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">logic</span>       clk_in, clk_50m, pll_locked;
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">logic</span>       rst_n_sync;
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">logic</span>       tx_start, tx_busy;
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">logic</span> [<span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] tx_data, rx_data;
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">logic</span>       rx_valid, parity_err, frame_err;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     IBUFDS u_ibufds (
+</span></span><span style="display:flex;"><span>          .I (clkp),
+</span></span><span style="display:flex;"><span>          .IB(clkn),
+</span></span><span style="display:flex;"><span>          .O (clk_in)
+</span></span><span style="display:flex;"><span>     );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     clk_wiz_0 u_clk_wiz (
+</span></span><span style="display:flex;"><span>          .clk_in1 (clk_in),
+</span></span><span style="display:flex;"><span>          .clk_out1(clk_50m),
+</span></span><span style="display:flex;"><span>          .locked  (pll_locked)
+</span></span><span style="display:flex;"><span>     );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">assign</span> rst_n_sync <span style="color:#f92672">=</span> rstn <span style="color:#f92672">&amp;</span> pll_locked;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     uart_top u_uart (
+</span></span><span style="display:flex;"><span>          .clk(clk_50m), .rst_n(rst_n_sync),
+</span></span><span style="display:flex;"><span>          .tx_start(tx_start), .tx_data(tx_data), .tx_busy(tx_busy), .tx(uart_tx),
+</span></span><span style="display:flex;"><span>          .rx(uart_rx), .rx_data(rx_data), .rx_valid(rx_valid),
+</span></span><span style="display:flex;"><span>          .parity_err(parity_err), .frame_err(frame_err)
+</span></span><span style="display:flex;"><span>     );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>     <span style="color:#75715e">// Loopback: retransmit each received byte when TX is idle.
+</span></span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">always_ff</span> @(<span style="color:#66d9ef">posedge</span> clk_50m <span style="color:#66d9ef">or</span> <span style="color:#66d9ef">negedge</span> rst_n_sync) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>rst_n_sync) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>               tx_start <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">1</span><span style="color:#ae81ff">&#39;b0</span>;
+</span></span><span style="display:flex;"><span>               tx_data  <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">&#39;0</span>;
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>               tx_start <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">1</span><span style="color:#ae81ff">&#39;b0</span>;
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">if</span> (rx_valid <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>tx_busy) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>                    tx_data  <span style="color:#f92672">&lt;=</span> rx_data;
+</span></span><span style="display:flex;"><span>                    tx_start <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">1</span><span style="color:#ae81ff">&#39;b1</span>;
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">endmodule</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>tx_data/rx_data</code> are internal bus signals in <code>uart_loopback_top</code></li>
+<li><code>.xdc</code> constraints apply only to external top-level ports (<code>clkp</code>, <code>clkn</code>, <code>rstn</code>, <code>uart_rx</code>, <code>uart_tx</code>)</li>
+</ul>
+<h2 id="xdc-pin-assignment-axu3egb">.xdc Pin Assignment (AXU3EGB)<a hidden class="anchor" aria-hidden="true" href="#xdc-pin-assignment-axu3egb">#</a></h2>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-tcl" data-lang="tcl"><span style="display:flex;"><span>set_property PACKAGE_PIN AE5 <span style="color:#66d9ef">[</span>get_ports clkp<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property PACKAGE_PIN AF12 <span style="color:#66d9ef">[</span>get_ports rstn<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property PACKAGE_PIN AH11 <span style="color:#66d9ef">[</span>get_ports uart_rx<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set_property IOSTANDARD LVDS <span style="color:#66d9ef">[</span>get_ports clkp<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property IOSTANDARD LVDS <span style="color:#66d9ef">[</span>get_ports clkn<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property IOSTANDARD LVCMOS33 <span style="color:#66d9ef">[</span>get_ports rstn<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property IOSTANDARD LVCMOS33 <span style="color:#66d9ef">[</span>get_ports uart_rx<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>set_property IOSTANDARD LVCMOS33 <span style="color:#66d9ef">[</span>get_ports uart_tx<span style="color:#66d9ef">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set_property PACKAGE_PIN AH12 <span style="color:#66d9ef">[</span>get_ports uart_tx<span style="color:#66d9ef">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><strong>Note</strong>: On some boards/tools, <code>clkn</code> PACKAGE_PIN is auto-paired from <code>clkp</code>. Add an explicit <code>clkn</code> PACKAGE_PIN only if your flow requires it.</p>
+</blockquote>
+<blockquote>
+<p><strong>Always verify pin assignments against your board schematic.</strong> FPGA board revisions can change package pin assignments. Using the wrong <code>PACKAGE_PIN</code> may route the signal to an unconnected pad (silent failure) or to an incompatible I/O bank (DRC error during synthesis). The board&rsquo;s reference design <code>.xdc</code> file is the authoritative source.</p>
+</blockquote>
+<h2 id="putty--tera-term-setup">PuTTY / Tera Term Setup<a hidden class="anchor" aria-hidden="true" href="#putty--tera-term-setup">#</a></h2>
+<pre tabindex="0"><code>Connection settings:
+  ┌─────────────────────────────────────────┐
+  │  Serial Port:  COMx  (check Device Mgr) │
+  │  Baud Rate:    115200                   │
+  │  Data Bits:    8                        │
+  │  Parity:       Even                     │
+  │  Stop Bits:    1                        │
+  │  Flow Control: None                     │
+  └─────────────────────────────────────────┘
+</code></pre><ul>
+<li>Type characters → the same character should echo back immediately (loopback design)</li>
+<li>If nothing appears: follow the troubleshooting guide below</li>
+</ul>
+<h2 id="troubleshooting-guide">Troubleshooting Guide<a hidden class="anchor" aria-hidden="true" href="#troubleshooting-guide">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Symptom</th>
+          <th>Likely Cause</th>
+          <th>Fix</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>No output at all</strong></td>
+          <td>Wrong COM port or baud rate</td>
+          <td>Check Device Manager; match baud</td>
+      </tr>
+      <tr>
+          <td><strong>Garbled characters</strong></td>
+          <td>Baud rate mismatch</td>
+          <td>Verify <code>BAUD_CNT_MAX</code> calculation</td>
+      </tr>
+      <tr>
+          <td><strong>Characters shifted/wrong</strong></td>
+          <td>Wrong parity setting</td>
+          <td>Match 8E1 in both FPGA and terminal</td>
+      </tr>
+      <tr>
+          <td><strong>Timeout / lock-up</strong></td>
+          <td>Reset polarity or pin mismatch</td>
+          <td>Confirm <code>rst_n</code> is mapped correctly and released High</td>
+      </tr>
+      <tr>
+          <td><strong>ILA no trigger</strong></td>
+          <td>Wrong trigger signal</td>
+          <td>Check <code>mark_debug</code> attribute placement</td>
+      </tr>
+      <tr>
+          <td><strong>First char dropped</strong></td>
+          <td>TX starts too early</td>
+          <td>Check <code>tx_busy</code> / flow control logic</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>Systematic debugging order</strong>: (1) Confirm the COM port and baud rate in Device Manager. (2) Arm the ILA and trigger on <code>rx_valid</code>. (3) If <code>rx_valid</code> never triggers, the problem is at the RX input (pin, Start Bit detection, or baud rate). If it triggers but the byte value is wrong, the problem is bit ordering or parity. Start physical, work inward.</p>
+</blockquote>
+<h2 id="timing-closure-tips">Timing Closure Tips<a hidden class="anchor" aria-hidden="true" href="#timing-closure-tips">#</a></h2>
+<p>After <strong>Place &amp; Route</strong>, open the <strong>Timing Report</strong> (<code>Report Timing Summary</code>):</p>
+<pre tabindex="0"><code>WNS (Worst Negative Slack) &gt;= 0.0 ns  → PASS
+WHS (Worst Hold Slack)     &gt;= 0.0 ns  → PASS
+</code></pre><p>For a simple UART core at 50 MHz, timing closure is straightforward. Problems arise when:</p>
+<ul>
+<li>The UART module is part of a larger design with a faster system clock</li>
+<li>Long combinational paths exist in the FSM next-state logic</li>
+<li>Reset synchronization is absent (metastability on <code>rst_n</code> assertion)</li>
+</ul>
+<p>Common fixes:</p>
+<ul>
+<li>Use <strong>pipelining</strong> to break long combinational paths</li>
+<li>Add <code>set_max_delay</code> / <code>set_false_path</code> constraints for Clock Domain Crossing (CDC) signals</li>
+<li>Reduce clock frequency if WNS is severely negative</li>
+</ul>
+<h2 id="episode-7-summary">Episode 7 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-7-summary">#</a></h2>
+<ul>
+<li><strong>Implementation flow</strong>: Synthesis → P&amp;R → Bitstream → Test</li>
+<li><strong>ILA</strong>: <code>mark_debug</code> attribute → probe internal signals in hardware at full clock speed</li>
+<li><strong>.xdc</strong>: correct <code>PACKAGE_PIN</code> and <code>IOSTANDARD</code> are critical</li>
+<li><strong>PuTTY setup</strong>: 115200, 8E1, No flow control</li>
+<li><strong>Troubleshooting</strong>: check baud rate, parity, reset, and pin assignments</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 8: RTL Design Review &amp; Improvements</strong>
+FIFO buffering, dynamic baud rate, multi-byte framing protocol</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>The ILA (<code>mark_debug</code> attribute) is the FPGA engineer&rsquo;s equivalent of a print statement — it captures hardware signal waveforms in BRAM post-trigger without affecting timing</li>
+<li>Pin assignments in <code>.xdc</code> are unforgiving: the wrong <code>PACKAGE_PIN</code> produces silent failure; always cross-reference the board&rsquo;s reference design or schematic</li>
+<li>Start hardware debugging at the physical layer: COM port → baud rate → parity → then examine ILA waveforms; resist the urge to assume the RTL is wrong before proving the hardware connection works</li>
+<li><code>WNS &gt;= 0</code> and <code>WHS &gt;= 0</code> in the timing report are pass/fail gates; a design with negative WNS is not timing-closed and will produce intermittent failures</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/systemverilog/">SystemVerilog</a></li>
+      <li><a href="https://easyfpga.blog/tags/vivado/">Vivado</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep8/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>RTL Design Review &amp; Improvements</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep6/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Top Module — Integrating TX &amp; RX</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Board-Level Understanding and Debugging for FPGA Engineers | EasyFPGA</title>
+<meta name="keywords" content="Debug, FPGA, ILA, Schematic, Oscilloscope, SYSMON, Trigger, XADC, Signal Integrity, Power Integrity">
+<meta name="description" content="FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Board-Level Understanding and Debugging for FPGA Engineers">
+  <meta property="og:description" content="FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-13T12:11:04+00:00">
+    <meta property="article:modified_time" content="2026-02-13T12:11:04+00:00">
+    <meta property="article:tag" content="Debug">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="ILA">
+    <meta property="article:tag" content="Schematic">
+    <meta property="article:tag" content="Oscilloscope">
+    <meta property="article:tag" content="SYSMON">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Board-Level Understanding and Debugging for FPGA Engineers">
+  <meta name="twitter:description" content="FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Board-Level Understanding and Debugging for FPGA Engineers",
+      "item": "https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Board-Level Understanding and Debugging for FPGA Engineers",
+  "name": "Board-Level Understanding and Debugging for FPGA Engineers",
+  "description": "FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.",
+  "keywords": [
+    "Debug", "FPGA", "ILA", "Schematic", "Oscilloscope", "SYSMON", "Trigger", "XADC", "Signal Integrity", "Power Integrity"
+  ],
+  "articleBody": "An FPGA does not work in isolation. No matter how correct your RTL is, the design will fail if the power supply is noisy, the clock does not reach the device cleanly, or a digital interface is mismatched at the board level. FPGA engineers who can diagnose hardware problems are significantly more effective than those who can only debug RTL in simulation.\nThis post covers the board-level skills that separate a junior FPGA engineer from a senior one.\n1. Schematic and Datasheet Analysis Before the board is built — and when it comes back from the fab — the schematic is your primary diagnostic tool.\nPin mapping: Study the FPGA datasheet before finalising pin assignments. Not all pins are equal: LVDS-capable pairs, high-speed transceiver pins, dedicated clock input pins, and multi-function I/O all have specific placement constraints. Your XDC/SDC constraint file must match the schematic exactly. Verify that external clock and reset signals connect to pins that the Vivado tool permits for those functions.\nTermination: High-speed signal lines require controlled impedance and proper termination. Verify that termination resistor values in the schematic match the FPGA’s expected signaling standard. If the FPGA has tunable internal termination (e.g., TERM_100 in UltraScale I/O standards), ensure the schematic and HDL constraints agree.\nPower supply review: FPGAs have multiple power rails — VCCINT (core), VCCIO (I/O per bank), VCCAUX (auxiliary clocking), VCCBRAM, etc. Each rail has a tight voltage tolerance (typically ±3–5%). Verify that the power sequencing order matches the datasheet power-on recommendation; powering rails in the wrong order can permanently damage the device.\n2. Power Integrity Measurement A stable power supply is the foundation of correct FPGA operation. Modern FPGAs draw transient currents of tens of amperes during configuration and switching events, which create voltage ripple on the supply rails.\nOscilloscope setup for ripple measurement:\nSwitch the probe to AC coupling mode to block the DC component and amplify the small ripple on top of it. Set the vertical scale to 10–50 mV/div to resolve millivolt-level noise. Enable the 20 MHz bandwidth limiter to reduce oscilloscope self-noise if looking for low-frequency switching ripple. Power-up sequence verification: Use a multi-channel oscilloscope to capture all supply rails simultaneously during power-on. Verify that each rail ramps up within the datasheet-specified time window and in the correct order. A rail that comes up late or out of sequence is a common source of startup failures that disappear once the board is fully powered.\n3. Slow Serial Interface Debugging (I2C, SPI) I2C and SPI are used extensively for sensor initialisation, DAC/ADC configuration, and EEPROM access. They are low frequency but easy to get wrong.\nProtocol decoding: Modern oscilloscopes decode I2C and SPI in real time. Use this feature to read the actual address, register, and data values on the signal lines — not just look at the waveform shape. This immediately shows whether your RTL is generating the correct transaction sequence.\nSlew rate and glitch checking: Too high a pull-up resistor value on an I2C bus slows the rise time and rounds the edges. Too low can cause overshoot and ringing. Look for waveforms that do not reach full VOH before the next transition, or glitches on the data line during an acknowledgement stretch.\n4. High-Speed Signal Measurement and Triggering At gigabit speeds, you cannot see signal defects with a basic edge trigger. Oscilloscope trigger capability becomes the measure of debugging expertise.\nPulse width trigger: Capture pulses that are only slightly too wide or too narrow — useful for detecting single-event glitches on clock or data lines.\nEye diagram: For PCIe, Gigabit Ethernet, or SERDES links, set the oscilloscope to infinite persistence and overlay thousands of bit transitions. The resulting “eye” pattern shows:\nEye height → voltage noise margin Eye width → timing (jitter) margin Eye opening → whether the receiver can reliably sample the data A closed or partially closed eye means the link will have errors, even if the frame rate appears acceptable from higher-level statistics.\nSerial trigger (pattern trigger): Trigger the oscilloscope only when a specific bit pattern appears on a serial line (e.g., the Ethernet preamble 0x55 55 55 55 55 55 55 D5). This isolates exactly the packet boundary you want to examine without manually scrolling through hours of captured data.\n5. In-Chip Debugging Tools Vivado ILA (Integrated Logic Analyser): Insert ILA probes anywhere in your HDL design to capture on-chip signals into Block RAM and stream the result to your PC over JTAG. Supports complex trigger conditions — combinational expressions, sequences of events, counters.\nQuartus SignalTap: Intel’s equivalent in-system logic analyser, with similar capabilities.\nXADC / System Monitor (SYSMON): Every AMD/Xilinx FPGA contains a built-in 12-bit ADC connected to internal temperature and voltage sensors. Reading these in real time tells you:\nDie temperature: If logic density or clock frequency is too high, die temperature rises sharply. Use SYSMON alarms to shut down before thermal damage occurs. Compare temperature readings at different clock frequencies to verify your cooling solution (heat sink, fan) is adequate. Internal supply voltages (VCCINT, VCCAUX, VCCBRAM): If voltage droops when the design is fully switching, the VRM (Voltage Regulator Module) on the board may be undersized, or bulk decoupling capacitors near the device may be insufficient. 6. Common Real-World Scenario “Simulation passes, but the sensor returns no data on the actual board.”\nStep 1: Attach oscilloscope probes to the I2C SCL and SDA lines.\nStep 2: Set up I2C protocol decoding. Trigger on the START condition.\nStep 3: Observe: the signal fails to reach 3.3 V — it tops out at ~1.8 V.\nStep 4: Check the schematic. The level shifter supplying the 3.3 V side has its VCCA pin connected to a rail that is not powered up at the time the I2C transaction is attempted, leaving the pull-up inactive.\nResolution: Fix the power sequencing or switch the pull-up to an always-on rail.\nThis cycle — form hypothesis → measure with instruments → hardware correction — is the core debugging loop that distinguishes experienced FPGA engineers. Simulation can verify that the RTL logic is correct. Instruments tell you whether the board is actually delivering the environment the RTL expects.\n",
+  "wordCount" : "1020",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-02-13T12:11:04Z",
+  "dateModified": "2026-02-13T12:11:04Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Board-Level Understanding and Debugging for FPGA Engineers
+    </h1>
+    <div class="post-description">
+      FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.
+    </div>
+    <div class="post-meta"><span title='2026-02-13 12:11:04 +0000 +0000'>February 13, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-schematic-and-datasheet-analysis" aria-label="1. Schematic and Datasheet Analysis">1. Schematic and Datasheet Analysis</a></li>
+                <li>
+                    <a href="#2-power-integrity-measurement" aria-label="2. Power Integrity Measurement">2. Power Integrity Measurement</a></li>
+                <li>
+                    <a href="#3-slow-serial-interface-debugging-i2c-spi" aria-label="3. Slow Serial Interface Debugging (I2C, SPI)">3. Slow Serial Interface Debugging (I2C, SPI)</a></li>
+                <li>
+                    <a href="#4-high-speed-signal-measurement-and-triggering" aria-label="4. High-Speed Signal Measurement and Triggering">4. High-Speed Signal Measurement and Triggering</a></li>
+                <li>
+                    <a href="#5-in-chip-debugging-tools" aria-label="5. In-Chip Debugging Tools">5. In-Chip Debugging Tools</a></li>
+                <li>
+                    <a href="#6-common-real-world-scenario" aria-label="6. Common Real-World Scenario">6. Common Real-World Scenario</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>An FPGA does not work in isolation. No matter how correct your RTL is, the design will fail if the power supply is noisy, the clock does not reach the device cleanly, or a digital interface is mismatched at the board level. FPGA engineers who can diagnose hardware problems are significantly more effective than those who can only debug RTL in simulation.</p>
+<p>This post covers the board-level skills that separate a junior FPGA engineer from a senior one.</p>
+<h2 id="1-schematic-and-datasheet-analysis">1. Schematic and Datasheet Analysis<a hidden class="anchor" aria-hidden="true" href="#1-schematic-and-datasheet-analysis">#</a></h2>
+<p>Before the board is built — and when it comes back from the fab — the schematic is your primary diagnostic tool.</p>
+<p><strong>Pin mapping:</strong> Study the FPGA datasheet before finalising pin assignments. Not all pins are equal: LVDS-capable pairs, high-speed transceiver pins, dedicated clock input pins, and multi-function I/O all have specific placement constraints. Your XDC/SDC constraint file must match the schematic exactly. Verify that external clock and reset signals connect to pins that the Vivado tool permits for those functions.</p>
+<p><strong>Termination:</strong> High-speed signal lines require controlled impedance and proper termination. Verify that termination resistor values in the schematic match the FPGA&rsquo;s expected signaling standard. If the FPGA has tunable internal termination (e.g., <code>TERM_100</code> in UltraScale I/O standards), ensure the schematic and HDL constraints agree.</p>
+<p><strong>Power supply review:</strong> FPGAs have multiple power rails — VCCINT (core), VCCIO (I/O per bank), VCCAUX (auxiliary clocking), VCCBRAM, etc. Each rail has a tight voltage tolerance (typically ±3–5%). Verify that the power sequencing order matches the datasheet power-on recommendation; powering rails in the wrong order can permanently damage the device.</p>
+<h2 id="2-power-integrity-measurement">2. Power Integrity Measurement<a hidden class="anchor" aria-hidden="true" href="#2-power-integrity-measurement">#</a></h2>
+<p>A stable power supply is the foundation of correct FPGA operation. Modern FPGAs draw transient currents of tens of amperes during configuration and switching events, which create voltage ripple on the supply rails.</p>
+<p><strong>Oscilloscope setup for ripple measurement:</strong></p>
+<ul>
+<li>Switch the probe to <strong>AC coupling</strong> mode to block the DC component and amplify the small ripple on top of it.</li>
+<li>Set the vertical scale to 10–50 mV/div to resolve millivolt-level noise.</li>
+<li>Enable the 20 MHz bandwidth limiter to reduce oscilloscope self-noise if looking for low-frequency switching ripple.</li>
+</ul>
+<p><strong>Power-up sequence verification:</strong> Use a multi-channel oscilloscope to capture all supply rails simultaneously during power-on. Verify that each rail ramps up within the datasheet-specified time window and in the correct order. A rail that comes up late or out of sequence is a common source of startup failures that disappear once the board is fully powered.</p>
+<h2 id="3-slow-serial-interface-debugging-i2c-spi">3. Slow Serial Interface Debugging (I2C, SPI)<a hidden class="anchor" aria-hidden="true" href="#3-slow-serial-interface-debugging-i2c-spi">#</a></h2>
+<p>I2C and SPI are used extensively for sensor initialisation, DAC/ADC configuration, and EEPROM access. They are low frequency but easy to get wrong.</p>
+<p><strong>Protocol decoding:</strong> Modern oscilloscopes decode I2C and SPI in real time. Use this feature to read the actual address, register, and data values on the signal lines — not just look at the waveform shape. This immediately shows whether your RTL is generating the correct transaction sequence.</p>
+<p><strong>Slew rate and glitch checking:</strong> Too high a pull-up resistor value on an I2C bus slows the rise time and rounds the edges. Too low can cause overshoot and ringing. Look for waveforms that do not reach full VOH before the next transition, or glitches on the data line during an acknowledgement stretch.</p>
+<h2 id="4-high-speed-signal-measurement-and-triggering">4. High-Speed Signal Measurement and Triggering<a hidden class="anchor" aria-hidden="true" href="#4-high-speed-signal-measurement-and-triggering">#</a></h2>
+<p>At gigabit speeds, you cannot see signal defects with a basic edge trigger. Oscilloscope trigger capability becomes the measure of debugging expertise.</p>
+<p><strong>Pulse width trigger:</strong> Capture pulses that are only slightly too wide or too narrow — useful for detecting single-event glitches on clock or data lines.</p>
+<p><strong>Eye diagram:</strong> For PCIe, Gigabit Ethernet, or SERDES links, set the oscilloscope to infinite persistence and overlay thousands of bit transitions. The resulting &ldquo;eye&rdquo; pattern shows:</p>
+<ul>
+<li><strong>Eye height</strong> → voltage noise margin</li>
+<li><strong>Eye width</strong> → timing (jitter) margin</li>
+<li><strong>Eye opening</strong> → whether the receiver can reliably sample the data</li>
+</ul>
+<p>A closed or partially closed eye means the link will have errors, even if the frame rate appears acceptable from higher-level statistics.</p>
+<p><strong>Serial trigger (pattern trigger):</strong> Trigger the oscilloscope only when a specific bit pattern appears on a serial line (e.g., the Ethernet preamble <code>0x55 55 55 55 55 55 55 D5</code>). This isolates exactly the packet boundary you want to examine without manually scrolling through hours of captured data.</p>
+<h2 id="5-in-chip-debugging-tools">5. In-Chip Debugging Tools<a hidden class="anchor" aria-hidden="true" href="#5-in-chip-debugging-tools">#</a></h2>
+<p><strong>Vivado ILA (Integrated Logic Analyser):</strong> Insert ILA probes anywhere in your HDL design to capture on-chip signals into Block RAM and stream the result to your PC over JTAG. Supports complex trigger conditions — combinational expressions, sequences of events, counters.</p>
+<p><strong>Quartus SignalTap:</strong> Intel&rsquo;s equivalent in-system logic analyser, with similar capabilities.</p>
+<p><strong>XADC / System Monitor (SYSMON):</strong> Every AMD/Xilinx FPGA contains a built-in 12-bit ADC connected to internal temperature and voltage sensors. Reading these in real time tells you:</p>
+<ul>
+<li><strong>Die temperature:</strong> If logic density or clock frequency is too high, die temperature rises sharply. Use SYSMON alarms to shut down before thermal damage occurs. Compare temperature readings at different clock frequencies to verify your cooling solution (heat sink, fan) is adequate.</li>
+<li><strong>Internal supply voltages (VCCINT, VCCAUX, VCCBRAM):</strong> If voltage droops when the design is fully switching, the VRM (Voltage Regulator Module) on the board may be undersized, or bulk decoupling capacitors near the device may be insufficient.</li>
+</ul>
+<h2 id="6-common-real-world-scenario">6. Common Real-World Scenario<a hidden class="anchor" aria-hidden="true" href="#6-common-real-world-scenario">#</a></h2>
+<blockquote>
+<p>&ldquo;Simulation passes, but the sensor returns no data on the actual board.&rdquo;</p>
+</blockquote>
+<p><strong>Step 1:</strong> Attach oscilloscope probes to the I2C SCL and SDA lines.</p>
+<p><strong>Step 2:</strong> Set up I2C protocol decoding. Trigger on the START condition.</p>
+<p><strong>Step 3:</strong> Observe: the signal fails to reach 3.3 V — it tops out at ~1.8 V.</p>
+<p><strong>Step 4:</strong> Check the schematic. The level shifter supplying the 3.3 V side has its VCCA pin connected to a rail that is not powered up at the time the I2C transaction is attempted, leaving the pull-up inactive.</p>
+<p><strong>Resolution:</strong> Fix the power sequencing or switch the pull-up to an always-on rail.</p>
+<p>This cycle — <strong>form hypothesis → measure with instruments → hardware correction</strong> — is the core debugging loop that distinguishes experienced FPGA engineers. Simulation can verify that the RTL logic is correct. Instruments tell you whether the board is actually delivering the environment the RTL expects.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/debug/">Debug</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/ila/">ILA</a></li>
+      <li><a href="https://easyfpga.blog/tags/schematic/">Schematic</a></li>
+      <li><a href="https://easyfpga.blog/tags/oscilloscope/">Oscilloscope</a></li>
+      <li><a href="https://easyfpga.blog/tags/sysmon/">SYSMON</a></li>
+      <li><a href="https://easyfpga.blog/tags/trigger/">Trigger</a></li>
+      <li><a href="https://easyfpga.blog/tags/xadc/">XADC</a></li>
+      <li><a href="https://easyfpga.blog/tags/signal-integrity/">Signal Integrity</a></li>
+      <li><a href="https://easyfpga.blog/tags/power-integrity/">Power Integrity</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/understanding-fpga-speed-grades/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

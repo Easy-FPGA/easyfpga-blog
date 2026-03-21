@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SerDes on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/serdes/</link>
+    <description>Recent content in SerDes on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 21 Aug 2025 05:10:32 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/serdes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Role of Scrambling in High-Speed Serial Communication</title>
+      <link>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</guid>
+      <description>Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.</description>
+    </item>
+    <item>
+      <title>From Parallel Bus to High-Speed SERDES and Gigabit Transceivers</title>
+      <link>https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/</link>
+      <pubDate>Thu, 21 Aug 2025 02:41:58 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/</guid>
+      <description>Why parallel buses hit a wall at gigabit speeds, how SERDES solves the problem, and a look at AMD&amp;#39;s GTH, GTY, and GTM transceivers.</description>
+    </item>
+  </channel>
+</rss>

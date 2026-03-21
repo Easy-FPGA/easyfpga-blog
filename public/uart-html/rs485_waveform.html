@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 8px 16px; background: #f5f5f0; font-family: monospace; }
+  h3 { color: #1a7a4a; font-size: 14px; margin: 0 0 4px 0; }
+  .label { font-size: 11px; fill: #333; }
+  .sublabel { font-size: 10px; fill: #888; }
+</style>
+</head>
+<body>
+<h3>RS-485 Differential Signal (A, B, and A−B)</h3>
+<svg width="720" height="230" viewBox="0 0 720 230">
+  <rect width="720" height="230" fill="#f5f5f0"/>
+
+  <!--
+    Logic regions:
+      Logic '0': x=60..260   (A high, B low  → A−B = +5V)
+      Logic '1': x=260..460  (A low,  B high → A−B = −5V)
+      Logic '0': x=460..660  (A high, B low  → A−B = +5V)
+    
+    3 rows:
+      Row 1 (A):   top=20,  high=30, low=65,  mid=47
+      Row 2 (B):   top=85,  high=95, low=130, mid=112
+      Row 3 (A−B): top=150, pos=160, neg=195, zero=177
+    
+    Each bit width = 100px (x: 60..660)
+    Pre-idle: x=40..60
+    Post-idle: x=660..705
+  -->
+
+  <!-- ── Logic region shading ── -->
+  <rect x="60"  y="10" width="200" height="215" fill="#e8f4e8" opacity="0.5"/>
+  <rect x="260" y="10" width="200" height="215" fill="#fde8e8" opacity="0.5"/>
+  <rect x="460" y="10" width="200" height="215" fill="#e8f4e8" opacity="0.5"/>
+
+  <!-- Region labels -->
+  <text x="160" y="225" text-anchor="middle" font-size="11" fill="#1a7a4a" font-weight="bold">Logic '0'</text>
+  <text x="360" y="225" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="bold">Logic '1'</text>
+  <text x="560" y="225" text-anchor="middle" font-size="11" fill="#1a7a4a" font-weight="bold">Logic '0'</text>
+
+  <!-- ── Row separators ── -->
+  <line x1="0" y1="82" x2="720" y2="82" stroke="#bbb" stroke-width="0.5"/>
+  <line x1="0" y1="147" x2="720" y2="147" stroke="#bbb" stroke-width="0.5"/>
+
+  <!-- ── Y-axis labels ── -->
+  <text x="2" y="35" font-size="10" fill="#2980b9">+5V</text>
+  <text x="2" y="70" font-size="10" fill="#c0392b">0V</text>
+  <text x="2" y="100" font-size="10" fill="#2980b9">+5V</text>
+  <text x="2" y="135" font-size="10" fill="#c0392b">0V</text>
+  <text x="2" y="165" font-size="10" fill="#2980b9">+5V</text>
+  <text x="2" y="200" font-size="10" fill="#c0392b">−5V</text>
+
+  <!-- ── Signal name labels ── -->
+  <text x="32" y="48" font-size="12" fill="#2c5aa0" font-weight="bold" text-anchor="middle">A(+)</text>
+  <text x="32" y="113" font-size="12" fill="#e67e22" font-weight="bold" text-anchor="middle">B(−)</text>
+  <text x="32" y="178" font-size="12" fill="#27ae60" font-weight="bold" text-anchor="middle">A−B</text>
+
+  <!-- ════ A(+) waveform ════ -->
+  <!--
+    Logic '0' regions: A = HIGH (y=30)
+    Logic '1' region:  A = LOW  (y=65)
+    idle before: HIGH, idle after: HIGH
+  -->
+  <polyline points="
+    40,30
+    260,30
+    260,65
+    460,65
+    460,30
+    705,30
+  " fill="none" stroke="#2c5aa0" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- A(+) reference line (0V) -->
+  <line x1="40" y1="65" x2="705" y2="65" stroke="#aaa" stroke-width="0.7" stroke-dasharray="3,3"/>
+
+  <!-- ════ B(−) waveform ════ -->
+  <!--
+    Logic '0' regions: B = LOW  (y=130)
+    Logic '1' region:  B = HIGH (y=95)
+    idle before: LOW, idle after: LOW
+  -->
+  <polyline points="
+    40,130
+    260,130
+    260,95
+    460,95
+    460,130
+    705,130
+  " fill="none" stroke="#e67e22" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- B(−) reference line (0V) -->
+  <line x1="40" y1="130" x2="705" y2="130" stroke="#aaa" stroke-width="0.7" stroke-dasharray="3,3"/>
+
+  <!-- ════ A−B waveform ════ -->
+  <!--
+    Logic '0': A−B = +5V (y=160)
+    Logic '1': A−B = −5V (y=195)
+    0V reference: y=177
+  -->
+  <polyline points="
+    40,160
+    260,160
+    260,195
+    460,195
+    460,160
+    705,160
+  " fill="none" stroke="#27ae60" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- A−B zero reference -->
+  <line x1="40" y1="177" x2="705" y2="177" stroke="#aaa" stroke-width="0.7" stroke-dasharray="3,3"/>
+
+  <!-- A−B level annotations -->
+  <text x="160" y="157" text-anchor="middle" font-size="10" fill="#27ae60">A−B &gt; +200mV</text>
+  <text x="360" y="208" text-anchor="middle" font-size="10" fill="#c0392b">A−B &lt; −200mV</text>
+  <text x="560" y="157" text-anchor="middle" font-size="10" fill="#27ae60">A−B &gt; +200mV</text>
+
+  <!-- Transition tick marks -->
+  <line x1="60"  y1="10" x2="60"  y2="215" stroke="#666" stroke-width="0.8" stroke-dasharray="2,2"/>
+  <line x1="260" y1="10" x2="260" y2="215" stroke="#666" stroke-width="0.8" stroke-dasharray="2,2"/>
+  <line x1="460" y1="10" x2="460" y2="215" stroke="#666" stroke-width="0.8" stroke-dasharray="2,2"/>
+  <line x1="660" y1="10" x2="660" y2="215" stroke="#666" stroke-width="0.8" stroke-dasharray="2,2"/>
+
+  <!-- X axis arrow -->
+  <line x1="40" y1="215" x2="710" y2="215" stroke="#666" stroke-width="1"/>
+  <polygon points="710,212 718,215 710,218" fill="#666"/>
+  <text x="695" y="228" font-size="10" fill="#666">t</text>
+</svg>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>C on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/c/</link>
+    <description>Recent content in C on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/c/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Vitis C Code</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep12/</link>
+      <pubDate>Fri, 27 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep12/</guid>
+      <description>Writing MicroBlaze C applications in Vitis: platform creation from XSA, BSP and xparameters.h explained, loopback C code, printf routing to UART, and interrupt-driven receive.</description>
+    </item>
+  </channel>
+</rss>

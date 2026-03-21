@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>UART Parity Bit and Frame Structure | EasyFPGA</title>
+<meta name="keywords" content="FPGA, Parity, UART">
+<meta name="description" content="UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="UART Parity Bit and Frame Structure">
+  <meta property="og:description" content="UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-07-16T12:02:34+00:00">
+    <meta property="article:modified_time" content="2025-07-16T12:02:34+00:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Parity">
+    <meta property="article:tag" content="UART">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="UART Parity Bit and Frame Structure">
+  <meta name="twitter:description" content="UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "UART Parity Bit and Frame Structure",
+      "item": "https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "UART Parity Bit and Frame Structure",
+  "name": "UART Parity Bit and Frame Structure",
+  "description": "UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated",
+  "keywords": [
+    "FPGA", "Parity", "UART"
+  ],
+  "articleBody": "UART Frame Format UART (Universal Asynchronous Receiver/Transmitter) sends data in a structured frame that includes the following components:\nStart Bit: Always 0; indicates the beginning of the frame.\nData Bits: The actual payload, typically 5 to 8 bits.\nParity Bit (optional): Used for simple error detection.\nStop Bit(s): One or two bits set to 1; mark the end of the frame.\nParity Bit Modes Even Parity: The parity bit is set such that the total number of 1s (including the parity bit) is even.\nOdd Parity: The parity bit ensures the total number of 1s is odd.\nNo Parity: Parity bit is omitted.\nExample: Even Parity Calculation Let’s consider an example with ** 0x29**:\nBinary: 00101001 → Number of 1s = 3 (odd)\nEven Parity: Add parity bit 1 → Total 1s = 4 (even)\n✅ Result: For even parity, the parity bit for 0x29 is 1\nVerilog Implementation with Reduction XOR `logic [7:0] tx_data = 8'b10101010;\rparity_bit \u003c= (parity_mode) ? ~^tx_data : ^tx_data;` Using the reduction XOR operator (^), you can easily calculate the parity:\n^tx_data returns the XOR of all bits in tx_data\nFor even parity, parity_bit = ^tx_data\nFor odd parity, use ~^tx_data\nSimulation Behavior In the simulation waveform, you can clearly observe that the parity bit is transmitted immediately after the data bits. This follows the standard UART sequence.\nSimulation waveform under even parity mode\nRX-Side Parity Check Logic `parity_bit_rx \u003c= rx_line; // Received parity bit from UART frame\r// Parity bit computed from received data\rparity_bit_calc \u003c= parity_mode ? ~^shift_reg : ^shift_reg; if (parity_bit_rx != parity_bit_calc)\rrx_error \u003c= 1'b1; // Set error flag if parity doesn't match` The receiver recalculates the expected parity from the received data and compares it with the parity bit received over the wire. If the values differ, it flags a parity error.\n",
+  "wordCount" : "302",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-07-16T12:02:34Z",
+  "dateModified": "2025-07-16T12:02:34Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UART Parity Bit and Frame Structure
+    </h1>
+    <div class="post-description">
+      UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated
+    </div>
+    <div class="post-meta"><span title='2025-07-16 12:02:34 +0000 +0000'>July 16, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#uart-frame-format" aria-label="UART Frame Format">UART Frame Format</a></li>
+                <li>
+                    <a href="#parity-bit-modes" aria-label="Parity Bit Modes">Parity Bit Modes</a><ul>
+                        
+                <li>
+                    <a href="#example-even-parity-calculation" aria-label="Example: Even Parity Calculation">Example: Even Parity Calculation</a></li></ul>
+                </li>
+                <li>
+                    <a href="#verilog-implementation-with-reduction-xor" aria-label="Verilog Implementation with Reduction XOR">Verilog Implementation with Reduction XOR</a></li>
+                <li>
+                    <a href="#simulation-behavior" aria-label="Simulation Behavior">Simulation Behavior</a></li>
+                <li>
+                    <a href="#rx-side-parity-check-logic" aria-label="RX-Side Parity Check Logic">RX-Side Parity Check Logic</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="uart-frame-format">UART Frame Format<a hidden class="anchor" aria-hidden="true" href="#uart-frame-format">#</a></h2>
+<p>UART (Universal Asynchronous Receiver/Transmitter) sends data in a structured frame that includes the following components:</p>
+<ul>
+<li>
+<p><strong>Start Bit</strong>: Always <code>0</code>; indicates the beginning of the frame.</p>
+</li>
+<li>
+<p><strong>Data Bits</strong>: The actual payload, typically 5 to 8 bits.</p>
+</li>
+<li>
+<p><strong>Parity Bit</strong> <em>(optional)</em>: Used for simple error detection.</p>
+</li>
+<li>
+<p><strong>Stop Bit(s)</strong>: One or two bits set to <code>1</code>; mark the end of the frame.</p>
+</li>
+</ul>
+<h2 id="parity-bit-modes">Parity Bit Modes<a hidden class="anchor" aria-hidden="true" href="#parity-bit-modes">#</a></h2>
+<ul>
+<li>
+<p><strong>Even Parity</strong>: The parity bit is set such that the total number of <code>1</code>s (including the parity bit) is even.</p>
+</li>
+<li>
+<p><strong>Odd Parity</strong>: The parity bit ensures the total number of <code>1</code>s is odd.</p>
+</li>
+<li>
+<p><strong>No Parity</strong>: Parity bit is omitted.</p>
+</li>
+</ul>
+<h3 id="example-even-parity-calculation">Example: Even Parity Calculation<a hidden class="anchor" aria-hidden="true" href="#example-even-parity-calculation">#</a></h3>
+<p>Let&rsquo;s consider an example with ** 0x29**:</p>
+<ul>
+<li>
+<p><strong>Binary</strong>: <code>00101001</code> → Number of <code>1</code>s = 3 (odd)</p>
+</li>
+<li>
+<p><strong>Even Parity</strong>: Add parity bit <code>1</code> → Total <code>1</code>s = 4 (even)</p>
+</li>
+<li>
+<p>✅ <em>Result</em>: For even parity, the parity bit for <code>0x29</code> is <code>1</code></p>
+</li>
+</ul>
+<h2 id="verilog-implementation-with-reduction-xor">Verilog Implementation with Reduction XOR<a hidden class="anchor" aria-hidden="true" href="#verilog-implementation-with-reduction-xor">#</a></h2>
+<pre tabindex="0"><code>`logic [7:0] tx_data = 8&#39;b10101010;
+parity_bit &lt;= (parity_mode) ? ~^tx_data : ^tx_data;`
+</code></pre><p>Using the reduction XOR operator (^), you can easily calculate the parity:</p>
+<ul>
+<li>
+<p><code>^tx_data</code> returns the XOR of all bits in <code>tx_data</code></p>
+</li>
+<li>
+<p>For <strong>even parity</strong>, <code>parity_bit = ^tx_data</code></p>
+</li>
+<li>
+<p>For <strong>odd parity</strong>, use <code>~^tx_data</code></p>
+</li>
+</ul>
+<h2 id="simulation-behavior">Simulation Behavior<a hidden class="anchor" aria-hidden="true" href="#simulation-behavior">#</a></h2>
+<p>In the simulation waveform, you can clearly observe that the parity bit is transmitted immediately after the data bits. This follows the standard UART sequence.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/07/image.png?w=1024"><em>Simulation waveform under even parity mode</em></p>
+<h2 id="rx-side-parity-check-logic">RX-Side Parity Check Logic<a hidden class="anchor" aria-hidden="true" href="#rx-side-parity-check-logic">#</a></h2>
+<pre tabindex="0"><code>`parity_bit_rx   &lt;= rx_line; // Received parity bit from UART frame
+
+// Parity bit computed from received data
+parity_bit_calc &lt;= parity_mode ? ~^shift_reg : ^shift_reg; 
+
+if (parity_bit_rx != parity_bit_calc)
+    rx_error &lt;= 1&#39;b1; // Set error flag if parity doesn&#39;t match`
+</code></pre><p>The receiver recalculates the expected parity from the received data and compares it with the parity bit received over the wire. If the values differ, it flags a parity error.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/parity/">Parity</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>From Parallel Bus to High-Speed SERDES and Gigabit Transceivers</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Why AMD(Xilinx) Recommends Synchronous Resets</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

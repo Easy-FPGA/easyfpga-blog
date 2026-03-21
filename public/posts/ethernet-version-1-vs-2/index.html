@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Ethernet II vs IEEE 802.3: Key Differences Explained | EasyFPGA</title>
+<meta name="keywords" content="Ethernet, Ethernet II, Ethernet version, IEEE 802.3, EtherType">
+<meta name="description" content="The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/ethernet-version-1-vs-2/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/ethernet-version-1-vs-2/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/ethernet-version-1-vs-2/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Ethernet II vs IEEE 802.3: Key Differences Explained">
+  <meta property="og:description" content="The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-09-22T14:42:35+00:00">
+    <meta property="article:modified_time" content="2025-09-22T14:42:35+00:00">
+    <meta property="article:tag" content="Ethernet">
+    <meta property="article:tag" content="Ethernet II">
+    <meta property="article:tag" content="Ethernet Version">
+    <meta property="article:tag" content="IEEE 802.3">
+    <meta property="article:tag" content="EtherType">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Ethernet II vs IEEE 802.3: Key Differences Explained">
+  <meta name="twitter:description" content="The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Ethernet II vs IEEE 802.3: Key Differences Explained",
+      "item": "https://easyfpga.blog/posts/ethernet-version-1-vs-2/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Ethernet II vs IEEE 802.3: Key Differences Explained",
+  "name": "Ethernet II vs IEEE 802.3: Key Differences Explained",
+  "description": "The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.",
+  "keywords": [
+    "Ethernet", "Ethernet II", "Ethernet version", "IEEE 802.3", "EtherType"
+  ],
+  "articleBody": "If you have ever looked at an Ethernet frame in Wireshark and wondered why the 2-byte field at offset 12 is sometimes labelled “EtherType” and sometimes “Length”, this post explains the reason.\n1. Ethernet II (also called DIX Ethernet) Origin: Defined jointly by DEC, Intel, and Xerox in 1980 — hence the alternative name “DIX Ethernet”.\nFrame structure:\nField Size Meaning Destination MAC 6 B Target station address Source MAC 6 B Sending station address EtherType 2 B Upper-layer protocol identifier Payload 46–1500 B Network-layer packet FCS (CRC-32) 4 B Frame check sequence The 2-byte field carries an EtherType value — a number that directly identifies which protocol is encapsulated in the payload:\nEtherType Protocol 0x0800 IPv4 0x86DD IPv6 0x0806 ARP 0x8100 802.1Q VLAN tag Why it matters: Because EtherType directly names the upper protocol, IP stacks can demultiplex packets with a single table lookup. No additional header is required.\nStatus today: Ethernet II is the de-facto standard for all IPv4/IPv6 traffic worldwide.\n2. IEEE 802.3 Ethernet (Original Standard) Origin: Standardised by the IEEE 802.3 committee in 1983.\nFrame structure:\nField Size Meaning Destination MAC 6 B Target station address Source MAC 6 B Sending station address Length 2 B Number of bytes in the MAC data field (46–1500) LLC header 3 B 802.2 Logical Link Control (DSAP, SSAP, Control) Optional SNAP 5 B Carries an OUI + EtherType for protocol identification Payload variable FCS (CRC-32) 4 B Because the third field is a length rather than a protocol ID, the frame on its own cannot tell you which upper-layer protocol the payload contains. An 802.2 LLC header (and optionally a SNAP header) must follow immediately to carry that information.\nStatus today: Largely confined to legacy IBM/Novell networks and some industrial protocols. Uncommon in modern IP networks.\n3. Summary Comparison Ethernet II (DIX) IEEE 802.3 2-byte field meaning EtherType — upper protocol number Length — payload byte count Upper-protocol identification Direct (EtherType value) Indirect (requires 802.2 LLC / SNAP) Primary users IPv4, IPv6, ARP — global internet standard Legacy IBM/Novell, 802.2-based protocols Max payload 1500 B (MTU) 1500 B (same) Prevalence today Overwhelming majority Niche / legacy 4. How to Tell Them Apart Look at the numeric value of the 2-byte field at offset 12 in the frame:\n≥ 0x0600 (1536 decimal): This is an EtherType → Ethernet II frame. ≤ 0x05DC (1500 decimal): This is a Length → IEEE 802.3 frame (look for LLC/SNAP after it). Examples:\n0x0800 (2048) → Ethernet II carrying IPv4 0x86DD (34525) → Ethernet II carrying IPv6 0x05DC (1500) or less → IEEE 802.3 + LLC Practical takeaway: Every IPv4/IPv6 packet you capture in Wireshark is encapsulated in an Ethernet II frame. The IEEE 802.3 variant is effectively invisible in modern IP networks.\n",
+  "wordCount" : "458",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-09-22T14:42:35Z",
+  "dateModified": "2025-09-22T14:42:35Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/ethernet-version-1-vs-2/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Ethernet II vs IEEE 802.3: Key Differences Explained
+    </h1>
+    <div class="post-description">
+      The 2-byte field at offset 12 in an Ethernet frame means completely different things in Ethernet II and IEEE 802.3 — here is why it matters.
+    </div>
+    <div class="post-meta"><span title='2025-09-22 14:42:35 +0000 +0000'>September 22, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-ethernet-ii-also-called-dix-ethernet" aria-label="1. Ethernet II (also called DIX Ethernet)">1. Ethernet II (also called DIX Ethernet)</a></li>
+                <li>
+                    <a href="#2-ieee-8023-ethernet-original-standard" aria-label="2. IEEE 802.3 Ethernet (Original Standard)">2. IEEE 802.3 Ethernet (Original Standard)</a></li>
+                <li>
+                    <a href="#3-summary-comparison" aria-label="3. Summary Comparison">3. Summary Comparison</a></li>
+                <li>
+                    <a href="#4-how-to-tell-them-apart" aria-label="4. How to Tell Them Apart">4. How to Tell Them Apart</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>If you have ever looked at an Ethernet frame in Wireshark and wondered why the 2-byte field at offset 12 is sometimes labelled &ldquo;EtherType&rdquo; and sometimes &ldquo;Length&rdquo;, this post explains the reason.</p>
+<h2 id="1-ethernet-ii-also-called-dix-ethernet">1. Ethernet II (also called DIX Ethernet)<a hidden class="anchor" aria-hidden="true" href="#1-ethernet-ii-also-called-dix-ethernet">#</a></h2>
+<p><strong>Origin:</strong> Defined jointly by <strong>DEC, Intel, and Xerox in 1980</strong> — hence the alternative name &ldquo;DIX Ethernet&rdquo;.</p>
+<p><strong>Frame structure:</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Size</th>
+          <th>Meaning</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Destination MAC</td>
+          <td>6 B</td>
+          <td>Target station address</td>
+      </tr>
+      <tr>
+          <td>Source MAC</td>
+          <td>6 B</td>
+          <td>Sending station address</td>
+      </tr>
+      <tr>
+          <td><strong>EtherType</strong></td>
+          <td><strong>2 B</strong></td>
+          <td>Upper-layer protocol identifier</td>
+      </tr>
+      <tr>
+          <td>Payload</td>
+          <td>46–1500 B</td>
+          <td>Network-layer packet</td>
+      </tr>
+      <tr>
+          <td>FCS (CRC-32)</td>
+          <td>4 B</td>
+          <td>Frame check sequence</td>
+      </tr>
+  </tbody>
+</table>
+<p>The 2-byte field carries an <strong>EtherType value</strong> — a number that directly identifies which protocol is encapsulated in the payload:</p>
+<table>
+  <thead>
+      <tr>
+          <th>EtherType</th>
+          <th>Protocol</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>0x0800</code></td>
+          <td>IPv4</td>
+      </tr>
+      <tr>
+          <td><code>0x86DD</code></td>
+          <td>IPv6</td>
+      </tr>
+      <tr>
+          <td><code>0x0806</code></td>
+          <td>ARP</td>
+      </tr>
+      <tr>
+          <td><code>0x8100</code></td>
+          <td>802.1Q VLAN tag</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Why it matters:</strong> Because EtherType directly names the upper protocol, IP stacks can demultiplex packets with a single table lookup. No additional header is required.</p>
+<p><strong>Status today:</strong> Ethernet II is the <strong>de-facto standard for all IPv4/IPv6 traffic worldwide</strong>.</p>
+<h2 id="2-ieee-8023-ethernet-original-standard">2. IEEE 802.3 Ethernet (Original Standard)<a hidden class="anchor" aria-hidden="true" href="#2-ieee-8023-ethernet-original-standard">#</a></h2>
+<p><strong>Origin:</strong> Standardised by the <strong>IEEE 802.3 committee in 1983</strong>.</p>
+<p><strong>Frame structure:</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Size</th>
+          <th>Meaning</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Destination MAC</td>
+          <td>6 B</td>
+          <td>Target station address</td>
+      </tr>
+      <tr>
+          <td>Source MAC</td>
+          <td>6 B</td>
+          <td>Sending station address</td>
+      </tr>
+      <tr>
+          <td><strong>Length</strong></td>
+          <td><strong>2 B</strong></td>
+          <td>Number of bytes in the MAC data field (46–1500)</td>
+      </tr>
+      <tr>
+          <td>LLC header</td>
+          <td>3 B</td>
+          <td>802.2 Logical Link Control (DSAP, SSAP, Control)</td>
+      </tr>
+      <tr>
+          <td>Optional SNAP</td>
+          <td>5 B</td>
+          <td>Carries an OUI + EtherType for protocol identification</td>
+      </tr>
+      <tr>
+          <td>Payload</td>
+          <td>variable</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>FCS (CRC-32)</td>
+          <td>4 B</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<p>Because the third field is a <strong>length</strong> rather than a protocol ID, the frame on its own cannot tell you which upper-layer protocol the payload contains. An 802.2 LLC header (and optionally a SNAP header) must follow immediately to carry that information.</p>
+<p><strong>Status today:</strong> Largely confined to legacy IBM/Novell networks and some industrial protocols. Uncommon in modern IP networks.</p>
+<h2 id="3-summary-comparison">3. Summary Comparison<a hidden class="anchor" aria-hidden="true" href="#3-summary-comparison">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>Ethernet II (DIX)</th>
+          <th>IEEE 802.3</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2-byte field meaning</td>
+          <td>EtherType — upper protocol number</td>
+          <td>Length — payload byte count</td>
+      </tr>
+      <tr>
+          <td>Upper-protocol identification</td>
+          <td>Direct (EtherType value)</td>
+          <td>Indirect (requires 802.2 LLC / SNAP)</td>
+      </tr>
+      <tr>
+          <td>Primary users</td>
+          <td>IPv4, IPv6, ARP — <strong>global internet standard</strong></td>
+          <td>Legacy IBM/Novell, 802.2-based protocols</td>
+      </tr>
+      <tr>
+          <td>Max payload</td>
+          <td>1500 B (MTU)</td>
+          <td>1500 B (same)</td>
+      </tr>
+      <tr>
+          <td>Prevalence today</td>
+          <td>Overwhelming majority</td>
+          <td>Niche / legacy</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="4-how-to-tell-them-apart">4. How to Tell Them Apart<a hidden class="anchor" aria-hidden="true" href="#4-how-to-tell-them-apart">#</a></h2>
+<p>Look at the numeric value of the 2-byte field at offset 12 in the frame:</p>
+<ul>
+<li><strong>≥ 0x0600 (1536 decimal):</strong> This is an <strong>EtherType</strong> → Ethernet II frame.</li>
+<li><strong>≤ 0x05DC (1500 decimal):</strong> This is a <strong>Length</strong> → IEEE 802.3 frame (look for LLC/SNAP after it).</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>0x0800</code> (2048) → Ethernet II carrying IPv4</li>
+<li><code>0x86DD</code> (34525) → Ethernet II carrying IPv6</li>
+<li><code>0x05DC</code> (1500) or less → IEEE 802.3 + LLC</li>
+</ul>
+<blockquote>
+<p><strong>Practical takeaway:</strong> Every IPv4/IPv6 packet you capture in Wireshark is encapsulated in an <strong>Ethernet II</strong> frame. The IEEE 802.3 variant is effectively invisible in modern IP networks.</p>
+</blockquote>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/ethernet/">Ethernet</a></li>
+      <li><a href="https://easyfpga.blog/tags/ethernet-ii/">Ethernet II</a></li>
+      <li><a href="https://easyfpga.blog/tags/ethernet-version/">Ethernet Version</a></li>
+      <li><a href="https://easyfpga.blog/tags/ieee-802.3/">IEEE 802.3</a></li>
+      <li><a href="https://easyfpga.blog/tags/ethertype/">EtherType</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/lenet5-implementation-on-fpga/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>LeNet-5 Implementation on FPGA: An Overview</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-frame-structure/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Ethernet II &#43; IPv4 &#43; UDP Frame Structure Reference</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

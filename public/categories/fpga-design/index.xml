@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>FPGA Design on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/fpga-design/</link>
+    <description>Recent content in FPGA Design on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Nov 2025 22:09:14 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/fpga-design/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Critical Path and Pipelining in FPGA Design</title>
+      <link>https://easyfpga.blog/posts/critical-path-and-pipelining/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/critical-path-and-pipelining/</guid>
+      <description>What a critical path is, how it limits your clock frequency, and how to fix it with pipelining — with SystemVerilog examples.</description>
+    </item>
+    <item>
+      <title>Implementing a DDR Memory Interface on FPGA with Xilinx MIG</title>
+      <link>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</guid>
+      <description>Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.</description>
+    </item>
+    <item>
+      <title>Why AMD(Xilinx) Recommends Synchronous Resets</title>
+      <link>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</link>
+      <pubDate>Mon, 30 Jun 2025 12:52:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&#34;&gt;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;advantages-of-synchronous-resets&#34;&gt;Advantages of Synchronous Resets&lt;/h2&gt;
+&lt;p&gt;BenefitExplanation&lt;strong&gt;Better Resource Mapping&lt;/strong&gt;Synchronous resets can be mapped directly to more FPGA resources (e.g., flip-flops inside DSPs, BRAMs).&lt;strong&gt;Improved Logic Performance&lt;/strong&gt;Asynchronous resets can negatively affect general logic timing paths and increase routing complexity.&lt;strong&gt;Simpler Routing&lt;/strong&gt;A global asynchronous reset might not increase control sets but does require routing reset wires to many elements, which can become complex.&lt;strong&gt;Protects Memory Structures&lt;/strong&gt;Asynchronous resets may corrupt the contents of BRAMs, LUTRAMs, and SRLs during reset assertion—especially if those resources are driven by asynchronously reset registers.&lt;strong&gt;Placement Flexibility&lt;/strong&gt;With synchronous resets, the logic can be more easily remapped during implementation for better packing and performance.&lt;strong&gt;Compatibility with Dedicated Blocks&lt;/strong&gt;Some blocks like DSP48s and BRAMs only support synchronous resets, so using asynchronous resets can prevent proper inference into those blocks.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Understanding Active-Low Resets in HDL Design</title>
+      <link>https://easyfpga.blog/posts/active-low-reset/</link>
+      <pubDate>Mon, 30 Jun 2025 12:33:48 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/active-low-reset/</guid>
+      <description>&lt;p&gt;In HDL design (such as Verilog or VHDL), an &lt;strong&gt;active-low reset&lt;/strong&gt; means the reset signal is &lt;strong&gt;enabled when it is low (logic 0)&lt;/strong&gt;. It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:&lt;/p&gt;
+&lt;h3 id=&#34;1-electrical-stability&#34;&gt;1. &lt;strong&gt;Electrical Stability&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Logic low (0 volts, GND) is generally &lt;strong&gt;more stable and noise-immune&lt;/strong&gt; than logic high (VCC).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Virtual Input/Output</title>
+      <link>https://easyfpga.blog/posts/virtual-input-output/</link>
+      <pubDate>Tue, 10 Jun 2025 01:09:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/virtual-input-output/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/vio.html&#34;&gt;https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/vio.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;When debugging an FPGA, there are times when you need to modify settings or parameters and monitor internal signals in real time. Setting up communication interfaces, such as receiving input from switches and keys or using UART, can be a complex process. However, AMD FPGAs offer a solution with the &lt;strong&gt;Virtual I/O&lt;/strong&gt; IP, which allows these tasks to be easily performed via JTAG.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-13.png?w=1024&#34;&gt;&lt;em&gt;&lt;a href=&#34;https://docs.amd.com/v/u/en-US/pg159-vio&#34;&gt;https://docs.amd.com/v/u/en-US/pg159-vio&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Xilinx Virtual Input/Output (VIO)&lt;/strong&gt; is a soft IP core provided by Xilinx that allows you to monitor and control internal FPGA signals in real time using the Vivado Integrated Logic Analyzer (ILA) without needing physical I/O pins.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>AXI with FPGA and SoC</title>
+      <link>https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/</link>
+      <pubDate>Tue, 27 May 2025 05:10:47 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/</guid>
+      <description>AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include</description>
+    </item>
+    <item>
+      <title>Trigger At StartUp</title>
+      <link>https://easyfpga.blog/posts/trigger-at-startup/</link>
+      <pubDate>Fri, 28 Mar 2025 08:44:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/trigger-at-startup/</guid>
+      <description>The Trigger at Start up feature is used to configure the trigger settings of an ILA core in a design programming file (.bit or .pdi) so that it is pre</description>
+    </item>
+    <item>
+      <title>Vivado’s Text Editor</title>
+      <link>https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/</link>
+      <pubDate>Wed, 19 Mar 2025 21:38:24 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/</guid>
+      <description>The Vivado IDE&amp;#39;s Text Editor is less favored for coding compared to Vim and Visual Studio Code, which excel in shortcuts for tasks like find/replace a</description>
+    </item>
+  </channel>
+</rss>

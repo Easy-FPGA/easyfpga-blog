@@ -1,0 +1,16 @@
+{{/* Shortcode: anim-serial-cdr
+   Usage: {{< anim-serial-cdr width="900" height="480" src="/high-speed-interface/Serial%20Clock%20Recovery%20Animation.html" >}}
+   Defaults: width=900, height=480, src=/high-speed-interface/Serial%20Clock%20Recovery%20Animation.html
+*/}}
+{{ $w := (.Get "width") | default "900" }}
+{{ $h := (.Get "height") | default "480" }}
+{{ $src := (.Get "src") | default "/high-speed-interface/Serial%20Clock%20Recovery%20Animation.html" }}
+
+<div style="text-align:center; margin:24px 0; max-width:100%;">
+  <iframe src="{{ $src }}"
+          width="{{ $w }}" height="{{ $h }}"
+          style="width:100%; max-width:{{ $w }}px; height:{{ $h }}px; border:1px solid #334155; border-radius:12px; background:#0f172a;"
+          title="Serial Data Clock Recovery Animation"
+          loading="lazy"></iframe>
+  <div style="color:#a5b4fc; font-size:14px; margin-top:8px;">Serial Data &amp; Clock Recovery Animation</div>
+</div>

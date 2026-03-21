@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>FPGA product lines | EasyFPGA</title>
+<meta name="keywords" content="AMD, Artix, FPGA, Kintex, Portfolio, Spartan, UltraScale&#43;, Xilinx">
+<meta name="description" content="AMD&#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/fpga-product-lines/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/fpga-product-lines/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/fpga-product-lines/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="FPGA product lines">
+  <meta property="og:description" content="AMD&#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-03-19T04:30:17+00:00">
+    <meta property="article:modified_time" content="2025-03-19T04:30:17+00:00">
+    <meta property="article:tag" content="AMD">
+    <meta property="article:tag" content="Artix">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Kintex">
+    <meta property="article:tag" content="Portfolio">
+    <meta property="article:tag" content="Spartan">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="FPGA product lines">
+  <meta name="twitter:description" content="AMD&#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "FPGA product lines",
+      "item": "https://easyfpga.blog/posts/fpga-product-lines/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "FPGA product lines",
+  "name": "FPGA product lines",
+  "description": "AMD's FPGA product families, categorized into UltraScale+, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res",
+  "keywords": [
+    "AMD", "Artix", "FPGA", "Kintex", "Portfolio", "Spartan", "UltraScale+", "Xilinx"
+  ],
+  "articleBody": "Let’s explore the AMD (Xilinx) FPGA product families for reference\nhttps://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga.html\nLooking at the Portfolio on the AMD FPGA (Xilinx) website, you’ll notice it is divided into three categories. These categories are UltraScale+, UltraScale, and 7 Series at the top. This categorization of product families is based on semiconductor process technology. UltraScale+ is manufactured on the 16nm FinFET process. UltraScale is manufactured on the 20nm process. 7 Series is manufactured on the 28nm process.\nFiner process technologies offer several advantages. They provide higher chip performance. They also allow the configuration of more logic cells in the same area and result in lower power consumption.\nFPGA FamilyTarget ApplicationKey Features****Zynq UltraScale+ ****MPSoCIntegrated ARM Cortex-A53 + FPGAEmbedded systems, AI/Edge computingSpartan UltraScale+Low-cost, simple logic processingBasic FPGA logic, minimal DSP \u0026 memoryArtix UltraScale+Low power, cost-effectiveIndustrial controllers, sensor interfacesKintex UltraScale+Balanced performance \u0026 costVideo processing, wireless communication, 5GVirtex UltraScale+Highest performance, high-speed interfacesData centers, networking, AI accelerationVersal ACAPAI engines, highest processing powerMachine learning, 6G, high-speed data acceleration\nEven within the same Series, product families are divided into Spartan, Artix, Kintex, and Virtex. Each product family has a different Target Application based on price and performance. In other words, there are differences in internal architecture optimization (e.g., number of LUTs, DSP blocks, transceiver speed, memory interface).\nSpartan and Artix can be seen as low-cost, high-efficiency chips, while Kintex and Virtex require mid-to-high-level performance and high costs.\nFeature****Spartan UltraScale+****Artix UltraScale+****Kintex UltraScale+****Virtex UltraScale+****Logic Cells (LUT Count)Up to 218KUp to 308KUp to 1,843KUp to 3,780KDSP BlocksUp to 384Up to 1,200Up to 3,528Up to 12,288Block RAM (BRAM)Very SmallSmallLargerLargest (HBM Support)Transceiver SpeedUp to 16.3GbpsUp to 16.3GbpsUp to 32.75GbpsUp to 58GbpsPCIe SupportUp to Gen4x8 or Gen4x4Up to Gen4x4 or Gen3x8Up to Gen4x8 or Gen3x16Up to Gen3x16, Gen4x8Ethernet SupportNo high-speed EthernetUp to 10GUp to 100GUp to 100GDDR SupportDDR4 (up to 2,400Mbps)DDR4 (up to 2,133Mbps)DDR4 (up to 2,666Mbps)DDR4/HBM (up to 4,266Mbps)\nThe table above compares the detailed specifications of product families within UltraScale+. The Spartan family was released later compared to other product families. Some of its features also outperform Artix in certain areas.\n(AMD states that this product family was released in anticipation of the explosive growth in sensors and connected devices like robots)\nProduct families are mainly divided from Spartan to Virtex. This division is based on the amount of Logic Cells. It also depends on the internal memory blocks and the supported speed of Transceivers.\nThe link below provides a selection guide for UltraScale+ products. You can check the detailed specifications differences of internal blocks there.\nhttps://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide UltraScale+ product selection guide\n",
+  "wordCount" : "417",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-03-19T04:30:17Z",
+  "dateModified": "2025-03-19T04:30:17Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/fpga-product-lines/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      FPGA product lines
+    </h1>
+    <div class="post-description">
+      AMD&#39;s FPGA product families, categorized into UltraScale&#43;, UltraScale, and 7 Series, utilize varying semiconductor processes (16nm, 20nm, and 28nm res
+    </div>
+    <div class="post-meta"><span title='2025-03-19 04:30:17 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> 
+
+  <div class="post-content"><p>Let&rsquo;s explore the AMD (Xilinx) FPGA product families for reference</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-19.png?w=1024"><em><a href="https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga.html">https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga.html</a></em></p>
+<p>Looking at the Portfolio on the AMD FPGA (Xilinx) website, you&rsquo;ll notice it is divided into three categories. These categories are UltraScale+, UltraScale, and 7 Series at the top. This categorization of product families is based on semiconductor process technology. UltraScale+ is manufactured on the 16nm FinFET process. UltraScale is manufactured on the 20nm process. 7 Series is manufactured on the 28nm process.</p>
+<p>Finer process technologies offer several advantages. They provide higher chip performance. They also allow the configuration of more logic cells in the same area and result in lower power consumption.</p>
+<p><strong>FPGA Family<strong><strong>Target Application</strong></strong>Key Features****Zynq <strong><strong>UltraScale</strong></strong>+ ****MPSoC</strong>Integrated ARM Cortex-A53 + FPGAEmbedded systems, AI/Edge computing<strong>Spartan <strong><strong>UltraScale</strong></strong>+<strong>Low-cost, simple logic processingBasic FPGA logic, minimal DSP &amp; memory</strong>Artix UltraScale+<strong>Low power, cost-effectiveIndustrial controllers, sensor interfaces</strong>Kintex UltraScale+<strong>Balanced performance &amp; costVideo processing, wireless communication, 5G</strong>Virtex UltraScale+<strong>Highest performance, high-speed interfacesData centers, networking, AI acceleration</strong>Versal ACAP</strong>AI engines, highest processing powerMachine learning, 6G, high-speed data acceleration</p>
+<p>Even within the same Series, product families are divided into Spartan, Artix, Kintex, and Virtex. Each product family has a different Target Application based on price and performance. In other words, there are differences in internal architecture optimization (e.g., number of LUTs, DSP blocks, transceiver speed, memory interface).</p>
+<p>Spartan and Artix can be seen as low-cost, high-efficiency chips, while Kintex and Virtex require mid-to-high-level performance and high costs.</p>
+<p><strong>Feature****Spartan UltraScale+****Artix UltraScale+****Kintex UltraScale+****Virtex UltraScale+****Logic Cells (LUT Count)<strong>Up to 218KUp to 308KUp to 1,843KUp to 3,780K</strong>DSP Blocks</strong>Up to 384Up to 1,200Up to 3,528Up to 12,288<strong>Block RAM (BRAM)<strong>Very SmallSmallLargerLargest (HBM Support)<strong>Transceiver Speed</strong>Up to 16.3GbpsUp to 16.3GbpsUp to 32.75GbpsUp to 58Gbps</strong>PCIe Support</strong>Up to Gen4x8 or Gen4x4Up to Gen4x4 or Gen3x8Up to Gen4x8 or Gen3x16Up to Gen3x16, Gen4x8<strong>Ethernet Support</strong>No high-speed EthernetUp to 10GUp to 100GUp to 100G<strong>DDR Support</strong>DDR4 (up to 2,400Mbps)DDR4 (up to 2,133Mbps)DDR4 (up to 2,666Mbps)DDR4/HBM (up to 4,266Mbps)</p>
+<p>The table above compares the detailed specifications of product families within UltraScale+. The Spartan family was released later compared to other product families. Some of its features also outperform Artix in certain areas.</p>
+<p>(AMD states that this product family was released in anticipation of the explosive growth in sensors and connected devices like robots)</p>
+<p>Product families are mainly divided from Spartan to Virtex. This division is based on the amount of Logic Cells. It also depends on the internal memory blocks and the supported speed of Transceivers.</p>
+<p>The link below provides a selection guide for UltraScale+ products. You can check the detailed specifications differences of internal blocks there.</p>
+<p><a href="https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide">https://docs.amd.com/v/u/en-US/ultrascale-plus-fpga-product-selection-guide</a> UltraScale+ product selection guide</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/amd/">AMD</a></li>
+      <li><a href="https://easyfpga.blog/tags/artix/">Artix</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/kintex/">Kintex</a></li>
+      <li><a href="https://easyfpga.blog/tags/portfolio/">Portfolio</a></li>
+      <li><a href="https://easyfpga.blog/tags/spartan/">Spartan</a></li>
+      <li><a href="https://easyfpga.blog/tags/ultrascale&#43;/">UltraScale&#43;</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Implementation of UART with Xilinx FPGA and AXI Uartlite IP</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga-manufacturers/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA Manufacturers</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

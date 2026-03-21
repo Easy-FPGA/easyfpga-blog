@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync | EasyFPGA</title>
+<meta name="keywords" content="source-synchronous, parallel interface, DDR, skew, signal integrity, DQS">
+<meta name="description" content="Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&#39;s DQ&#43;DQS pair solve the timing problem.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/source-synchronous-parallel-interface/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/source-synchronous-parallel-interface/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/source-synchronous-parallel-interface/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync">
+  <meta property="og:description" content="Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&#39;s DQ&#43;DQS pair solve the timing problem.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-12T10:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-12T10:00:00+09:00">
+    <meta property="article:tag" content="Source-Synchronous">
+    <meta property="article:tag" content="Parallel Interface">
+    <meta property="article:tag" content="DDR">
+    <meta property="article:tag" content="Skew">
+    <meta property="article:tag" content="Signal Integrity">
+    <meta property="article:tag" content="DQS">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync">
+  <meta name="twitter:description" content="Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&#39;s DQ&#43;DQS pair solve the timing problem.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync",
+      "item": "https://easyfpga.blog/posts/source-synchronous-parallel-interface/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync",
+  "name": "Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync",
+  "description": "Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR's DQ+DQS pair solve the timing problem.",
+  "keywords": [
+    "source-synchronous", "parallel interface", "DDR", "skew", "signal integrity", "DQS"
+  ],
+  "articleBody": "Overview As parallel interfaces push to higher speeds, keeping all data bits synchronized becomes increasingly difficult. This post explains why global clock distribution hits a wall — and how source-synchronous signaling solves it.\nSignal Propagation on PCB Before diving into timing, it helps to understand how fast signals actually travel on a PCB:\nTypical propagation speed on FR4: 15–17 cm/ns A 1 cm trace length difference ≈ 60–70 ps of timing skew At 1 GHz (1 ns period), 70 ps of skew already consumes 7% of your entire timing budget from a single centimeter of mismatch. As data rates climb, this becomes unmanageable.\nThe Problem with Global Synchronous Clocking In a globally synchronous system, one central clock is distributed to all receivers across the board.\nGlobal Synchronous — Clock skew accumulates across traces\r■ CLK\r■ D[0] (short trace)\r■ D[1] (long trace)\r■ D[2] (longer trace)\rThe core problem: As trace lengths diverge, each data bit arrives at a slightly different time. The receiver must sample all bits with a single clock edge — but the valid window shrinks as skew grows.\nSource-Synchronous: Send the Clock with the Data The source-synchronous approach eliminates the global clock problem by having the transmitter send its own sampling strobe alongside the data.\nIn DDR memory, this is the DQS (Data Strobe) signal — one strobe per byte lane, traveling with its 8 data bits (DQ).\nSource-Synchronous — DQS strobe travels with DQ data\r■ DQS (strobe)\r■ DQ[0]\r■ DQ[1]\r■ DQ[2]\r■ DQ[3]\r↕ sample point\rKey insight: The DQS strobe and DQ data experience the same board-level delay — they travel the same path. The receiver simply uses DQS edges to sample DQ, regardless of how long the traces are.\nGlobal Synchronous vs. Source-Synchronous Global Synchronous Source-Synchronous Clock source Central, shared Transmitted with data Skew challenge All traces vs. clock tree Only intra-pair (DQ↔DQS) Trace matching Every signal to clock DQ matched to DQS per byte lane Example PCI, ISA DDR2/3/4/5, LPDDR Speed limit ~200–400 MHz 3200+ MT/s DDR4 in Practice DDR4 organizes its signals into byte lanes. Each lane has:\n8× DQ bits 1× DQS (differential) — the strobe for that lane 1× DM (data mask) Byte Lane 0 Byte Lane 1\rDQ[7:0] ←→ DQS0 DQ[15:8] ←→ DQS1 The FPGA MIG (Memory Interface Generator) or PHY automatically handles:\nWrite Leveling — aligns DQS to the memory clock on write Read Training — calibrates DQ sampling window on read These calibration routines compensate for any remaining board-level skew at startup.\nPCB Design Guidelines Intra-pair matching (DQ↔DQS within same byte lane): within ±10 ps (≈ 1–2 mm on FR4) Inter-pair matching (between byte lanes): within ±25 ps — relaxed because each lane has its own strobe Use serpentine (meander) routing for length matching Keep all DQ/DQS traces on the same PCB layer with consistent impedance (typically 40–50 Ω differential) Minimize stubs and via transitions Summary Global synchronous clocking struggles beyond a few hundred MHz due to skew accumulation across the board Source-synchronous moves the reference clock to the data source — the strobe travels with the data, so board delay cancels out DDR memory’s DQ+DQS pairing is the canonical example: each byte lane has its own strobe, limiting skew control to just that group PCB design requires intra-pair trace matching to within picoseconds; write leveling and read training handle the rest at runtime ",
+  "wordCount" : "562",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-12T10:00:00+09:00",
+  "dateModified": "2026-03-12T10:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/source-synchronous-parallel-interface/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync
+    </h1>
+    <div class="post-description">
+      Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&#39;s DQ&#43;DQS pair solve the timing problem.
+    </div>
+    <div class="post-meta"><span title='2026-03-12 10:00:00 +0900 KST'>March 12, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#overview" aria-label="Overview">Overview</a></li>
+                <li>
+                    <a href="#signal-propagation-on-pcb" aria-label="Signal Propagation on PCB">Signal Propagation on PCB</a></li>
+                <li>
+                    <a href="#the-problem-with-global-synchronous-clocking" aria-label="The Problem with Global Synchronous Clocking">The Problem with Global Synchronous Clocking</a></li>
+                <li>
+                    <a href="#source-synchronous-send-the-clock-with-the-data" aria-label="Source-Synchronous: Send the Clock with the Data">Source-Synchronous: Send the Clock with the Data</a></li>
+                <li>
+                    <a href="#global-synchronous-vs-source-synchronous" aria-label="Global Synchronous vs. Source-Synchronous">Global Synchronous vs. Source-Synchronous</a></li>
+                <li>
+                    <a href="#ddr4-in-practice" aria-label="DDR4 in Practice">DDR4 in Practice</a></li>
+                <li>
+                    <a href="#pcb-design-guidelines" aria-label="PCB Design Guidelines">PCB Design Guidelines</a></li>
+                <li>
+                    <a href="#summary" aria-label="Summary">Summary</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>As parallel interfaces push to higher speeds, keeping all data bits synchronized becomes increasingly difficult. This post explains why global clock distribution hits a wall — and how <strong>source-synchronous</strong> signaling solves it.</p>
+<hr>
+<h2 id="signal-propagation-on-pcb">Signal Propagation on PCB<a hidden class="anchor" aria-hidden="true" href="#signal-propagation-on-pcb">#</a></h2>
+<p>Before diving into timing, it helps to understand how fast signals actually travel on a PCB:</p>
+<ul>
+<li>Typical propagation speed on FR4: <strong>15–17 cm/ns</strong></li>
+<li>A 1 cm trace length difference ≈ <strong>60–70 ps</strong> of timing skew</li>
+</ul>
+<p>At 1 GHz (1 ns period), 70 ps of skew already consumes <strong>7% of your entire timing budget</strong> from a single centimeter of mismatch. As data rates climb, this becomes unmanageable.</p>
+<hr>
+<h2 id="the-problem-with-global-synchronous-clocking">The Problem with Global Synchronous Clocking<a hidden class="anchor" aria-hidden="true" href="#the-problem-with-global-synchronous-clocking">#</a></h2>
+<p>In a globally synchronous system, one central clock is distributed to all receivers across the board.</p>
+<div class="anim-container" style="background:#1a1a2e;border-radius:10px;padding:24px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.85rem;margin-bottom:12px;">Global Synchronous — Clock skew accumulates across traces</div>
+  <canvas id="globalClkCanvas" width="680" height="180" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem;">
+    <span style="color:#f6e05e;">&#9632; CLK</span>
+    <span style="color:#68d391;">&#9632; D[0] (short trace)</span>
+    <span style="color:#fc8181;">&#9632; D[1] (long trace)</span>
+    <span style="color:#76e4f7;">&#9632; D[2] (longer trace)</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('globalClkCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const colors = ['#f6e05e','#68d391','#fc8181','#76e4f7'];
+  const labels = ['CLK','D[0]','D[1]','D[2]'];
+  const delays = [0, 0, 8, 18];
+  let t = 0;
+
+  function drawWave(y, color, delay, period, high) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const rowH = 28;
+    for (let x = 0; x < W; x++) {
+      const phase = ((x - delay + t) % period + period) % period;
+      const val = phase < period / 2 ? high : high + rowH;
+      if (x === 0) ctx.moveTo(x, y + val);
+      else ctx.lineTo(x, y + val);
+    }
+    ctx.stroke();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, W, H);
+    const period = 80;
+    const rowSpacing = 42;
+    delays.forEach((d, i) => {
+      drawWave(i * rowSpacing + 4, colors[i], d, period, 0);
+      ctx.fillStyle = colors[i];
+      ctx.font = '11px monospace';
+      ctx.fillText(labels[i], 4, i * rowSpacing + 18);
+    });
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.setLineDash([3,3]);
+    ctx.lineWidth = 1;
+    [120, 200, 280].forEach(xBase => {
+      ctx.beginPath(); ctx.moveTo(xBase, 8); ctx.lineTo(xBase, H - 8); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xBase + delays[2], 8); ctx.lineTo(xBase + delays[2], H - 8); ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    t = (t + 0.6) % period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
+
+<p><strong>The core problem:</strong> As trace lengths diverge, each data bit arrives at a slightly different time. The receiver must sample all bits with a single clock edge — but the valid window shrinks as skew grows.</p>
+<hr>
+<h2 id="source-synchronous-send-the-clock-with-the-data">Source-Synchronous: Send the Clock with the Data<a hidden class="anchor" aria-hidden="true" href="#source-synchronous-send-the-clock-with-the-data">#</a></h2>
+<p>The source-synchronous approach eliminates the global clock problem by having the <strong>transmitter send its own sampling strobe alongside the data</strong>.</p>
+<p>In DDR memory, this is the <strong>DQS (Data Strobe)</strong> signal — one strobe per byte lane, traveling with its 8 data bits (DQ).</p>
+<div class="anim-container" style="background:#1a1a2e;border-radius:10px;padding:24px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.85rem;margin-bottom:12px;">Source-Synchronous — DQS strobe travels with DQ data</div>
+  <canvas id="ssCanvas" width="680" height="220" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; DQS (strobe)</span>
+    <span style="color:#68d391;">&#9632; DQ[0]</span>
+    <span style="color:#fc8181;">&#9632; DQ[1]</span>
+    <span style="color:#76e4f7;">&#9632; DQ[2]</span>
+    <span style="color:#b794f4;">&#9632; DQ[3]</span>
+    <span style="color:#ff6b6b;">&#8597; sample point</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('ssCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const groupDelay = 22;
+  const colors = ['#f6e05e','#68d391','#fc8181','#76e4f7','#b794f4'];
+  const labels = ['DQS','DQ[0]','DQ[1]','DQ[2]','DQ[3]'];
+  const intraSkew = [0, 2, -2, 3, -1];
+  let t = 0;
+  const period = 80;
+  const rowSpacing = 40;
+
+  function drawWave(y, color, skew, isDQS) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isDQS ? 2.5 : 1.8;
+    ctx.beginPath();
+    const rowH = isDQS ? 22 : 20;
+    for (let x = 0; x < W; x++) {
+      const phase = ((x - groupDelay - skew + t) % period + period) % period;
+      const val = phase < period / 2 ? 0 : rowH;
+      if (x === 0) ctx.moveTo(x, y + val);
+      else ctx.lineTo(x, y + val);
+    }
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.font = '11px monospace';
+    ctx.fillText(labels[isDQS ? 0 : intraSkew.indexOf(skew)], 4, y + 14);
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, W, H);
+
+    labels.forEach((l, i) => {
+      ctx.strokeStyle = colors[i];
+      ctx.lineWidth = i === 0 ? 2.5 : 1.8;
+      ctx.beginPath();
+      const rowH = i === 0 ? 22 : 20;
+      for (let x = 0; x < W; x++) {
+        const phase = ((x - groupDelay - intraSkew[i] + t) % period + period) % period;
+        const val = phase < period / 2 ? 0 : rowH;
+        if (x === 0) ctx.moveTo(x, i * rowSpacing + 6 + val);
+        else ctx.lineTo(x, i * rowSpacing + 6 + val);
+      }
+      ctx.stroke();
+      ctx.fillStyle = colors[i];
+      ctx.font = '11px monospace';
+      ctx.fillText(l, 4, i * rowSpacing + 20);
+    });
+
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,3]);
+    for (let x = groupDelay; x < W; x += period) {
+      const xPos = (x - t % period + period) % period + groupDelay;
+      if (xPos > 0 && xPos < W) {
+        ctx.beginPath(); ctx.moveTo(xPos, 0); ctx.lineTo(xPos, H); ctx.stroke();
+      }
+    }
+    ctx.setLineDash([]);
+
+    t = (t + 0.6) % period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
+
+<p><strong>Key insight:</strong> The DQS strobe and DQ data experience the <em>same</em> board-level delay — they travel the same path. The receiver simply uses DQS edges to sample DQ, regardless of how long the traces are.</p>
+<hr>
+<h2 id="global-synchronous-vs-source-synchronous">Global Synchronous vs. Source-Synchronous<a hidden class="anchor" aria-hidden="true" href="#global-synchronous-vs-source-synchronous">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>Global Synchronous</th>
+          <th>Source-Synchronous</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Clock source</td>
+          <td>Central, shared</td>
+          <td>Transmitted with data</td>
+      </tr>
+      <tr>
+          <td>Skew challenge</td>
+          <td>All traces vs. clock tree</td>
+          <td>Only intra-pair (DQ↔DQS)</td>
+      </tr>
+      <tr>
+          <td>Trace matching</td>
+          <td>Every signal to clock</td>
+          <td>DQ matched to DQS per byte lane</td>
+      </tr>
+      <tr>
+          <td>Example</td>
+          <td>PCI, ISA</td>
+          <td>DDR2/3/4/5, LPDDR</td>
+      </tr>
+      <tr>
+          <td>Speed limit</td>
+          <td>~200–400 MHz</td>
+          <td>3200+ MT/s</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="ddr4-in-practice">DDR4 in Practice<a hidden class="anchor" aria-hidden="true" href="#ddr4-in-practice">#</a></h2>
+<p>DDR4 organizes its signals into <strong>byte lanes</strong>. Each lane has:</p>
+<ul>
+<li>8× DQ bits</li>
+<li>1× DQS (differential) — the strobe for that lane</li>
+<li>1× DM (data mask)</li>
+</ul>
+<pre tabindex="0"><code>Byte Lane 0          Byte Lane 1
+DQ[7:0] ←→ DQS0     DQ[15:8] ←→ DQS1
+</code></pre><p>The FPGA MIG (Memory Interface Generator) or PHY automatically handles:</p>
+<ul>
+<li><strong>Write Leveling</strong> — aligns DQS to the memory clock on write</li>
+<li><strong>Read Training</strong> — calibrates DQ sampling window on read</li>
+</ul>
+<p>These calibration routines compensate for any remaining board-level skew at startup.</p>
+<hr>
+<h2 id="pcb-design-guidelines">PCB Design Guidelines<a hidden class="anchor" aria-hidden="true" href="#pcb-design-guidelines">#</a></h2>
+<ul>
+<li><strong>Intra-pair matching</strong> (DQ↔DQS within same byte lane): within <strong>±10 ps</strong> (≈ 1–2 mm on FR4)</li>
+<li><strong>Inter-pair matching</strong> (between byte lanes): within <strong>±25 ps</strong> — relaxed because each lane has its own strobe</li>
+<li>Use serpentine (meander) routing for length matching</li>
+<li>Keep all DQ/DQS traces on the same PCB layer with consistent impedance (typically 40–50 Ω differential)</li>
+<li>Minimize stubs and via transitions</li>
+</ul>
+<hr>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<ul>
+<li>Global synchronous clocking struggles beyond a few hundred MHz due to skew accumulation across the board</li>
+<li>Source-synchronous moves the reference clock to the data source — the strobe travels with the data, so board delay cancels out</li>
+<li>DDR memory&rsquo;s DQ+DQS pairing is the canonical example: each byte lane has its own strobe, limiting skew control to just that group</li>
+<li>PCB design requires intra-pair trace matching to within picoseconds; write leveling and read training handle the rest at runtime</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/source-synchronous/">Source-Synchronous</a></li>
+      <li><a href="https://easyfpga.blog/tags/parallel-interface/">Parallel Interface</a></li>
+      <li><a href="https://easyfpga.blog/tags/ddr/">DDR</a></li>
+      <li><a href="https://easyfpga.blog/tags/skew/">Skew</a></li>
+      <li><a href="https://easyfpga.blog/tags/signal-integrity/">Signal Integrity</a></li>
+      <li><a href="https://easyfpga.blog/tags/dqs/">DQS</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/crc-calculator-guide/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>CRC Calculator &amp; RTL Generator: Complete Guide</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/high-speed-parallel-interface-design/">
+    <span class="title">Next »</span>
+    <br>
+    <span>High-Speed Parallel Interface Design: Principles, Limitations, and Practice</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

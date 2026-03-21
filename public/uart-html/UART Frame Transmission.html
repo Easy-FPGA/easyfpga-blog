@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UART Frame Transmission</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f1117; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: 'Segoe UI', monospace; color: #ccc; }
+    h2 { font-size: 15px; color: #90caf9; margin-bottom: 8px; letter-spacing: .5px; }
+    canvas { border-radius: 8px; display: block; }
+    #info { margin-top: 10px; display: flex; gap: 18px; font-size: 11px; flex-wrap: wrap; justify-content: center; }
+    .badge { padding: 3px 10px; border-radius: 12px; font-weight: bold; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>UART Frame Transmission — 0xA5, 8E1, 115 200 bps</h2>
+  <canvas id="c" width="720" height="210"></canvas>
+  <div id="info">
+    <span class="badge" style="background:#ef535033;color:#ef9090;">Start bit = 0 (falling edge → RX syncs)</span>
+    <span class="badge" style="background:#1565c044;color:#90caf9;">Data bits: LSB first</span>
+    <span class="badge" style="background:#e65100aa;color:#ffcc80;">Parity bit (even)</span>
+    <span class="badge" style="background:#1b5e2044;color:#a5d6a7;">Stop bit = 1</span>
+  </div>
+
+  <script>
+  (function () {
+    var c = document.getElementById('c');
+    var g = c.getContext('2d');
+    var W = 720, H = 210;
+
+    // 0xA5 = 1010_0101 → LSB first: D0=1, D1=0, D2=1, D3=0, D4=0, D5=1, D6=0, D7=1
+    // Even parity: count of 1s in data = 4 (even) → parity bit = 0
+    var bits   = [  1,     0,     1,    0,    1,    0,    0,    1,    0,    1,    0,    1,    1];
+    var labels = ['idle','Start','D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'Par','Stop','idle'];
+    var values = [  '1',  '0',   '1',  '0',  '1',  '0',  '0',  '1',  '0',  '1',  '0',  '1',  '1'];
+    // Colors per field
+    var clrs   = ['#607d8b','#ef5350','#42a5f5','#42a5f5','#42a5f5','#42a5f5',
+                  '#42a5f5','#42a5f5','#42a5f5','#42a5f5','#ffa726','#66bb6a','#607d8b'];
+
+    var N = bits.length;
+    var bw = 48, ox = 16, ty = 84, th = 40;
+    var cur = 0, timer = 0, SPEED = 52, holdTick = 0;
+
+    function draw() {
+      g.clearRect(0, 0, W, H);
+      g.fillStyle = '#0f1117'; g.fillRect(0, 0, W, H);
+
+      // --- Draw already-transmitted signal (solid) ---
+      for (var i = 0; i < N - 1; i++) {
+        if (i > cur) continue;
+        var x0 = ox + bw * i, x1 = ox + bw * (i + 1);
+        var y0 = ty - bits[i] * th, y1 = ty - bits[i + 1] * th;
+
+        g.strokeStyle = (i === cur) ? clrs[i] : '#2a4a6a';
+        g.lineWidth = (i === cur) ? 3 : 2;
+        g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y0);
+        if (y0 !== y1) g.lineTo(x1, y1);
+        g.stroke();
+      }
+
+      // --- Active bit highlight box ---
+      if (cur < N) {
+        var bx = ox + bw * cur;
+        g.fillStyle = clrs[cur] + '22';
+        g.fillRect(bx, ty - th - 10, bw, th * 2 + 18);
+        g.strokeStyle = clrs[cur] + 'aa';
+        g.lineWidth = 1.5; g.strokeRect(bx, ty - th - 10, bw, th * 2 + 18);
+      }
+
+      // --- Labels below waveform ---
+      for (var i = 0; i < N; i++) {
+        var cx = ox + bw * i + bw / 2;
+        var dim = i > cur;
+        g.globalAlpha = dim ? 0.20 : 1.0;
+        g.fillStyle = (i === cur) ? clrs[i] : '#607d8b';
+        g.font = (i === cur) ? 'bold 10px monospace' : '10px monospace';
+        g.textAlign = 'center';
+        g.fillText(labels[i], cx, ty + th + 18);
+        // bit value above
+        g.fillStyle = '#aaa'; g.font = '11px monospace';
+        g.fillText(values[i], cx, ty - th - 14);
+        g.globalAlpha = 1.0;
+      }
+
+      // --- Status line ---
+      if (cur < N) {
+        var fieldName = labels[cur];
+        var fieldDesc =
+          cur === 0 || cur === N - 1 ? 'Idle — line HIGH (logic 1)' :
+          cur === 1  ? 'Start bit — line LOW → receiver resets timing' :
+          cur === N - 2 ? 'Stop bit — line HIGH → frame complete' :
+          cur === N - 3 ? 'Parity bit — even parity: 4 ones in data → P = 0' :
+          'Data bit ' + (cur - 2) + ' = ' + values[cur] + '  (0xA5, LSB first: bit' + (cur-2) + ')';
+
+        g.fillStyle = clrs[cur];
+        g.font = 'bold 13px monospace';
+        g.textAlign = 'center';
+        g.fillText(fieldName + ' = ' + values[cur] + '   →   ' + fieldDesc, W / 2, H - 10);
+      }
+
+      // TX label
+      g.fillStyle = '#90caf9'; g.font = 'bold 11px monospace'; g.textAlign = 'left'; g.globalAlpha = 1;
+      g.fillText('TX', 2, ty - th - 8);
+
+      // Timing arrow (full frame width)
+      var frameX0 = ox + bw, frameX1 = ox + bw * (N - 1);
+      g.strokeStyle = '#334'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(frameX0, H - 30); g.lineTo(frameX1, H - 30); g.stroke();
+      g.fillStyle = '#445'; g.font = '10px monospace'; g.textAlign = 'center';
+      g.fillText('← one frame (8E1) = 11 bits × 8.68 µs = 95.5 µs at 115 200 bps →', W / 2, H - 35);
+
+      // Advance animation
+      timer++;
+      if (timer >= SPEED) {
+        timer = 0;
+        if (cur < N - 1) cur++;
+        else { holdTick++; if (holdTick > 80) { cur = 0; holdTick = 0; } }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  })();
+  </script>
+</body>
+</html>

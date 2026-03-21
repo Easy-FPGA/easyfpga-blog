@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "../../../91_lecture/high_speed_interface"
+		},
+		{
+			"path": "../../../../OneDrive/Lecture/uart/pdf"
+		},
+		{
+			"path": "../../../91_lecture"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../d01_crc_gen/src"
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"marp": true,
+			"D:/work/91_lecture/high_speed_interface/.venv/Scripts/python.exe": true,
+			"%": true
+		}
+	}
+}

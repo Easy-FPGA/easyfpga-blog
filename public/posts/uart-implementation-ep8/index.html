@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>RTL Design Review &amp; Improvements | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, SystemVerilog, Xilinx, EasyFPGA">
+<meta name="description" content="Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep8/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep8/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep8/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="RTL Design Review & Improvements">
+  <meta property="og:description" content="Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-23T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-23T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="SystemVerilog">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep15/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep14/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep13/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep12/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep11/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep10/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep9/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="RTL Design Review & Improvements">
+  <meta name="twitter:description" content="Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "RTL Design Review \u0026 Improvements",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep8/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "RTL Design Review \u0026 Improvements",
+  "name": "RTL Design Review \u0026 Improvements",
+  "description": "Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "SystemVerilog", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "RTL Design Review \u0026 Improvements The basic UART core from Episodes 5–6 is correct but minimal. Real applications require more: buffering for when the host is busy, baud rate changes at runtime, and multi-byte packet framing. This episode systematically identifies each limitation of the minimal design and shows how to address it — without over-engineering for unused features.\nCurrent Design — Limitations Limitation Description No FIFO buffer Byte is lost if processor doesn’t read in time Fixed baud rate Baud rate fixed at compile time — not reconfigurable Single-byte only No multi-byte framing or packet structure No flow control Receiver can’t signal sender to pause No break detection Line stuck-low condition not detected Which limitation matters for your application? For a simple UART debug console, fixed baud rate and no FIFO are acceptable. For a production sensor interface at high data rates, FIFO is mandatory. For industrial protocols (Modbus, DMX512), multi-byte framing and break detection are required. Add improvements only for the use case at hand — each adds complexity.\nImprovement 1: FIFO Buffer Replace the simple register with a circular FIFO buffer.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 module uart_fifo #( parameter DEPTH = 16, parameter WIDTH = 8 )( input logic clk, rst_n, input logic wr_en, input logic [WIDTH-1:0] wr_data, input logic rd_en, output logic [WIDTH-1:0] rd_data, output logic full, empty ); logic [WIDTH-1:0] mem [DEPTH-1:0]; logic [$clog2(DEPTH)-1:0] wr_ptr, rd_ptr; logic [$clog2(DEPTH):0] count; assign full = (count == DEPTH); assign empty = (count == 0); // ... write/read pointer logic ... endmodule FIFO depth calculation: At 115,200 bps, a new byte arrives every 95.5 µs. If your host processor may be preempted for up to 1 ms (e.g., interrupt latency), you need at least ceil(1000 / 95.5) ≈ 11 bytes of FIFO depth to avoid overflow. A depth of 16 is the standard minimum; 64 or 256 is safer for OS-driven hosts.\nImprovement 2: Dynamic Baud Rate Use a lookup table to set BAUD_DIV at runtime.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 logic [1:0] baud_sel; // 00=9600, 01=115200, 10=460800 logic [15:0] baud_div; always_comb case (baud_sel) 2'b00: baud_div = 16'd5208; // 50 MHz / 9600 2'b01: baud_div = 16'd434; // 50 MHz / 115200 2'b10: baud_div = 16'd108; // 50 MHz / 460800 default: baud_div = 16'd434; endcase always_ff @(posedge clk or negedge rst_n) if (!rst_n || cnt == baud_div - 1) cnt \u003c= '0; else cnt \u003c= cnt + 1; assign baud_tick = (cnt == baud_div - 1); Caution with dynamic baud rate: Never change baud_sel while a frame is in progress. The baud_div change takes effect on the next counter reload — mid-frame causes a timing corruption of the current byte. Add a guard: only allow baud_sel changes when both TX and RX FSMs are in the IDLE state.\nImprovement 3: Multi-Byte Frame Protocol Define a simple packet structure with SOF/EOF markers.\nPacket format:\r┌──────┬──────────┬────────────────────┬──────────┬──────┐\r│ SOF │ Length │ Data bytes │ Checksum │ EOF │\r│ 0x7B │ 1 byte │ N bytes (N=Len) │ 1 byte │ 0x7D │\r└──────┴──────────┴────────────────────┴──────────┴──────┘\r'{' '}' Frame FSM States WAIT_SOF → RECV_LEN → RECV_DATA → RECV_CKS → WAIT_EOF\r│ │\r└──────── error: back to WAIT_SOF ◄───────────┘ The checksum is a byte sum of all data bytes. On checksum mismatch or missing EOF, the FSM resets to WAIT_SOF and flags a protocol error. This structure can be extended to CRC-16 for stronger error detection.\nImprovement 4: Break Detection A break condition = line stays LOW for more than one full frame duration.\n1 2 3 4 5 6 7 8 9 10 11 logic [15:0] break_cnt; logic break_detected; always_ff @(posedge clk or negedge rst_n) begin if (!rst_n) break_cnt \u003c= '0; else if (uart_rx) break_cnt \u003c= '0; // Line high: reset counter else break_cnt \u003c= break_cnt + 1; // Line low: count up end // Break if line stays low \u003e 2 full frames (22 bits at current baud) assign break_detected = (break_cnt \u003e 2 * BAUD_CNT_MAX * 11); Break detection is required by LIN bus (automotive) and DMX512 (stage lighting), where a break condition is a deliberate protocol-level signaling event that marks the start of a packet.\nImprovement 5: Interrupt Interface 1 2 3 4 5 output logic irq_rx_valid, // New byte received output logic irq_tx_ready, // TX FIFO has space output logic irq_parity_err, // Parity error detected output logic irq_frame_err, // Frame error detected output logic irq_break // Break condition detected Connect these to a CPU interrupt controller for software-driven handling. In a pure RTL design (no CPU), these can trigger a downstream processing FSM directly.\nUpdated Architecture ┌──────────────────────────────────────┐\r│ uart_top (improved) │\r│ │\ruart_rx ───────►│ RX FSM ──► RX FIFO ──► data_out │\r│ ↕ │\r│ Flow Ctrl │\r│ ↕ │\ruart_tx ◄───────│ TX FSM ◄── TX FIFO ◄── data_in │\r│ │\r│ Interrupt Controller ──► irq[4:0] │\r└──────────────────────────────────────┘ Episode 8 Summary FIFO buffer: prevents byte loss on processor latency Dynamic baud rate: LUT-based baud_div selection at runtime Multi-byte framing: SOF/EOF markers, length field, checksum Break detection: line stuck-low longer than 2 full frames Interrupt interface: event signals for processor integration Next Episode Episode 9: MicroBlaze — Soft-Core Processor on FPGA MicroBlaze architecture, AXI4-Lite interface, Vivado → Vitis flow\nKey Takeaways Add a FIFO when the receiving application cannot service bytes within one baud period; calculate the required depth from application interrupt latency divided by the byte period at the configured baud rate Dynamic baud rate requires a guard condition (check IDLE state) before baud_sel changes — mid-frame baud changes corrupt the current byte The multi-byte frame protocol (SOF + Length + Data + Checksum + EOF) is a practical template for binary application-layer protocols over UART Break detection is a named protocol feature in LIN and DMX512 — implement it only when the target protocol specification explicitly requires it Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "999",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-23T12:00:00+09:00",
+  "dateModified": "2026-03-23T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep8/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      RTL Design Review &amp; Improvements
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-description">
+      Evolving the basic UART RTL: FIFO buffering to prevent byte loss, runtime baud rate selection, multi-byte framing with SOF/EOF markers, break detection, and an interrupt interface.
+    </div>
+    <div class="post-meta"><span title='2026-03-23 12:00:00 +0900 KST'>March 23, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#rtl-design-review--improvements" aria-label="RTL Design Review &amp; Improvements">RTL Design Review &amp; Improvements</a><ul>
+                        
+                <li>
+                    <a href="#current-design--limitations" aria-label="Current Design — Limitations">Current Design — Limitations</a></li>
+                <li>
+                    <a href="#improvement-1-fifo-buffer" aria-label="Improvement 1: FIFO Buffer">Improvement 1: FIFO Buffer</a></li>
+                <li>
+                    <a href="#improvement-2-dynamic-baud-rate" aria-label="Improvement 2: Dynamic Baud Rate">Improvement 2: Dynamic Baud Rate</a></li>
+                <li>
+                    <a href="#improvement-3-multi-byte-frame-protocol" aria-label="Improvement 3: Multi-Byte Frame Protocol">Improvement 3: Multi-Byte Frame Protocol</a><ul>
+                        
+                <li>
+                    <a href="#frame-fsm-states" aria-label="Frame FSM States">Frame FSM States</a></li></ul>
+                </li>
+                <li>
+                    <a href="#improvement-4-break-detection" aria-label="Improvement 4: Break Detection">Improvement 4: Break Detection</a></li>
+                <li>
+                    <a href="#improvement-5-interrupt-interface" aria-label="Improvement 5: Interrupt Interface">Improvement 5: Interrupt Interface</a></li>
+                <li>
+                    <a href="#updated-architecture" aria-label="Updated Architecture">Updated Architecture</a></li>
+                <li>
+                    <a href="#episode-8-summary" aria-label="Episode 8 Summary">Episode 8 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="rtl-design-review--improvements">RTL Design Review &amp; Improvements<a hidden class="anchor" aria-hidden="true" href="#rtl-design-review--improvements">#</a></h1>
+<p>The basic UART core from Episodes 5–6 is correct but minimal. Real applications require more: buffering for when the host is busy, baud rate changes at runtime, and multi-byte packet framing. This episode systematically identifies each limitation of the minimal design and shows how to address it — without over-engineering for unused features.</p>
+<h2 id="current-design--limitations">Current Design — Limitations<a hidden class="anchor" aria-hidden="true" href="#current-design--limitations">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Limitation</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>No FIFO buffer</strong></td>
+          <td>Byte is lost if processor doesn&rsquo;t read in time</td>
+      </tr>
+      <tr>
+          <td><strong>Fixed baud rate</strong></td>
+          <td>Baud rate fixed at compile time — not reconfigurable</td>
+      </tr>
+      <tr>
+          <td><strong>Single-byte only</strong></td>
+          <td>No multi-byte framing or packet structure</td>
+      </tr>
+      <tr>
+          <td><strong>No flow control</strong></td>
+          <td>Receiver can&rsquo;t signal sender to pause</td>
+      </tr>
+      <tr>
+          <td><strong>No break detection</strong></td>
+          <td>Line stuck-low condition not detected</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>Which limitation matters for your application?</strong> For a simple UART debug console, fixed baud rate and no FIFO are acceptable. For a production sensor interface at high data rates, FIFO is mandatory. For industrial protocols (Modbus, DMX512), multi-byte framing and break detection are required. Add improvements only for the use case at hand — each adds complexity.</p>
+</blockquote>
+<h2 id="improvement-1-fifo-buffer">Improvement 1: FIFO Buffer<a hidden class="anchor" aria-hidden="true" href="#improvement-1-fifo-buffer">#</a></h2>
+<p>Replace the simple register with a <strong>circular FIFO</strong> buffer.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#66d9ef">module</span> uart_fifo #(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">parameter</span> DEPTH <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">parameter</span> WIDTH <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>)(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span>             clk, rst_n,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span>             wr_en,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span> [WIDTH<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] wr_data,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">logic</span>             rd_en,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> [WIDTH<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] rd_data,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span>             full, empty
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">logic</span> [WIDTH<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] mem [DEPTH<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">logic</span> [$clog2(DEPTH)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] wr_ptr, rd_ptr;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">logic</span> [$clog2(DEPTH)<span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>]   count;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">assign</span> full  <span style="color:#f92672">=</span> (count <span style="color:#f92672">==</span> DEPTH);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">assign</span> empty <span style="color:#f92672">=</span> (count <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... write/read pointer logic ...
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">endmodule</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><strong>FIFO depth calculation</strong>: At 115,200 bps, a new byte arrives every 95.5 µs. If your host processor may be preempted for up to 1 ms (e.g., interrupt latency), you need at least <code>ceil(1000 / 95.5) ≈ 11</code> bytes of FIFO depth to avoid overflow. A depth of 16 is the standard minimum; 64 or 256 is safer for OS-driven hosts.</p>
+</blockquote>
+<h2 id="improvement-2-dynamic-baud-rate">Improvement 2: Dynamic Baud Rate<a hidden class="anchor" aria-hidden="true" href="#improvement-2-dynamic-baud-rate">#</a></h2>
+<p>Use a lookup table to set <code>BAUD_DIV</code> at runtime.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#66d9ef">logic</span> [<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] baud_sel;         <span style="color:#75715e">// 00=9600, 01=115200, 10=460800
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">logic</span> [<span style="color:#ae81ff">15</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] baud_div;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">always_comb</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> (baud_sel)
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">2</span><span style="color:#ae81ff">&#39;b00</span><span style="color:#f92672">:</span> baud_div <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span><span style="color:#ae81ff">&#39;d5208</span>;   <span style="color:#75715e">//  50 MHz / 9600
+</span></span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">2</span><span style="color:#ae81ff">&#39;b01</span><span style="color:#f92672">:</span> baud_div <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span><span style="color:#ae81ff">&#39;d434</span>;    <span style="color:#75715e">//  50 MHz / 115200
+</span></span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">2</span><span style="color:#ae81ff">&#39;b10</span><span style="color:#f92672">:</span> baud_div <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span><span style="color:#ae81ff">&#39;d108</span>;    <span style="color:#75715e">//  50 MHz / 460800
+</span></span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span> baud_div <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span><span style="color:#ae81ff">&#39;d434</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">endcase</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">always_ff</span> @(<span style="color:#66d9ef">posedge</span> clk <span style="color:#66d9ef">or</span> <span style="color:#66d9ef">negedge</span> rst_n)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>rst_n <span style="color:#f92672">||</span> cnt <span style="color:#f92672">==</span> baud_div <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) cnt <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">&#39;0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span> cnt <span style="color:#f92672">&lt;=</span> cnt <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assign</span> baud_tick <span style="color:#f92672">=</span> (cnt <span style="color:#f92672">==</span> baud_div <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><strong>Caution with dynamic baud rate</strong>: Never change <code>baud_sel</code> while a frame is in progress. The <code>baud_div</code> change takes effect on the next counter reload — mid-frame causes a timing corruption of the current byte. Add a guard: only allow <code>baud_sel</code> changes when both TX and RX FSMs are in the IDLE state.</p>
+</blockquote>
+<h2 id="improvement-3-multi-byte-frame-protocol">Improvement 3: Multi-Byte Frame Protocol<a hidden class="anchor" aria-hidden="true" href="#improvement-3-multi-byte-frame-protocol">#</a></h2>
+<p>Define a simple packet structure with SOF/EOF markers.</p>
+<pre tabindex="0"><code>Packet format:
+┌──────┬──────────┬────────────────────┬──────────┬──────┐
+│ SOF  │  Length  │     Data bytes     │ Checksum │  EOF │
+│ 0x7B │  1 byte  │  N bytes (N=Len)   │  1 byte  │ 0x7D │
+└──────┴──────────┴────────────────────┴──────────┴──────┘
+  &#39;{&#39;                                                &#39;}&#39;
+</code></pre><h3 id="frame-fsm-states">Frame FSM States<a hidden class="anchor" aria-hidden="true" href="#frame-fsm-states">#</a></h3>
+<pre tabindex="0"><code>WAIT_SOF → RECV_LEN → RECV_DATA → RECV_CKS → WAIT_EOF
+    │                                              │
+    └──────── error: back to WAIT_SOF ◄───────────┘
+</code></pre><p>The checksum is a byte sum of all data bytes. On checksum mismatch or missing EOF, the FSM resets to <code>WAIT_SOF</code> and flags a protocol error. This structure can be extended to CRC-16 for stronger error detection.</p>
+<h2 id="improvement-4-break-detection">Improvement 4: Break Detection<a hidden class="anchor" aria-hidden="true" href="#improvement-4-break-detection">#</a></h2>
+<p>A <strong>break condition</strong> = line stays LOW for more than one full frame duration.</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#66d9ef">logic</span> [<span style="color:#ae81ff">15</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] break_cnt;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">logic</span>        break_detected;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">always_ff</span> @(<span style="color:#66d9ef">posedge</span> clk <span style="color:#66d9ef">or</span> <span style="color:#66d9ef">negedge</span> rst_n) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>rst_n) break_cnt <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">&#39;0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (uart_rx) break_cnt <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">&#39;0</span>;   <span style="color:#75715e">// Line high: reset counter
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span> break_cnt <span style="color:#f92672">&lt;=</span> break_cnt <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;      <span style="color:#75715e">// Line low: count up
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Break if line stays low &gt; 2 full frames (22 bits at current baud)
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">assign</span> break_detected <span style="color:#f92672">=</span> (break_cnt <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> BAUD_CNT_MAX <span style="color:#f92672">*</span> <span style="color:#ae81ff">11</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Break detection is required by LIN bus (automotive) and DMX512 (stage lighting), where a break condition is a deliberate protocol-level signaling event that marks the start of a packet.</p>
+<h2 id="improvement-5-interrupt-interface">Improvement 5: Interrupt Interface<a hidden class="anchor" aria-hidden="true" href="#improvement-5-interrupt-interface">#</a></h2>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> irq_rx_valid,   <span style="color:#75715e">// New byte received
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> irq_tx_ready,   <span style="color:#75715e">// TX FIFO has space
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> irq_parity_err, <span style="color:#75715e">// Parity error detected
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> irq_frame_err,  <span style="color:#75715e">// Frame error detected
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">output</span> <span style="color:#66d9ef">logic</span> irq_break        <span style="color:#75715e">// Break condition detected
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>Connect these to a CPU interrupt controller for software-driven handling. In a pure RTL design (no CPU), these can trigger a downstream processing FSM directly.</p>
+<h2 id="updated-architecture">Updated Architecture<a hidden class="anchor" aria-hidden="true" href="#updated-architecture">#</a></h2>
+<pre tabindex="0"><code>                ┌──────────────────────────────────────┐
+                │            uart_top (improved)        │
+                │                                       │
+uart_rx ───────►│ RX FSM ──► RX FIFO ──► data_out      │
+                │                ↕                      │
+                │            Flow Ctrl                  │
+                │                ↕                      │
+uart_tx ◄───────│ TX FSM ◄── TX FIFO ◄── data_in       │
+                │                                       │
+                │  Interrupt Controller ──► irq[4:0]    │
+                └──────────────────────────────────────┘
+</code></pre><h2 id="episode-8-summary">Episode 8 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-8-summary">#</a></h2>
+<ul>
+<li><strong>FIFO buffer</strong>: prevents byte loss on processor latency</li>
+<li><strong>Dynamic baud rate</strong>: LUT-based <code>baud_div</code> selection at runtime</li>
+<li><strong>Multi-byte framing</strong>: SOF/EOF markers, length field, checksum</li>
+<li><strong>Break detection</strong>: line stuck-low longer than 2 full frames</li>
+<li><strong>Interrupt interface</strong>: event signals for processor integration</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 9: MicroBlaze — Soft-Core Processor on FPGA</strong>
+MicroBlaze architecture, AXI4-Lite interface, Vivado → Vitis flow</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>Add a FIFO when the receiving application cannot service bytes within one baud period; calculate the required depth from application interrupt latency divided by the byte period at the configured baud rate</li>
+<li>Dynamic baud rate requires a guard condition (check IDLE state) before <code>baud_sel</code> changes — mid-frame baud changes corrupt the current byte</li>
+<li>The multi-byte frame protocol (SOF + Length + Data + Checksum + EOF) is a practical template for binary application-layer protocols over UART</li>
+<li>Break detection is a named protocol feature in LIN and DMX512 — implement it only when the target protocol specification explicitly requires it</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/systemverilog/">SystemVerilog</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep9/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>MicroBlaze: Soft-Core Processor on FPGA</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep7/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA Implementation &amp; Hardware Test</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

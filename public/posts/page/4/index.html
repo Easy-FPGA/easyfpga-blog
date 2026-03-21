@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Posts | EasyFPGA</title>
+<meta name="keywords" content="">
+<meta name="description" content="Posts - EasyFPGA">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://easyfpga.blog/posts/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Posts">
+  <meta property="og:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Posts">
+  <meta name="twitter:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }
+  ]
+}
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span class="active">Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a></div>
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Trigger At StartUp
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>When debugging hardware using the Hardware Manager, the device connection is established after a delay following the initial boot. Once connected, you can configure trigger conditions and begin debugging.
+However, this delay means that the FPGA’s initial state cannot be examined using the Integrated Logic Analyzer (ILA), as it occurs before the device is accessible via the Hardware Manager.
+Illustrate a Hardware Manager connected to a device via JTAG,
+The Trigger At StartUp method enables you to define trigger conditions in the initial phase, immediately after the bitstream is downloaded and the system begins running. This allows you to debug the early stages of operation effectively.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-28 08:44:30 +0000 +0000'>March 28, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Trigger At StartUp" href="https://easyfpga.blog/posts/trigger-at-startup/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Gigabit Ethernet with Xilinx FPGA and TEMAC IP
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>In FPGA-based designs, Ethernet is commonly used as a communication interface with PCs. Whether for data transfer, debugging, or network-based control, Ethernet provides a flexible and high-speed connectivity option.
+To integrate Ethernet into an FPGA, the design typically consists of:
+MAC (Media Access Control) Layer: Handles frame encapsulation and transmission.
+PHY (Physical Layer) Interface: Manages signal-level modulation and transmission over the Ethernet medium.
+Higher-Level Processing: Can be implemented using embedded processors (such as MicroBlaze or ARM in SoC FPGAs) or custom hardware logic for protocol handling.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-21 03:21:36 +0000 +0000'>March 21, 2025</span>&nbsp;·&nbsp;<span>7 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Gigabit Ethernet with Xilinx FPGA and TEMAC IP" href="https://easyfpga.blog/posts/gigabit-ethernet-with-xilinx-fpga-and-temac-ip/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Vivado’s Text Editor
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Effectively utilizing Vivado’s Text Editor can greatly assist in FPGA design.
+Let’s explore the advantages of the Text Editor in Vivado IDE (Integrated Development Environment) when developing AMD (Xilinx) FPGAs.
+**On-the-fly syntax checking: **Instant syntax check
+**Assistance with errors and warnings: **Markers in red or yellow appear on the right scroll bar. They allow you to navigate directly to the location of syntax errors or warnings. Additionally, you can hover (move the cursor over) to identify the specific error
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 21:38:24 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Vivado’s Text Editor" href="https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Implementation of UART with Xilinx FPGA and AXI Uartlite IP
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Overview
+What is UART?
+UART (Universal Asynchronous Receiver/Transmitter) is a hardware communication protocol used for serial communication between two devices. It is called asynchronous because it does not require a separate clock signal like SPI or I2C. Instead, both devices agree on a common data rate (baud rate) to ensure correct data transmission.
+How Does UART Work? UART consists of two main data lines:
+TX (Transmitter) Line – Sends data.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 21:25:52 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Implementation of UART with Xilinx FPGA and AXI Uartlite IP" href="https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA product lines
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Let’s explore the AMD (Xilinx) FPGA product families for reference
+https://www.amd.com/en/products/adaptive-socs-and-fpgas/fpga.html
+Looking at the Portfolio on the AMD FPGA (Xilinx) website, you’ll notice it is divided into three categories. These categories are UltraScale&#43;, UltraScale, and 7 Series at the top. This categorization of product families is based on semiconductor process technology. UltraScale&#43; is manufactured on the 16nm FinFET process. UltraScale is manufactured on the 20nm process. 7 Series is manufactured on the 28nm process.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:30:17 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA product lines" href="https://easyfpga.blog/posts/fpga-product-lines/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA Manufacturers
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Major FPGA Manufacturers
+1.AMD (Acquired Xilinx in 2022)
+Key Products: Spartan, Aritix, Kintex, Virtex, ZynQ, Versal
+Xilinx was a long-time leader in the FPGA market and was acquired by AMD in 2022.
+Provides high-performance FPGA and adaptive SoC (System-on-Chip) product lines. Produces products used in various fields such as data centers, communications, and automotive.
+**Intel (Acquired **Altera in 2015) Key Products: Cyclone, Arria, Stratix, Agilex
+Altera was acquired by Intel and integrated into the Intel FPGA business unit.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:18:12 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA Manufacturers" href="https://easyfpga.blog/posts/fpga-manufacturers/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA Applications
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>FPGA Applications
+Based on the FPGA advantages discussed earlier, the main application areas are industrial, automotive, medical, defense, aerospace, network equipment, video applications, and pre-ASIC prototyping. These are relatively small-volume productions. However, they require high-performance functions and can satisfy various interfaces.
+You can get more information about application areas on the sites below.
+https://www.xilinx.com/applications.html
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:15:08 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA Applications" href="https://easyfpga.blog/posts/fpga-applications/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA Advantages
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>*https://www.amd.com/ko/products/adaptive-socs-and-fpgas/fpga.html *
+So, what are the reasons for using FPGAs? Let’s explore through the advantages of FPGAs.
+First is the development time and cost. As discussed earlier, while ASICs take 6 months to several years to develop, FPGA development takes weeks to months. Therefore, FPGAs allow for faster market release. The NRE (Non-recurring Engineering) costs of ASICs are very high. They range from millions to tens of millions of dollars. Therefore, FPGA-based hardware solutions are cost-effective in comparison. However, ASICs may need to be considered when mass production is required (approximately 100,000 units or more).
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:12:25 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA Advantages" href="https://easyfpga.blog/posts/fpga-advantages/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA vs ASIC: Key Differences Explained
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>If an FPGA can be compared to a breadboard, then an ASIC is like a PCB.
+PCB(https://en.wikipedia.org/wiki/Printed_circuit_board#/media/File:SEG_DVD_430_-_Printed_circuit_board-4276.jpg)
+The photo above is a PCB. To be precise, it has components mounted on top of it. It is commonly used in various home appliances such as smartphones and TVs.
+To create a PCB, you need to draw a Schematic (circuit diagram). Then, create a PCB layout design. Finally, have it manufactured by a PCB manufacturer. If there is an error after manufacturing is complete, you must fix it. Do you need to change a PCB line (trace) or component? What steps should you take? To have a normal product, you need to modify the Schematic and PCB layout and manufacture it again. Of course, you can cut the line in the middle and connect it with an external wire. However, this will greatly reduce the stability of the product sold.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:09:07 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA vs ASIC: Key Differences Explained" href="https://easyfpga.blog/posts/fpga-vs-asic/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">What is FPGA?
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>FPGA: Field Programmable Gate Array
+To take the Bread Board as an example… Bread Board (https://en.wikipedia.org/wiki/Breadboard#/media/File:Ultrasound-PreAmp-Breadboard.jpg)
+The photo above shows a breadboard. Breadboards are used to temporarily test prototypes. They usually have strips on both sides to extend power lines. The interior is divided into abcde and fghij sections where components or wires can be connected. This allows you to implement desired functions and test them with frequent changes.
+You can think of the components plugged into the breadboard as modules designed in HDL. The wires connecting them can be viewed as wire declarations in HDL. The placement of the components is similar to the Placement process in FPGA Implementation. Connecting the wires is akin to the Routing process.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-03-19 04:07:35 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to What is FPGA?" href="https://easyfpga.blog/posts/what-is-fpga/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="https://easyfpga.blog/posts/page/3/">
+      «&nbsp;Prev&nbsp;
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

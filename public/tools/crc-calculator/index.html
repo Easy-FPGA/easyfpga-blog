@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRC Calculator - CRC8/16/32 Online | EasyFPGA CRC RTL Builder</title>
+    <meta name="description" content="Free online CRC-8, CRC-16, CRC-32 calculator and SystemVerilog RTL generator for FPGA/ASIC designers.">
+    <meta name="keywords" content="CRC calculator, CRC32, CRC16, CRC8, FPGA, Verilog, online, RTL generator">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+            border-bottom: 1px solid #21262d;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #58a6ff;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #8b949e;
+            font-size: 0.95rem;
+        }
+
+        header a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        /* Card */
+        .card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        /* Preset buttons */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover { background: #30363d; border-color: #58a6ff; }
+        .preset-btn.active { background: #1f4068; border-color: #58a6ff; color: #58a6ff; }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Input tabs */
+        .input-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #1f4068;
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        /* Calculate button */
+        .calc-btn {
+            width: 100%;
+            background: #238636;
+            border: 1px solid #2ea043;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+
+        .calc-btn:hover { background: #2ea043; }
+        .calc-btn:active { transform: scale(0.99); }
+
+        /* Result */
+        .result-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .result-box.show { display: block; }
+
+        .result-main {
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            color: #3fb950;
+            text-align: center;
+            margin: 12px 0;
+            letter-spacing: 0.1em;
+        }
+
+        .result-formats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .result-format {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .result-format .fmt-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            margin-bottom: 4px;
+        }
+
+        .result-format .fmt-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #e6edf3;
+            cursor: pointer;
+        }
+
+        .result-format .fmt-value:hover { color: #58a6ff; }
+
+        .copy-hint {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* Error */
+        .error-box {
+            background: #2d1a1a;
+            border: 1px solid #6e2020;
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: #f85149;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .error-box.show { display: block; }
+
+        /* Info section */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .info-item .info-name {
+            font-size: 0.9rem;
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-item .info-poly {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #3fb950;
+            margin-bottom: 6px;
+        }
+
+        .info-item .info-desc {
+            font-size: 0.78rem;
+            color: #8b949e;
+            line-height: 1.4;
+        }
+
+        .info-item .info-use {
+            font-size: 0.75rem;
+            color: #d29922;
+            margin-top: 4px;
+        }
+
+        /* CTA */
+        .cta-box {
+            background: linear-gradient(135deg, #1f3a5f 0%, #1a2a1a 100%);
+            border: 1px solid #2d5a8e;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .cta-box h3 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+        }
+
+        .cta-box p {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cta-btn.primary {
+            background: #238636;
+            border: 1px solid #2ea043;
+            color: #fff;
+        }
+
+        .cta-btn.secondary {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+        }
+
+        .cta-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #8b949e;
+            font-size: 0.85rem;
+            border-top: 1px solid #21262d;
+            margin-top: 30px;
+        }
+
+        footer a { color: #58a6ff; text-decoration: none; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #238636;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show { opacity: 1; }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .result-main { font-size: 1.5rem; }
+        }
+
+        /* RTL Generator */
+        .gen-main-btn {
+            width: 100%;
+            background: #1f3a5f;
+            border: 1px solid #2d5a8e;
+            color: #58a6ff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+        .gen-main-btn:hover { background: #2d5a8e; }
+
+        .code-output {
+            margin-top: 16px;
+            border: 1px solid #2ea043;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .code-tab-bar {
+            display: flex;
+            align-items: center;
+            background: #0d2818;
+            border-bottom: 1px solid #2ea043;
+            padding: 0 8px;
+            gap: 2px;
+        }
+
+        .code-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #8b949e;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+        .code-tab:hover { color: #e6edf3; }
+        .code-tab.active {
+            color: #3fb950;
+            border-bottom-color: #3fb950;
+        }
+
+        .code-tab-spacer { flex: 1; }
+
+        .rtl-copy-btn {
+            background: #238636;
+            border: 1px solid #2ea043;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            margin: 4px 0;
+        }
+        .rtl-copy-btn:hover { background: #2ea043; }
+
+        .rtl-dl-btn {
+            background: #1f3a5f;
+            border: 1px solid #2d5a8e;
+            color: #58a6ff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            margin: 4px 0 4px 4px;
+        }
+        .rtl-dl-btn:hover { background: #2d5a8e; }
+
+        .code-panel {
+            background: #0d1117;
+            color: #e6edf3;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            max-height: 520px;
+            overflow-y: auto;
+            margin: 0;
+            display: none;
+        }
+        .code-panel.active { display: block; }
+        }
+
+        /* Quick Start */
+        .qs-card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .qs-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #e6edf3;
+            padding: 14px 20px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .qs-toggle:hover { background: #1c2128; }
+        .qs-toggle .qs-arrow { color: #8b949e; font-size: 0.75rem; transition: transform 0.2s; }
+        .qs-toggle.open .qs-arrow { transform: rotate(180deg); }
+        .qs-body {
+            display: none;
+            padding: 0 20px 18px;
+            border-top: 1px solid #21262d;
+        }
+        .qs-body.open { display: block; }
+        .qs-steps {
+            margin: 12px 0 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .qs-steps li {
+            display: flex;
+            gap: 10px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #c9d1d9;
+        }
+        .qs-steps li .qs-num {
+            background: #1f4068;
+            color: #58a6ff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 1px;
+        }
+        .qs-note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #1c2128;
+            border-left: 3px solid #58a6ff;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            color: #8b949e;
+            line-height: 1.6;
+        }
+        .qs-note a { color: #58a6ff; text-decoration: none; }
+        .qs-note a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <h1>🔢 CRC Calculator</h1>
+        <p>CRC-8 / CRC-16 / CRC-32 Online Calculator &nbsp;|&nbsp; <a href="https://easyfpga.blog" target="_blank">EasyFPGA.blog</a></p>
+        <p style="margin-top:8px; font-size:0.82rem;">
+            📄 <a href="/posts/crc-calculator-guide/" target="_blank">How CRC works &amp; full usage guide →</a>
+        </p>
+    </header>
+
+    <!-- Quick Start -->
+    <div class="qs-card">
+        <button class="qs-toggle" onclick="toggleQS(this)" aria-expanded="false">
+            <span>📖 Quick Start Guide</span>
+            <span class="qs-arrow">▼</span>
+        </button>
+        <div class="qs-body">
+            <ol class="qs-steps">
+                <li><span class="qs-num">1</span><span><strong>Select a preset</strong> (e.g. CRC-32 for Ethernet) or enter custom polynomial parameters below.</span></li>
+                <li><span class="qs-num">2</span><span><strong>Enter input data</strong> — choose HEX, ASCII, or Binary tab.<br>
+                    <em>HEX example:</em> <code style="color:#58a6ff">31 32 33</code> &nbsp;|&nbsp;
+                    <em>ASCII example:</em> <code style="color:#58a6ff">123456789</code></span></li>
+                <li><span class="qs-num">3</span><span>Click <strong>Calculate</strong> to get the CRC result in HEX / Decimal / Binary / Verilog literal.</span></li>
+                <li><span class="qs-num">4</span><span>Scroll to <strong>RTL Generator</strong> → set Data Width → click <strong>⚡ Generate RTL + Testbench</strong>.</span></li>
+                <li><span class="qs-num">5</span><span>Click <strong>📋 Copy</strong> or <strong>⬇ Download</strong> to save the <code style="color:#58a6ff">.sv</code> files for Vivado / Icarus simulation.</span></li>
+            </ol>
+            <div class="qs-note">
+                💡 The <strong>Self-Test</strong> section at the bottom verifies both the calculator and RTL generator against known CRC vectors (e.g. CRC-32 of "123456789" = 0xCBF43926).<br>
+                For a deeper explanation of CRC theory and RTL implementation, see the
+                <a href="/posts/crc-calculator-guide/" target="_blank">full guide on EasyFPGA.blog →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculator Card -->
+    <div class="card">
+        <h2>⚙️ Calculate</h2>
+
+        <!-- Presets -->
+        <div class="presets">
+            <button class="preset-btn active" onclick="setPreset('crc32')">CRC-32 (Ethernet)</button>
+            <button class="preset-btn" onclick="setPreset('crc32c')">CRC-32C (iSCSI)</button>
+            <button class="preset-btn" onclick="setPreset('crc16')">CRC-16/IBM</button>
+            <button class="preset-btn" onclick="setPreset('crc16ccitt')">CRC-16/CCITT</button>
+            <button class="preset-btn" onclick="setPreset('crc16modbus')">CRC-16/MODBUS</button>
+            <button class="preset-btn" onclick="setPreset('crc8')">CRC-8</button>
+            <button class="preset-btn" onclick="setPreset('custom')">Custom</button>
+        </div>
+
+        <!-- Input data -->
+        <div class="form-group">
+            <label>Input Data</label>
+            <div class="input-tabs">
+                <button class="tab-btn active" onclick="setInputMode('hex')">HEX</button>
+                <button class="tab-btn" onclick="setInputMode('ascii')">ASCII</button>
+                <button class="tab-btn" onclick="setInputMode('bin')">Binary</button>
+            </div>
+            <input type="text" id="dataInput" placeholder="31 32 33 34 35 36 37 38 39"
+                   oninput="onDataInput()" />
+            <div style="font-size:0.75rem; color:#8b949e; margin-top:4px;" id="inputHint">
+                HEX input: separate with spaces or commas (e.g. 31 32 33 or 0x31,0x32)
+            </div>
+        </div>
+
+        <!-- CRC parameters -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Width (bits)</label>
+                <select id="crcWidth" onchange="onParamChange()">
+                    <option value="32" selected>32</option>
+                    <option value="16">16</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Polynomial (HEX)</label>
+                <input type="text" id="poly" value="04C11DB7" oninput="onParamChange()" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Init Value (HEX)</label>
+                <input type="text" id="init" value="FFFFFFFF" oninput="onParamChange()" />
+            </div>
+            <div class="form-group">
+                <label>XOR Out (HEX)</label>
+                <input type="text" id="xorOut" value="FFFFFFFF" oninput="onParamChange()" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="refIn" checked onchange="onParamChange()"
+                           style="width:auto; margin-right:6px;">
+                    Reflect Input
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="refOut" checked onchange="onParamChange()"
+                           style="width:auto; margin-right:6px;">
+                    Reflect Output
+                </label>
+            </div>
+        </div>
+
+        <button class="calc-btn" onclick="calculate()">Calculate</button>
+
+        <!-- Error -->
+        <div class="error-box" id="errorBox"></div>
+
+        <!-- Result -->
+        <div class="result-box" id="resultBox">
+            <div style="text-align:center; color:#8b949e; font-size:0.85rem;">CRC Result</div>
+            <div class="result-main" id="resultHex">0x00000000</div>
+            <div class="result-formats">
+                <div class="result-format">
+                    <div class="fmt-label">HEX</div>
+                    <div class="fmt-value" id="fmtHex" onclick="copyValue('fmtHex')" title="Click to copy">-</div>
+                </div>
+                <div class="result-format">
+                    <div class="fmt-label">Decimal</div>
+                    <div class="fmt-value" id="fmtDec" onclick="copyValue('fmtDec')" title="Click to copy">-</div>
+                </div>
+                <div class="result-format">
+                    <div class="fmt-label">Binary</div>
+                    <div class="fmt-value" id="fmtBin" onclick="copyValue('fmtBin')" title="Click to copy" style="font-size:0.75rem; word-break:break-all;">-</div>
+                </div>
+                <div class="result-format">
+                    <div class="fmt-label">Verilog</div>
+                    <div class="fmt-value" id="fmtVerilog" onclick="copyValue('fmtVerilog')" title="Click to copy">-</div>
+                </div>
+            </div>
+            <div class="copy-hint">Click any value to copy</div>
+        </div>
+    </div>
+
+    <!-- RTL Generator -->
+    <div class="card">
+        <h2>💻 RTL Generator (SystemVerilog)</h2>
+        <p style="font-size:0.85rem; color:#8b949e; margin-bottom:16px;">
+            Generates a synthesizable SystemVerilog module based on the CRC parameters configured above.
+        </p>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Data Width (bits/clock)</label>
+                <select id="dataWidth" onchange="updateModuleName()">
+                    <option value="8">8-bit</option>
+                    <option value="16">16-bit</option>
+                    <option value="32" selected>32-bit</option>
+                    <option value="64">64-bit</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Module Name</label>
+                <input type="text" id="moduleName" value="crc32_w32" />
+            </div>
+        </div>
+        <button class="gen-main-btn" onclick="generateAll()">⚡ Generate RTL + Testbench</button>
+        <div class="code-output" id="codeOutput" style="display:none;">
+            <div class="code-tab-bar">
+                <button class="code-tab active" id="tab-rtl" onclick="showOutputTab('rtl')">📄 RTL (.sv)</button>
+                <button class="code-tab" id="tab-tb"  onclick="showOutputTab('tb')">🧪 Testbench (.sv)</button>
+                <div class="code-tab-spacer"></div>
+                <button class="rtl-copy-btn" onclick="copyActiveTab()">📋 Copy</button>
+                <button class="rtl-dl-btn" onclick="downloadActiveTab()">⬇ Download</button>
+            </div>
+            <pre class="code-panel active" id="rtlCode"></pre>
+            <pre class="code-panel" id="tbCode"></pre>
+        </div>
+    </div>
+
+    <!-- Preset Info -->
+    <div class="card">
+        <h2>📚 Common CRC Standards</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-name">CRC-32</div>
+                <div class="info-poly">Poly: 0x04C11DB7</div>
+                <div class="info-desc">Most widely used CRC. Excellent error detection.</div>
+                <div class="info-use">✅ Ethernet, ZIP, PNG, MPEG</div>
+            </div>
+            <div class="info-item">
+                <div class="info-name">CRC-32C</div>
+                <div class="info-poly">Poly: 0x1EDC6F41</div>
+                <div class="info-desc">Hardware-optimized variant of CRC-32.</div>
+                <div class="info-use">✅ iSCSI, SCTP, SSD, NVMe</div>
+            </div>
+            <div class="info-item">
+                <div class="info-name">CRC-16/CCITT</div>
+                <div class="info-poly">Poly: 0x1021</div>
+                <div class="info-desc">Widely used in communication protocols.</div>
+                <div class="info-use">✅ X.25, HDLC, Bluetooth</div>
+            </div>
+            <div class="info-item">
+                <div class="info-name">CRC-16/MODBUS</div>
+                <div class="info-poly">Poly: 0x8005</div>
+                <div class="info-desc">Industrial communication standard.</div>
+                <div class="info-use">✅ MODBUS, industrial equipment</div>
+            </div>
+            <div class="info-item">
+                <div class="info-name">CRC-16/IBM</div>
+                <div class="info-poly">Poly: 0x8005</div>
+                <div class="info-desc">General-purpose 16-bit CRC (USB, etc.).</div>
+                <div class="info-use">✅ USB, ARC</div>
+            </div>
+            <div class="info-item">
+                <div class="info-name">CRC-8</div>
+                <div class="info-poly">Poly: 0x07</div>
+                <div class="info-desc">Simple CRC for small packets.</div>
+                <div class="info-use">✅ I2C, SMBus, sensors</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Self-Test -->
+    <div class="card" id="selfTestCard">
+        <h2>🧪 Self-Test  <span id="selfTestBadge" style="font-size:0.8rem; font-weight:normal; margin-left:8px;"></span></h2>
+        <p style="font-size:0.82rem; color:#8b949e; margin-bottom:12px;">
+            Verifies the Calculator and RTL evaluator agree on all standard presets using the
+            IEEE test vector <code style="color:#3fb950;">"123456789"</code>.
+            Runs automatically on page load.
+        </p>
+        <div id="selfTestTable"></div>
+        <button class="gen-main-btn" style="margin-top:12px;" onclick="runSelfTest()">▶ Re-run Self-Test</button>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+        <h3>🚀 Implement it on FPGA!</h3>
+        <p>Learn how to implement and verify this CRC in Verilog/SystemVerilog through our courses.</p>
+        <div class="cta-buttons">
+            <!-- <a href="https://inflearn.com" class="cta-btn primary" target="_blank">📚 Inflearn Courses</a> -->
+            <a href="https://easyfpga.blog" class="cta-btn secondary" target="_blank">✍️ Visit Blog</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Made with ❤️ by <a href="https://easyfpga.blog" target="_blank">EasyFPGA</a></p>
+        <p style="margin-top:6px;">Contact: <a href="mailto:easyfpga.blog@gmail.com">easyfpga.blog@gmail.com</a></p>
+    </footer>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Presets
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const PRESETS = {
+    crc32:      { width: 32, poly: '04C11DB7', init: 'FFFFFFFF', xorOut: 'FFFFFFFF', refIn: true,  refOut: true  },
+    crc32c:     { width: 32, poly: '1EDC6F41', init: 'FFFFFFFF', xorOut: 'FFFFFFFF', refIn: true,  refOut: true  },
+    crc16:      { width: 16, poly: '8005',     init: '0000',     xorOut: '0000',     refIn: true,  refOut: true  },
+    crc16ccitt: { width: 16, poly: '1021',     init: 'FFFF',     xorOut: '0000',     refIn: false, refOut: false },
+    crc16modbus:{ width: 16, poly: '8005',     init: 'FFFF',     xorOut: '0000',     refIn: true,  refOut: true  },
+    crc8:       { width: 8,  poly: '07',       init: '00',       xorOut: '00',       refIn: false, refOut: false },
+    custom:     null
+};
+
+let currentMode = 'hex';
+let currentPreset = 'crc32';
+
+function setPreset(name) {
+    currentPreset = name;
+
+    // Update button states
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (!PRESETS[name]) return;
+
+    const p = PRESETS[name];
+    document.getElementById('crcWidth').value = p.width;
+    document.getElementById('poly').value = p.poly;
+    document.getElementById('init').value = p.init;
+    document.getElementById('xorOut').value = p.xorOut;
+    document.getElementById('refIn').checked = p.refIn;
+    document.getElementById('refOut').checked = p.refOut;
+
+    updateModuleName();
+    calculate();
+}
+
+function onParamChange() {
+    // Switch to custom preset
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.preset-btn').forEach(b => {
+        if (b.textContent === 'Custom') b.classList.add('active');
+    });
+    currentPreset = 'custom';
+    updateModuleName();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Input mode
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function setInputMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const hints = {
+        hex:   'HEX: tokens read left→right (big-endian). 1-2 digits=1 byte, 3-4=2 bytes, 5-6=3 bytes, 7-8=4 bytes. Tokens >8 digits split into 8-digit chunks.',
+        ascii: 'ASCII input: type text directly (e.g. 123456789)',
+        bin:   'Binary input: 8-bit groups (e.g. 00110001 00110010)',
+    };
+
+    document.getElementById('inputHint').textContent = hints[mode];
+    document.getElementById('dataInput').placeholder = {
+        hex:   '31 32 33  or  78563412  (= bytes 78,56,34,12 in order)',
+        ascii: '123456789',
+        bin:   '00110001 00110010 00110011',
+    }[mode];
+}
+
+function onDataInput() {
+    // Auto calculate on input
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Parse input data
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function parseInput(raw, mode) {
+    raw = raw.trim();
+    if (!raw) throw new Error('Please enter input data.');
+
+    if (mode === 'ascii') {
+        return Array.from(raw).map(c => c.charCodeAt(0));
+    }
+
+    if (mode === 'bin') {
+        const parts = raw.replace(/\s+/g, ' ').split(' ').filter(s => s.length > 0);
+        return parts.map(b => {
+            if (!/^[01]{1,8}$/.test(b)) throw new Error(`Invalid binary value: ${b}`);
+            return parseInt(b, 2);
+        });
+    }
+
+    // WORD (32-bit) mode — LSB-first byte expansion (matches RTL: data_in[7:0] = first byte)
+    if (mode === 'word') {
+        const cleaned = raw.replace(/0x/gi, '').replace(/[,\s]+/g, ' ').trim();
+        const parts = cleaned.split(' ').filter(s => s.length > 0);
+        const bytes = [];
+        for (const w of parts) {
+            if (!/^[0-9a-fA-F]{1,8}$/.test(w)) throw new Error(`Invalid WORD value: ${w}`);
+            const val = parseInt(w, 16) >>> 0;
+            bytes.push((val       ) & 0xFF);
+            bytes.push((val >>>  8) & 0xFF);
+            bytes.push((val >>> 16) & 0xFF);
+            bytes.push((val >>> 24) & 0xFF);
+        }
+        return bytes;
+    }
+
+    // HEX mode — big-endian (sequential) byte order.
+    // Each token is read left→right: '78563412' → [0x78, 0x56, 0x34, 0x12]
+    // Tokens > 8 hex digits are split into 8-digit chunks (left→right), each big-endian.
+    const cleaned = raw.replace(/0x/gi, '').replace(/[,\s]+/g, ' ').trim();
+    const parts = cleaned.split(' ').filter(s => s.length > 0);
+    const bytes = [];
+    for (const h of parts) {
+        if (!/^[0-9a-fA-F]+$/.test(h)) throw new Error(`Invalid HEX value: ${h}`);
+        const chunks = h.match(/.{1,8}/g);  // split into ≤8-digit chunks
+        for (const chunk of chunks) {
+            const val = parseInt(chunk, 16) >>> 0;
+            const byteCount = Math.ceil(chunk.length / 2);
+            for (let b = byteCount - 1; b >= 0; b--)  // MSB-first: left byte first
+                bytes.push((val >> (b * 8)) & 0xFF);
+        }
+    }
+    return bytes;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CRC calculation
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function reflect(val, bits) {
+    let result = 0;
+    for (let i = 0; i < bits; i++) {
+        if (val & (1 << i)) result |= (1 << (bits - 1 - i));
+    }
+    return result >>> 0;
+}
+
+function calcCRC(data, width, poly, init, xorOut, refIn, refOut) {
+    const mask = (width === 32) ? 0xFFFFFFFF : (width === 16 ? 0xFFFF : 0xFF);
+    const topBit = 1 << (width - 1);
+
+    let crc = init & mask;
+
+    for (let byte of data) {
+        if (refIn) byte = reflect(byte, 8);
+        crc ^= (byte << (width - 8));
+        crc &= mask;
+
+        for (let i = 0; i < 8; i++) {
+            if (crc & topBit) {
+                crc = ((crc << 1) ^ poly) & mask;
+            } else {
+                crc = (crc << 1) & mask;
+            }
+        }
+    }
+
+    if (refOut) crc = reflect(crc, width);
+    return ((crc ^ xorOut) & mask) >>> 0;  // force unsigned
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Main calculate function
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function calculate() {
+    const errorBox = document.getElementById('errorBox');
+    const resultBox = document.getElementById('resultBox');
+
+    errorBox.classList.remove('show');
+    resultBox.classList.remove('show');
+
+    try {
+        // Parse data
+        const rawInput = document.getElementById('dataInput').value;
+        const data = parseInput(rawInput, currentMode);
+
+        // Get parameters
+        const width  = parseInt(document.getElementById('crcWidth').value);
+        const poly   = parseInt(document.getElementById('poly').value, 16);
+        const init   = parseInt(document.getElementById('init').value, 16);
+        const xorOut = parseInt(document.getElementById('xorOut').value, 16);
+        const refIn  = document.getElementById('refIn').checked;
+        const refOut = document.getElementById('refOut').checked;
+
+        if (isNaN(poly) || isNaN(init) || isNaN(xorOut)) {
+            throw new Error('Please enter Polynomial, Init, and XOR Out values in HEX.');
+        }
+
+        // Calculate
+        const result = calcCRC(data, width, poly, init, xorOut, refIn, refOut);
+
+        // Display
+        const hexStr = result.toString(16).toUpperCase().padStart(width / 4, '0');
+        const binStr = result.toString(2).padStart(width, '0');
+
+        document.getElementById('resultHex').textContent = '0x' + hexStr;
+        document.getElementById('fmtHex').textContent = '0x' + hexStr;
+        document.getElementById('fmtDec').textContent = result.toString(10);
+        document.getElementById('fmtBin').textContent = binStr;
+        document.getElementById('fmtVerilog').textContent = `${width}'h${hexStr}`;
+
+        resultBox.classList.add('show');
+
+    } catch (e) {
+        errorBox.textContent = '❌ ' + e.message;
+        errorBox.classList.add('show');
+    }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Copy to clipboard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function copyValue(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Init: calculate on load with default "123456789"
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function toggleQS(btn) {
+    const body = btn.nextElementSibling;
+    const open = body.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+}
+
+window.onload = function() {
+    document.getElementById('dataInput').value = '31 32 33 34 35 36 37 38 39';
+    updateModuleName();
+    calculate();
+    runSelfTest();
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RTL Generation
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function updateModuleName() {
+    const crcWidth  = document.getElementById('crcWidth').value;
+    const dataWidth = document.getElementById('dataWidth') ?
+                      document.getElementById('dataWidth').value : '32';
+    document.getElementById('moduleName') &&
+        (document.getElementById('moduleName').value = `crc${crcWidth}_w${dataWidth}`);
+}
+
+function computeCRCMatrix(crcWidth, poly, dataWidth, refIn) {
+    const polyBig = BigInt(poly);
+    const maskBig = (1n << BigInt(crcWidth)) - 1n;
+
+    function stepBit(crc, bit) {
+        const feedback = ((crc >> BigInt(crcWidth - 1)) & 1n) ^ BigInt(bit & 1);
+        return ((crc << 1n) ^ (feedback ? polyBig : 0n)) & maskBig;
+    }
+
+    function processData(crcInitBig, dataValBig) {
+        let crc = BigInt(crcInitBig) & maskBig;
+        if (refIn) {
+            for (let k = 0; k < dataWidth; k++)
+                crc = stepBit(crc, Number((dataValBig >> BigInt(k)) & 1n));
+        } else {
+            for (let k = dataWidth - 1; k >= 0; k--)
+                crc = stepBit(crc, Number((dataValBig >> BigInt(k)) & 1n));
+        }
+        return crc;
+    }
+
+    const A = [];
+    for (let j = 0; j < crcWidth; j++)
+        A.push(processData(1n << BigInt(j), 0n));
+
+    const B = [];
+    for (let k = 0; k < dataWidth; k++)
+        B.push(processData(0n, 1n << BigInt(k)));
+
+    return { A, B };
+}
+
+// Evaluate module: returns INTERNAL next state (no refOut applied)
+// refOut must be applied separately only for final output
+function evalModule(crcInVal, dataVal, A, B, crcWidth, dataWidth) {
+    crcInVal = BigInt(crcInVal);
+    dataVal  = BigInt(dataVal);
+    let result = 0n;
+    for (let i = 0; i < crcWidth; i++) {
+        let bit = 0n;
+        for (let j = 0; j < crcWidth; j++)
+            if ((A[j] >> BigInt(i)) & 1n) bit ^= (crcInVal >> BigInt(j)) & 1n;
+        for (let k = 0; k < dataWidth; k++)
+            if ((B[k] >> BigInt(i)) & 1n) bit ^= (dataVal >> BigInt(k)) & 1n;
+        result |= (bit & 1n) << BigInt(i);  // always bit i — no refOut
+    }
+    return result;
+}
+
+// Apply refOut reflection to a BigInt CRC state
+function applyRefOut(val, crcWidth) {
+    let reflected = 0n;
+    for (let i = 0; i < crcWidth; i++)
+        if ((val >> BigInt(i)) & 1n) reflected |= 1n << BigInt(crcWidth - 1 - i);
+    return reflected;
+}
+
+// Get current RTL parameters from UI
+function getRTLParams() {
+    const crcWidth   = parseInt(document.getElementById('crcWidth').value);
+    const poly       = parseInt(document.getElementById('poly').value, 16);
+    const init       = parseInt(document.getElementById('init').value, 16);
+    const xorOut     = parseInt(document.getElementById('xorOut').value, 16);
+    const refIn      = document.getElementById('refIn').checked;
+    const refOut     = document.getElementById('refOut').checked;
+    const dataWidth  = parseInt(document.getElementById('dataWidth').value);
+    const moduleName = (document.getElementById('moduleName').value.trim())
+                       || `crc${crcWidth}_w${dataWidth}`;
+    if (isNaN(poly) || isNaN(init) || isNaN(xorOut))
+        throw new Error('Please enter valid CRC parameters first.');
+    const algNames = {
+        crc32:'CRC-32 (Ethernet/802.3)', crc32c:'CRC-32C (Castagnoli)',
+        crc16:'CRC-16/IBM', crc16ccitt:'CRC-16/CCITT',
+        crc16modbus:'CRC-16/MODBUS', crc8:'CRC-8', custom:'Custom CRC'
+    };
+    const algName = algNames[currentPreset] || 'Custom CRC';
+    const { A, B } = computeCRCMatrix(crcWidth, poly, dataWidth, refIn);
+    return { crcWidth, poly, init, xorOut, refIn, refOut, dataWidth, moduleName, algName, A, B };
+}
+
+function downloadActiveTab() {
+    const activePanel = document.querySelector('.code-panel.active');
+    if (!activePanel) return;
+    const isRTL = document.getElementById('tab-rtl').classList.contains('active');
+    const moduleName = (document.getElementById('moduleName').value.trim()) || 'crc_module';
+    const filename = isRTL ? `${moduleName}.sv` : `${moduleName}_tb.sv`;
+    const blob = new Blob([activePanel.textContent], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast(`Downloaded: ${filename}`);
+}
+
+function generateAll() {
+    try {
+        const p = getRTLParams();
+        document.getElementById('rtlCode').textContent = buildRTL(p);
+        document.getElementById('tbCode').textContent  = buildTestbench(p);
+        const out = document.getElementById('codeOutput');
+        out.style.display = 'block';
+        showOutputTab('rtl');
+        out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch(e) { alert('Error: ' + e.message); }
+}
+
+function showOutputTab(tab) {
+    ['rtl','tb'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+        document.getElementById(t + 'Code').classList.toggle('active', t === tab);
+    });
+}
+
+function copyActiveTab() {
+    const activePanel = document.querySelector('.code-panel.active');
+    if (activePanel)
+        navigator.clipboard.writeText(activePanel.textContent)
+            .then(() => showToast('Copied!'));
+}
+
+// ── RTL builder ──────────────────────────────────────────────────
+function buildRTL({ crcWidth, poly, init, xorOut, refIn, refOut, dataWidth, moduleName, algName, A, B }) {
+    const ph  = (v, w) => (v >>> 0).toString(16).toUpperCase().padStart(Math.ceil(w / 4), '0');
+    const sep = '// ' + '='.repeat(59);
+    const L   = [];
+    const hasXor = xorOut !== 0;
+
+    L.push('// Generated by CRC RTL Builder  (easyfpga.blog)');
+    L.push(sep);
+    L.push(`// Algorithm  : ${algName}`);
+    L.push(`// CRC Width  : ${crcWidth} bits`);
+    L.push(`// Data Width : ${dataWidth} bits/clock`);
+    L.push(`// Polynomial : 0x${ph(poly, crcWidth)}`);
+    L.push(`// Init Value : 0x${ph(init, crcWidth)}`);
+    L.push(`// XOR Out    : 0x${ph(xorOut, crcWidth)}`);
+    L.push(`// RefIn      : ${refIn}  |  RefOut : ${refOut}`);
+    L.push(sep);
+    L.push('// Port description:');
+    L.push('//   clk      : Clock (posedge)');
+    L.push('//   resetn   : Active-low synchronous reset');
+    L.push('//   data_in  : Input data word');
+    L.push('//   crc_out  : Registered CRC state (next clock after data_in)');
+    if (hasXor)
+        L.push('//   crc_final: Final CRC = crc_out ^ XOR_OUT  (matches Calculator output)');
+    L.push(sep);
+    L.push('');
+    L.push(`module ${moduleName} (`);
+    L.push(`    input  logic        clk,`);
+    L.push(`    input  logic        resetn,`);
+    L.push(`    input  logic [${dataWidth - 1}:0] data_in,`);
+    if (hasXor) {
+        L.push(`    output logic [${crcWidth - 1}:0] crc_out,`);
+        L.push(`    output logic [${crcWidth - 1}:0] crc_final`);
+    } else {
+        L.push(`    output logic [${crcWidth - 1}:0] crc_out`);
+    }
+    L.push(');');
+    L.push('');
+    L.push(`    logic [${crcWidth - 1}:0] crc_reg;`);
+    L.push(`    logic [${crcWidth - 1}:0] crc_next;`);
+    L.push('');
+    L.push('    // ── CRC combinational logic ──────────────────────────');
+    L.push('    always_comb begin');
+
+    for (let i = 0; i < crcWidth; i++) {
+        const terms  = [];
+        for (let j = 0; j < crcWidth; j++)
+            if ((A[j] >> BigInt(i)) & 1n) terms.push(`crc_reg[${j}]`);
+        for (let k = 0; k < dataWidth; k++)
+            if ((B[k] >> BigInt(i)) & 1n) terms.push(`data_in[${k}]`);
+        L.push(terms.length === 0
+            ? `        crc_next[${i}] = 1'b0;`
+            : `        crc_next[${i}] = ${terms.join(' ^ ')};`);
+    }
+
+    L.push('    end');
+    L.push('');
+    L.push('    // ── CRC register ─────────────────────────────────────');
+    L.push('    always_ff @(posedge clk) begin');
+    L.push(`        if (!resetn) crc_reg <= ${crcWidth}'h${ph(init, crcWidth)};`);
+    L.push('        else         crc_reg <= crc_next;');
+    L.push('    end');
+    L.push('');
+    if (refOut) {
+        L.push('    // RefOut: reflect crc_reg for output');
+        for (let i = 0; i < crcWidth; i++)
+            L.push(`    assign crc_out[${crcWidth - 1 - i}] = crc_reg[${i}];`);
+    } else {
+        L.push('    assign crc_out = crc_reg;');
+    }
+    if (hasXor) {
+        L.push(`    assign crc_final = crc_out ^ ${crcWidth}'h${ph(xorOut, crcWidth)};`);
+    }
+    L.push('');
+    L.push('endmodule');
+    return L.join('\n');
+}
+
+// ── Testbench builder ────────────────────────────────────────────
+function buildTestbench({ crcWidth, poly, init, xorOut, refIn, refOut, dataWidth, moduleName, algName, A, B }) {
+    const ph  = (v, w) => {
+        const hex = typeof v === 'bigint' ? v.toString(16) : (v >>> 0).toString(16);
+        return hex.toUpperCase().padStart(Math.ceil(w / 4), '0');
+    };
+    const sep = '// ' + '='.repeat(59);
+    const dataMask = (1n << BigInt(dataWidth)) - 1n;
+    const L = [];
+
+    // Build 4 deterministic test data words (BigInt)
+    const testWords = dataWidth <= 32 ? [
+        BigInt(0xA5A5A5A5 >>> 0) & dataMask,
+        BigInt(0x12345678 >>> 0) & dataMask,
+        BigInt(0xDEADBEEF >>> 0) & dataMask,
+        BigInt(0x00FF00FF >>> 0) & dataMask,
+    ] : [
+        0xA5A5A5A5A5A5A5A5n & dataMask,
+        0x123456789ABCDEF0n & dataMask,
+        0xDEADBEEFCAFEBABEn & dataMask,
+        0x00FF00FF00FF00FFn & dataMask,
+    ];
+
+    // Compute chained internal states (no refOut during chaining)
+    let state = BigInt(init);
+    const states = [state];
+    for (const w of testWords) {
+        state = evalModule(state, w, A, B, crcWidth, dataWidth);
+        states.push(state);
+    }
+    const crcMask = (1n << BigInt(crcWidth)) - 1n;
+    function toFinal(s) {
+        let v = refOut ? applyRefOut(s, crcWidth) : s;
+        return (v ^ BigInt(xorOut)) & crcMask;
+    }
+    const finalCRC = toFinal(state);
+
+    L.push('// Generated by CRC RTL Builder  (easyfpga.blog)');
+    L.push('// Self-checking testbench — run with Vivado xsim or Icarus Verilog');
+    L.push('//');
+    L.push('// Icarus: iverilog -g2012 -o sim ' + moduleName + '_tb.sv ' + moduleName + '.sv && vvp sim');
+    L.push('// Vivado: xvlog --sv ' + moduleName + '.sv ' + moduleName + '_tb.sv && xelab -debug typical ' + moduleName + '_tb && xsim ' + moduleName + '_tb --runall');
+    L.push(sep);
+    L.push('');
+    L.push('`timescale 1ns/1ps');
+    L.push(`module ${moduleName}_tb;`);
+    L.push('');
+    L.push('    logic        clk    = 0;');
+    L.push('    logic        resetn = 0;');
+    L.push(`    logic [${dataWidth-1}:0] data_in = '0;`);
+    L.push(`    logic [${crcWidth-1}:0] crc_out;`);
+    if (xorOut !== 0)
+        L.push(`    logic [${crcWidth-1}:0] crc_final;`);
+    L.push('');
+    L.push(`    ${moduleName} dut (.*);`);
+    L.push('');
+    L.push('    always #5 clk = ~clk;   // 100 MHz');
+    L.push('');
+    L.push(`    logic [${crcWidth-1}:0] result;`);
+    L.push('    integer pass_cnt = 0, fail_cnt = 0;');
+    L.push('');
+    L.push('    task automatic chk;');
+    L.push(`        input [${crcWidth-1}:0] expected;`);
+    L.push('        input string          label;');
+    L.push('        if (result === expected) begin');
+    L.push('            $display("PASS: %-30s | 0x%0X", label, result);');
+    L.push('            pass_cnt++;');
+    L.push('        end else begin');
+    L.push('            $display("FAIL: %-30s | expected=0x%0X  got=0x%0X", label, expected, result);');
+    L.push('            fail_cnt++;');
+    L.push('        end');
+    L.push('    endtask');
+    L.push('');
+    L.push('    initial begin');
+    L.push(`        $display("${sep.slice(3)}");`);
+    L.push(`        $display("CRC RTL Builder — Testbench: ${moduleName}");`);
+    L.push(`        $display("Algorithm : ${algName}");`);
+    L.push(`        $display("${sep.slice(3)}");`);
+    L.push('');
+    L.push('        // ── Reset ────────────────────────────────────────');
+    L.push('        resetn = 0;');
+    L.push('        @(posedge clk); #1;');
+    L.push('        @(posedge clk); #1;');
+    L.push('        resetn = 1;');
+    L.push('');
+    L.push('        // ── Test 1: single word ──────────────────────────');
+    L.push(`        data_in = ${dataWidth}'h${ph(testWords[0], dataWidth)};`);
+    L.push('        @(posedge clk); #1;');
+    const singleResult = toFinal(states[1]);
+    L.push(`        result = ${xorOut !== 0 ? 'crc_final' : 'crc_out'};`);
+    L.push(`        chk(${crcWidth}'h${ph(singleResult, crcWidth)}, "Single word");`);
+    L.push('');
+    L.push('        // ── Test 2: 4-word chain ─────────────────────────');
+    L.push('        resetn = 0; @(posedge clk); #1; resetn = 1;');
+    testWords.forEach((w, i) => {
+        L.push(`        data_in = ${dataWidth}'h${ph(w, dataWidth)}; @(posedge clk); #1;  // word ${i+1}`);
+    });
+    L.push(`        result = ${xorOut !== 0 ? 'crc_final' : 'crc_out'};`);
+    L.push(`        chk(${crcWidth}'h${ph(finalCRC, crcWidth)}, "4-word chain");`);
+    L.push('');
+    L.push('        // ── Summary ──────────────────────────────────────');
+    L.push(`        $display("${sep.slice(3)}");`);
+    L.push('        $display("%0d PASSED  %0d FAILED", pass_cnt, fail_cnt);');
+    L.push('        if (fail_cnt == 0) $display("ALL TESTS PASSED ✓");');
+    L.push('        else              $error("SOME TESTS FAILED!");');
+    L.push(`        $display("${sep.slice(3)}");`);
+    L.push('        $finish;');
+    L.push('    end');
+    L.push('endmodule');
+    return L.join('\n');
+}
+
+// Legacy wrappers (kept for backward compat)
+function generateRTL() { generateAll(); }
+function copyRTL() { copyActiveTab(); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Self-Test: Calculator vs RTL evaluator  ("123456789" test vector)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const KNOWN_GOOD = {
+    crc32:       { val: 0xCBF43926, label: 'CRC-32'        },
+    crc32c:      { val: 0xE3069283, label: 'CRC-32C'       },
+    crc16:       { val: 0xBB3D,     label: 'CRC-16/IBM'    },
+    crc16ccitt:  { val: 0x29B1,     label: 'CRC-16/CCITT'  },
+    crc16modbus: { val: 0x4B37,     label: 'CRC-16/MODBUS' },
+    crc8:        { val: 0xF4,       label: 'CRC-8'         },
+};
+
+function runSelfTest() {
+    const testInput = '123456789';
+    const testBytes = Array.from(testInput).map(c => c.charCodeAt(0));
+    const rows = [];
+    let allPass = true;
+
+    for (const [name, kg] of Object.entries(KNOWN_GOOD)) {
+        const p       = PRESETS[name];
+        const polyN   = parseInt(p.poly,   16) >>> 0;
+        const initN   = parseInt(p.init,   16) >>> 0;
+        const xorOutN = parseInt(p.xorOut, 16) >>> 0;
+
+        // ① Calculator result
+        const calcResult = calcCRC(testBytes, p.width, polyN, initN, xorOutN, p.refIn, p.refOut);
+
+        // ② RTL evaluator: simulate byte-by-byte with 8-bit dataWidth
+        const { A, B } = computeCRCMatrix(p.width, polyN, 8, p.refIn);
+        const crcMask = (1n << BigInt(p.width)) - 1n;
+        let state = BigInt(initN) & crcMask;
+        for (const byte of testBytes)
+            state = evalModule(state, byte, A, B, p.width, 8);
+        let rtlFinal = p.refOut ? applyRefOut(state, p.width) : state;
+        rtlFinal = (rtlFinal ^ BigInt(xorOutN)) & crcMask;
+        const rtlResult = Number(rtlFinal) >>> 0;
+
+        const hexW     = Math.ceil(p.width / 4);
+        const knownOK  = calcResult === (kg.val >>> 0);
+        const rtlMatch = calcResult === rtlResult;
+        const pass     = knownOK && rtlMatch;
+        if (!pass) allPass = false;
+
+        rows.push({ label: kg.label, calcResult, rtlResult, known: kg.val, pass, knownOK, rtlMatch, hexW });
+    }
+
+    const badge = document.getElementById('selfTestBadge');
+    badge.textContent = allPass ? '✅ ALL PASS' : '❌ FAIL';
+    badge.style.color = allPass ? '#3fb950' : '#f85149';
+
+    const h = (v, w) => '0x' + (v >>> 0).toString(16).toUpperCase().padStart(w, '0');
+    let html = `
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;font-family:'Courier New',monospace;">
+        <thead><tr style="color:#8b949e;text-align:left;border-bottom:1px solid #30363d;">
+            <th style="padding:6px 8px;">Preset</th>
+            <th style="padding:6px 8px;">Known-Good</th>
+            <th style="padding:6px 8px;">Calculator</th>
+            <th style="padding:6px 8px;">RTL Eval</th>
+            <th style="padding:6px 8px;text-align:center;">Result</th>
+        </tr></thead><tbody>`;
+
+    for (const r of rows) {
+        const rowColor  = r.pass ? '' : 'background:#2d1a1a;';
+        const calcColor = r.knownOK  ? '#3fb950' : '#f85149';
+        const rtlColor  = r.rtlMatch ? '#3fb950' : '#f85149';
+        const badge     = r.pass ? '<span style="color:#3fb950;">✅ PASS</span>'
+                                 : '<span style="color:#f85149;">❌ FAIL</span>';
+        html += `<tr style="border-bottom:1px solid #21262d;${rowColor}">
+            <td style="padding:6px 8px;color:#e6edf3;">${r.label}</td>
+            <td style="padding:6px 8px;color:#8b949e;">${h(r.known, r.hexW)}</td>
+            <td style="padding:6px 8px;color:${calcColor};">${h(r.calcResult, r.hexW)}</td>
+            <td style="padding:6px 8px;color:${rtlColor};">${h(r.rtlResult, r.hexW)}</td>
+            <td style="padding:6px 8px;text-align:center;">${badge}</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('selfTestTable').innerHTML = html;
+}
+</script>
+
+<footer style="margin-top:40px;padding:16px 24px;border-top:1px solid #444;text-align:center;font-size:0.82rem;color:#888;">
+  © 2026 <a href="https://easyfpga.blog/" style="color:#888;">Easy-FPGA</a> ·
+  Free to use with attribution ·
+  Commercial use requires
+  <a href="mailto:easyfpga.blog@gmail.com" style="color:#888;">written permission</a>
+  <br><br>
+  <a href="https://github.com/sponsors/Easy-FPGA" target="_blank"
+     style="display:inline-block;padding:7px 16px;background:#ea4aaa;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:0.85rem;">
+    ♥ Sponsor this project
+  </a>
+</footer>
+</body>
+</html>

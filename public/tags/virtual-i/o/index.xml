@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Virtual I/O on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/virtual-i/o/</link>
+    <description>Recent content in Virtual I/O on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 10 Jun 2025 01:09:32 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/virtual-i/o/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Virtual Input/Output</title>
+      <link>https://easyfpga.blog/posts/virtual-input-output/</link>
+      <pubDate>Tue, 10 Jun 2025 01:09:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/virtual-input-output/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/vio.html&#34;&gt;https://www.amd.com/en/products/adaptive-socs-and-fpgas/intellectual-property/vio.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;When debugging an FPGA, there are times when you need to modify settings or parameters and monitor internal signals in real time. Setting up communication interfaces, such as receiving input from switches and keys or using UART, can be a complex process. However, AMD FPGAs offer a solution with the &lt;strong&gt;Virtual I/O&lt;/strong&gt; IP, which allows these tasks to be easily performed via JTAG.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-13.png?w=1024&#34;&gt;&lt;em&gt;&lt;a href=&#34;https://docs.amd.com/v/u/en-US/pg159-vio&#34;&gt;https://docs.amd.com/v/u/en-US/pg159-vio&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Xilinx Virtual Input/Output (VIO)&lt;/strong&gt; is a soft IP core provided by Xilinx that allows you to monitor and control internal FPGA signals in real time using the Vivado Integrated Logic Analyzer (ILA) without needing physical I/O pins.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

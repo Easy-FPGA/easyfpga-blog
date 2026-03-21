@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>AXI with FPGA and SoC | EasyFPGA</title>
+<meta name="keywords" content="AMD, AXI, FPGA, Xilinx">
+<meta name="description" content="AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="AXI with FPGA and SoC">
+  <meta property="og:description" content="AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-05-27T05:10:47+00:00">
+    <meta property="article:modified_time" content="2025-05-27T05:10:47+00:00">
+    <meta property="article:tag" content="AMD">
+    <meta property="article:tag" content="AXI">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Xilinx">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="AXI with FPGA and SoC">
+  <meta name="twitter:description" content="AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "AXI with FPGA and SoC",
+      "item": "https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "AXI with FPGA and SoC",
+  "name": "AXI with FPGA and SoC",
+  "description": "AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include",
+  "keywords": [
+    "AMD", "AXI", "FPGA", "Xilinx"
+  ],
+  "articleBody": "AXI stands for Advanced eXtensible Interface. It is a part of the AMBA (Advanced Microcontroller Bus Architecture) protocol family, developed by ARM. AXI is designed for high-performance, high-frequency system designs and is widely adopted in FPGAs and SoCs.\nZynq SoC connects between Processing System (PS) and Programmable Logic (PL)\nInterconnection between Xilinx IP cores (e.g., Block RAM, DMA, TEMAC)\nCommunication with MicroBlaze processor\nAXI Interconnect to connect multiple master/slave devices\nTypes of AXI Interfaces TypeDescriptionUse CaseAXI4Full-featured, supports burst transfersMemory-mapped interfaces (e.g., DDR)AXI4-LiteLightweight, no burst supportControl and configuration registersAXI4-StreamNo address phase, continuous data flowHigh-speed streaming (video, audio)\nWhen working with Xilinx IP cores, you’ll often use one or more of these AXI interfaces, depending on your system needs.\nThe AXI Channels AXI4 and AXI4-Lite interfaces are composed of the following independent channels:\nWrite Address Channel (AW*)\nWrite Data Channel (W*)\nWrite Response Channel (B*)\nRead Address Channel (AR*)\nRead Data Channel (R*)\nRead Response Channel (RRESP)\nEach channel uses VALID/READY handshake signals to transfer data reliably. This enables pipelining and parallelism, essential for high-performance designs.\nAXI4 (Memory Mapped) AXI4 Memory-Mapped (AXI4-MM) is designed for high-performance memory-mapped communication between a master (e.g., CPU, DMA) and a slave (e.g., memory, custom IP).\nSignalDirectionDescriptionawaddrMaster → SlaveWrite addressawvalidMaster → SlaveWrite address validawreadySlave → MasterWrite address acceptedwdataMaster → SlaveWrite datawvalidMaster → SlaveWrite data validwreadySlave → MasterWrite data acceptedbrespSlave → MasterWrite response (OKAY, SLVERR, etc)bvalidSlave → MasterWrite response validbreadyMaster → SlaveMaster ready to receive responsearaddrMaster → SlaveRead addressarvalidMaster → SlaveRead address validarreadySlave → MasterRead address acceptedrdataSlave → MasterRead datarvalidSlave → MasterRead data validrreadyMaster → SlaveMaster ready to accept read datarrespSlave → MasterRead response (OKAY, SLVERR, etc)\nWrite Transaction Master sends write address over AW channel\nMaster sends write data over W channel\nSlave send write response over B channel\nRead Transaction Master sends read address over AR channel\nSlave send read data the response over R channel\nKey Features FeatureDescriptionAddress-basedAll data transactions use memory addressesSupports burstsUp to 256 data beats per burstSeparate channelsIndependent channels for address, data, and responsesOut-of-order supportResponses can come back out-of-order\nSimulation Waveform of AXI4-MM Write Transaction\nAXI4-MM Write Channel\nAXI4-MM Write Response\nSimulation Waveform of AXI4-MM Read Transaction\nAXI4-MM Read Address Channel\nAXI4-MM Read Response\nAXI4-Lite AXI4-Lite is a lightweight version of the AXI4 protocol, used for low-throughput control interfaces. It is typically used for accessing control and status registers in IP cores.\nKey Features No burst, only single data transfers\nLower logic and routing resource usage\nIdeal for control/status register access\nMaster (e.g., CPU) configures slave IP core\nFeatureAXI4-MMAXI4-LiteBurst Transfers✅ Supported❌ Not supportedMax Transfer SizeUp to 256 beats1 beatComplexityHigherLowerUse CaseHigh data transferControl registers\nSimulation waveform of AXI4-Lite Write Transaction\nSimulation waveform of AXI4-Lite Read Transcation\nAXI Stream AXI4-Stream is a simplified AXI protocol designed to transmit raw data without addressing. It is optimized for high-throughput, continuous data transfer, such as video, audio, or network packets.\nFeatures No address channel-simple interface\nHandshake using TVALID and TREADY\nPipelined structure for high speed\nSupports TKEEP, TLAST, TUSER for flexibility\nSignalDescriptionTVALIDSender indicates valid dataTREADYReceiver is ready to accept dataTDATAActual data being transmittedTLASTMarks the end of a frame or packetTKEEPByte qualifier for which bytes in TDATA are validTUSEROptional user-defined signalAXI4-Stream Key Signals\nWhen TVALID is high and TREADY is high, a data transfer occurs on the TDATA bus. This handshake ensures safe and synchronized data transmission.\nThe TVALID and TDATA wait until TREADY is high.\nTLAST Marks the end of a frame packet\nAXI is the de facto standard interface in modern FPGA and SoC designs. A good understanding of AXI is essential for efficient and scalable hardware design.\nBelow is the link to the AXI website: https://www.arm.com/architecture/system-architectures/amba/amba-specifications\n",
+  "wordCount" : "601",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-05-27T05:10:47Z",
+  "dateModified": "2025-05-27T05:10:47Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      AXI with FPGA and SoC
+    </h1>
+    <div class="post-description">
+      AXI, or Advanced eXtensible Interface, is part of the AMBA protocol by ARM, designed for high-performance system designs in FPGAs and SoCs. It include
+    </div>
+    <div class="post-meta"><span title='2025-05-27 05:10:47 +0000 +0000'>May 27, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#types-of-axi-interfaces" aria-label="Types of AXI Interfaces">Types of AXI Interfaces</a></li>
+                <li>
+                    <a href="#the-axi-channels" aria-label="The AXI Channels">The AXI Channels</a></li>
+                <li>
+                    <a href="#axi4-memory-mapped" aria-label="AXI4 (Memory Mapped)">AXI4 (Memory Mapped)</a><ul>
+                        
+                <li>
+                    <a href="#write-transaction" aria-label="Write Transaction">Write Transaction</a></li>
+                <li>
+                    <a href="#read-transaction" aria-label="Read Transaction">Read Transaction</a></li>
+                <li>
+                    <a href="#key-features" aria-label="Key Features">Key Features</a></li></ul>
+                </li>
+                <li>
+                    <a href="#axi4-lite" aria-label="AXI4-Lite">AXI4-Lite</a><ul>
+                        
+                <li>
+                    <a href="#key-features-1" aria-label="Key Features">Key Features</a></li></ul>
+                </li>
+                <li>
+                    <a href="#axi-stream" aria-label="AXI Stream">AXI Stream</a><ul>
+                        
+                <li>
+                    <a href="#features" aria-label="Features">Features</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>AXI stands for Advanced eXtensible Interface. It is a part of the AMBA (Advanced Microcontroller Bus Architecture) protocol family, developed by ARM. AXI is designed for high-performance, high-frequency system designs and is <strong>widely adopted in FPGAs and SoCs.</strong></p>
+<ul>
+<li>
+<p>Zynq SoC connects between Processing System (PS) and Programmable Logic (PL)</p>
+</li>
+<li>
+<p>Interconnection between Xilinx IP cores (e.g., Block RAM, DMA, TEMAC)</p>
+</li>
+<li>
+<p>Communication with MicroBlaze processor</p>
+</li>
+<li>
+<p>AXI Interconnect to connect multiple master/slave devices</p>
+</li>
+</ul>
+<h2 id="types-of-axi-interfaces">Types of AXI Interfaces<a hidden class="anchor" aria-hidden="true" href="#types-of-axi-interfaces">#</a></h2>
+<p>TypeDescriptionUse Case<strong>AXI4</strong>Full-featured, supports burst transfersMemory-mapped interfaces (e.g., DDR)<strong>AXI4-Lite</strong>Lightweight, no burst supportControl and configuration registers<strong>AXI4-Stream</strong>No address phase, continuous data flowHigh-speed streaming (video,
+audio)</p>
+<p>When working with Xilinx IP cores, you&rsquo;ll often use one or more of these AXI interfaces, depending on your system needs.</p>
+<h2 id="the-axi-channels">The AXI Channels<a hidden class="anchor" aria-hidden="true" href="#the-axi-channels">#</a></h2>
+<p>AXI4 and AXI4-Lite interfaces are composed of the following  independent channels:</p>
+<ul>
+<li>
+<p>Write Address Channel (AW*)</p>
+</li>
+<li>
+<p>Write Data Channel (W*)</p>
+</li>
+<li>
+<p>Write Response Channel (B*)</p>
+</li>
+<li>
+<p>Read Address Channel (AR*)</p>
+</li>
+<li>
+<p>Read Data Channel (R*)</p>
+</li>
+<li>
+<p>Read Response Channel (RRESP)</p>
+</li>
+</ul>
+<p>Each channel uses VALID/READY handshake signals to transfer data reliably. This enables pipelining and parallelism, essential for high-performance designs.</p>
+<h2 id="axi4-memory-mapped">AXI4 (Memory Mapped)<a hidden class="anchor" aria-hidden="true" href="#axi4-memory-mapped">#</a></h2>
+<p>AXI4 Memory-Mapped (AXI4-MM) is designed for high-performance memory-mapped communication between a master (e.g., CPU, DMA) and a slave (e.g., memory, custom IP).</p>
+<p>SignalDirectionDescription<code>awaddr</code>Master → SlaveWrite address<code>awvalid</code>Master → SlaveWrite address valid<code>awready</code>Slave → MasterWrite address accepted<code>wdata</code>Master → SlaveWrite data<code>wvalid</code>Master → SlaveWrite data valid<code>wready</code>Slave → MasterWrite data accepted<code>bresp</code>Slave → MasterWrite response (OKAY, SLVERR, etc)<code>bvalid</code>Slave → MasterWrite response valid<code>bready</code>Master → SlaveMaster ready to receive response<code>araddr</code>Master → SlaveRead address<code>arvalid</code>Master → SlaveRead address valid<code>arready</code>Slave → MasterRead address accepted<code>rdata</code>Slave → MasterRead data<code>rvalid</code>Slave → MasterRead data valid<code>rready</code>Master → SlaveMaster ready to accept read data<code>rresp</code>Slave → MasterRead response (OKAY, SLVERR, etc)</p>
+<h3 id="write-transaction">Write Transaction<a hidden class="anchor" aria-hidden="true" href="#write-transaction">#</a></h3>
+<ul>
+<li>
+<p>Master sends write address over AW channel</p>
+</li>
+<li>
+<p>Master sends write data over W channel</p>
+</li>
+<li>
+<p>Slave send write response over B channel</p>
+</li>
+</ul>
+<h3 id="read-transaction">Read Transaction<a hidden class="anchor" aria-hidden="true" href="#read-transaction">#</a></h3>
+<ul>
+<li>
+<p>Master sends read address over AR channel</p>
+</li>
+<li>
+<p>Slave send read data the response over R channel</p>
+</li>
+</ul>
+<h3 id="key-features">Key Features<a hidden class="anchor" aria-hidden="true" href="#key-features">#</a></h3>
+<p>FeatureDescription<strong>Address-based</strong>All data transactions use memory addresses<strong>Supports bursts</strong>Up to 256 data beats per burst<strong>Separate channels</strong>Independent channels for address, data, and responses<strong>Out-of-order support</strong>Responses can come back out-of-order</p>
+<p><img alt="AXI4-MM Simulation Write Transaction" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-7.png?w=1024"><em>Simulation Waveform of AXI4-MM Write Transaction</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-8.png?w=1024"><em>AXI4-MM Write Channel</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-9.png?w=1024"><em>AXI4-MM Write Response</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-10.png?w=1024"><em>Simulation Waveform of AXI4-MM Read Transaction</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-11.png?w=1024"><em>AXI4-MM Read Address Channel</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-12.png?w=870"><em>AXI4-MM Read Response</em></p>
+<h2 id="axi4-lite">AXI4-Lite<a hidden class="anchor" aria-hidden="true" href="#axi4-lite">#</a></h2>
+<p>AXI4-Lite is a lightweight version of the AXI4 protocol, used for low-throughput control interfaces. It is typically used for accessing control and status registers in IP cores.</p>
+<h3 id="key-features-1">Key Features<a hidden class="anchor" aria-hidden="true" href="#key-features-1">#</a></h3>
+<ul>
+<li>
+<p>No burst, only single data transfers</p>
+</li>
+<li>
+<p>Lower logic and routing resource usage</p>
+</li>
+<li>
+<p>Ideal for control/status register access</p>
+</li>
+<li>
+<p>Master (e.g., CPU) configures slave IP core</p>
+</li>
+</ul>
+<p>FeatureAXI4-MMAXI4-LiteBurst Transfers✅ Supported❌ Not supportedMax Transfer SizeUp to 256 beats1 beatComplexityHigherLowerUse CaseHigh data transferControl registers</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-4.png?w=1024"><em>Simulation waveform of AXI4-Lite Write Transaction</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-5.png?w=1024"><em>Simulation waveform of AXI4-Lite Read Transcation</em></p>
+<h2 id="axi-stream">AXI Stream<a hidden class="anchor" aria-hidden="true" href="#axi-stream">#</a></h2>
+<p>AXI4-Stream is a simplified AXI protocol designed to transmit raw data without addressing. It is optimized for high-throughput, continuous data transfer, such as video, audio, or network packets.</p>
+<h3 id="features">Features<a hidden class="anchor" aria-hidden="true" href="#features">#</a></h3>
+<ul>
+<li>
+<p>No address channel-simple interface</p>
+</li>
+<li>
+<p>Handshake using TVALID and TREADY</p>
+</li>
+<li>
+<p>Pipelined structure for high speed</p>
+</li>
+<li>
+<p>Supports TKEEP, TLAST, TUSER for flexibility</p>
+</li>
+</ul>
+<p>SignalDescriptionTVALIDSender indicates valid dataTREADYReceiver is ready to accept dataTDATAActual data being transmittedTLASTMarks the end of a frame or packetTKEEPByte qualifier for which bytes in TDATA are validTUSEROptional user-defined signal<em>AXI4-Stream Key Signals</em></p>
+<p>When TVALID is high and TREADY is high, a data transfer occurs on the TDATA bus. This handshake ensures safe and synchronized data transmission.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-1.png?w=1023"><em>The TVALID and TDATA wait until TREADY is high.</em></p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/05/image-3.png?w=1024"><em>TLAST Marks the end of a frame packet</em></p>
+<p>AXI is the de facto standard interface in modern FPGA and SoC designs. A good understanding of AXI is essential for efficient and scalable hardware design.</p>
+<p>Below is the link to the AXI website: <a href="https://www.arm.com/architecture/system-architectures/amba/amba-specifications">https://www.arm.com/architecture/system-architectures/amba/amba-specifications</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/amd/">AMD</a></li>
+      <li><a href="https://easyfpga.blog/tags/axi/">AXI</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/high-speed-serial-communication/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>High Speed Serial Communication with AMD&#39;s Gigabit Transceiver</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/trigger-at-startup/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Trigger At StartUp</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

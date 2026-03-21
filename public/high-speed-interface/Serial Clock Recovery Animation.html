@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Serial Data Clock Recovery Animation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', monospace; margin: 0; padding: 0; }
+    .label { font-weight: bold; margin-bottom: 4px; }
+    .timeline { display: flex; align-items: center; margin-bottom: 12px; }
+    .bit { width: 56px; height: 44px; position: relative; }
+    .bit .high { border-top: 4px solid #60a5fa; width: 100%; position: absolute; top: 10px; left: 0; }
+    .bit .low { border-bottom: 4px solid #f59e0b; width: 100%; position: absolute; bottom: 10px; left: 0; }
+    .bit .edge { width: 0; height: 44px; border-left: 2px dashed #fbbf24; position: absolute; left: 0; top: 0; }
+    .clk { height: 30px; display: flex; align-items: flex-end; }
+    .clk .pulse { width: 56px; height: 0; border-left: 4px solid #fbbf24; margin-right: -4px; transition: height 0.2s; }
+    .arrow { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #fbbf24; font-size: 22px; }
+    .desc { color: #cbd5e1; font-size: 15px; margin-bottom: 18px; }
+    .legend { font-size: 13px; color: #a5b4fc; margin-bottom: 10px; }
+    .legend span { margin-right: 18px; }
+  </style>
+</head>
+<body>
+  <div class="flex flex-col items-center min-h-screen py-8">
+    <h1 class="text-2xl font-bold mb-2 text-blue-200">Serial Data & Clock Recovery (CDR) Animation</h1>
+    <div class="desc max-w-xl text-center mb-4">
+      This animation shows how a clock can be recovered from a serial data stream by detecting edges (transitions) in the data. Each transition triggers a clock pulse, enabling the receiver to synchronize with the incoming data.
+    </div>
+    <div class="legend mb-2">
+      <span><span class="inline-block w-4 h-1 align-middle bg-blue-400 mr-1"></span>Data High (1)</span>
+      <span><span class="inline-block w-4 h-1 align-middle bg-amber-400 mr-1"></span>Data Low (0)</span>
+      <span><span class="inline-block w-2 h-2 align-middle bg-yellow-400 rounded-full mr-1"></span>Edge (Transition)</span>
+      <span><span class="inline-block w-1 h-4 align-middle bg-yellow-400 mr-1"></span>Recovered Clock Pulse</span>
+    </div>
+    <div class="label text-blue-300 mb-1">Received Data</div>
+    <div class="timeline" id="dataLine"></div>
+    <div class="label text-yellow-300 mt-6 mb-1">Recovered Clock (CDR)</div>
+    <div class="clk" id="clkLine"></div>
+    <div class="clk mt-2" id="clkContLine"></div>
+      <div class="w-full flex justify-center mt-2">
+        <canvas id="pllClockCanvas" width="450" height="38" style="background:transparent;"></canvas>
+      </div>
+  </div>
+  <script>
+    // Dynamic animation: data and clock move step by step
+    const dataBits = [1,0,1,1,0,0,1,0];
+    const dataLine = document.getElementById('dataLine');
+    const clkLine = document.getElementById('clkLine');
+    const N = dataBits.length;
+    let pos = 0;
+    let interval = null;
+
+
+    function renderFrame(idx, showAllClock = false, showContClock = false) {
+      dataLine.innerHTML = '';
+      clkLine.innerHTML = '';
+      const clkContLine = document.getElementById('clkContLine');
+      if (clkContLine) clkContLine.innerHTML = '';
+      for(let i=0; i<N; i++) {
+        const bitDiv = document.createElement('div');
+        bitDiv.className = 'bit';
+        if(dataBits[i] === 1) {
+          bitDiv.innerHTML = '<div class="high"></div>';
+        } else {
+          bitDiv.innerHTML = '<div class="low"></div>';
+        }
+        // Edge marker if transition from previous bit
+        if(i > 0 && dataBits[i] !== dataBits[i-1]) {
+          const edge = document.createElement('div');
+          edge.className = 'edge';
+          const arrow = document.createElement('div');
+          arrow.className = 'arrow';
+          arrow.innerHTML = '↓';
+          edge.appendChild(arrow);
+          bitDiv.appendChild(edge);
+        }
+        // Highlight current bit
+        if(i === idx && !showAllClock) {
+          bitDiv.style.background = '#334155';
+          bitDiv.style.boxShadow = '0 0 12px #fbbf24cc';
+        }
+        dataLine.appendChild(bitDiv);
+
+        // Clock pulse: only at edge (transition)
+        const clkDiv = document.createElement('div');
+        clkDiv.className = 'pulse';
+        if(i > 0 && dataBits[i] !== dataBits[i-1] && (showAllClock || i === idx)) {
+          clkDiv.style.height = '30px';
+          clkDiv.style.borderLeftColor = '#fbbf24';
+          clkDiv.style.boxShadow = '0 0 10px #fbbf24cc';
+        } else {
+          clkDiv.style.height = '0';
+          clkDiv.style.borderLeftColor = '#334155';
+        }
+        clkLine.appendChild(clkDiv);
+      }
+      // Add label for continuous clock
+      if (showContClock && clkContLine) {
+        clkContLine.style.marginTop = '2px';
+        clkContLine.style.position = 'relative';
+        if (!document.getElementById('contClockLabel')) {
+          const lbl = document.createElement('div');
+          lbl.id = 'contClockLabel';
+          lbl.textContent = 'Continuous Recovered Clock (PLL Output)';
+          lbl.style.position = 'absolute';
+          lbl.style.left = '0';
+          lbl.style.top = '-22px';
+          lbl.style.fontSize = '13px';
+          lbl.style.color = '#38bdf8';
+          lbl.style.fontWeight = 'bold';
+          clkContLine.appendChild(lbl);
+        }
+      }
+      // Draw PLL output as a true square wave below
+      const canvas = document.getElementById('pllClockCanvas');
+      if (showContClock && canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const margin = 18;
+        const w = canvas.width - margin * 2;
+        const h = canvas.height - 10;
+        const yMid = h / 2 + 8;
+        const amp = 12;
+        const bitW = w / N;
+        ctx.save();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(margin, yMid + amp);
+        for (let i = 0; i < N; i++) {
+          // Rising edge
+          ctx.lineTo(margin + i * bitW, yMid + amp);
+          ctx.lineTo(margin + i * bitW, yMid - amp);
+          // High
+          ctx.lineTo(margin + (i + 0.5) * bitW, yMid - amp);
+          // Falling edge
+          ctx.lineTo(margin + (i + 0.5) * bitW, yMid + amp);
+          // Low
+          ctx.lineTo(margin + (i + 1) * bitW, yMid + amp);
+        }
+        ctx.stroke();
+        ctx.restore();
+      } else if (canvas) {
+        // Clear if not showing
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function startAnimation() {
+      pos = 0;
+      renderFrame(pos);
+      if(interval) clearInterval(interval);
+      interval = setInterval(() => {
+        pos++;
+        if(pos >= N) {
+          clearInterval(interval);
+          // Show all recovered clock pulses and continuous clock at the end
+          setTimeout(() => { renderFrame(N-1, true, true); }, 400);
+          return;
+        }
+        renderFrame(pos);
+      }, 700);
+    }
+
+    // Remove play button, auto-play on load
+    // Initial static frame
+    renderFrame(0);
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(startAnimation, 600);
+    });
+  </script>
+</body>
+</html>

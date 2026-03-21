@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Memory Interface on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/memory-interface/</link>
+    <description>Recent content in Memory Interface on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 04 Sep 2025 03:20:49 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/memory-interface/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Implementing a DDR Memory Interface on FPGA with Xilinx MIG</title>
+      <link>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/ddr-memory-interface-fpga/</guid>
+      <description>Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.</description>
+    </item>
+  </channel>
+</rss>

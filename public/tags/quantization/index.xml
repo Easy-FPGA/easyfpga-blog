@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Quantization on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/quantization/</link>
+    <description>Recent content in Quantization on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 24 Nov 2025 23:03:14 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/quantization/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Quantization for CNN Inference on FPGA</title>
+      <link>https://easyfpga.blog/posts/quantization-for-fpga-cnn/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/quantization-for-fpga-cnn/</guid>
+      <description>Why integer quantization is essential for running CNN models on FPGA, how the conversion works, and a concrete fixed-point example.</description>
+    </item>
+  </channel>
+</rss>

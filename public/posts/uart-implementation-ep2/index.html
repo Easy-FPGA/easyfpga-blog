@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>UART Frame Format | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, Xilinx, EasyFPGA">
+<meta name="description" content="A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep2/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep2/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep2/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="UART Frame Format">
+  <meta property="og:description" content="A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-15T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-15T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep5/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep4/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep3/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep1/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="UART Frame Format">
+  <meta name="twitter:description" content="A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "UART Frame Format",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep2/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "UART Frame Format",
+  "name": "UART Frame Format",
+  "description": "A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "UART Frame Format Each UART transmission carries data inside a precisely defined frame. Understanding the purpose of every field — not just its name — is what separates a developer who can implement UART from scratch from one who only configures a vendor IP. This episode dissects the frame bit by bit, covering the transmission order convention, parity computation, and the overhead implications of different format choices.\nUART Frame Structure Every UART transmission is based on a fixed Frame structure.\nIdle Start D0 D1 D2 D3 D4 D5 D6 D7 Parity Stop Idle\r───────┐ ┌────\r1 │ 0 │ b0 │ b1 │ b2 │ b3 │ b4 │ b5 │ b6 │ b7 │ P │ 1 │ 1 |\r└─────┴────┴────┴────┴────┴────┴────┴────┴────┴───────┴──────────┘\r←──────────────── 1 Frame ─────────────────────────────→\r1bit ←──── 8 bits (LSB first) ────→ 1bit 1bit Field Bits Value Purpose Start Bit 1 Always 0 Signals start of frame (falling edge) Data Bits 5–9 Data Actual data payload (LSB first) Parity Bit 0–1 Even/Odd Optional error detection Stop Bit 1–2 Always 1 Signals end of frame, returns to idle Frame Transmission — Animated 0xA5 frame (8E1) — bits transmitted one at a time, LSB first. Watch each field highlighted in sequence.\nStart Bit \u0026 Stop Bit Start Bit Line is normally High (1, Idle) Transmission begins with a Low (0) → Falling Edge Receiver uses this falling edge to re-synchronize its timing Stop Bit Always High (1) Returns the line to Idle state 1 Stop bit (standard), 2 Stop bits (legacy devices, slow MCUs) Idle Start Data ... Stop Idle\r───┐ ↓ ↑──────────\r└──────────┘ ~~~data~~~ ───────┘\rFalling Edge Back to High Data Bits \u0026 Bit Order Data Width Options 5, 6, 7, 8 bits — 8-bit is most common (ASCII, byte data) 9 bits — special use (e.g., multi-drop address flag) Transmission Order: LSB First Data to send: 0xA5 = 1010_0101b\rBit order: D0 D1 D2 D3 D4 D5 D6 D7\rTX value: 1 0 1 0 0 1 0 1\r↑ LSB MSB ↑\rTX waveform: D0 → D1 → D2 → D3 → D4 → D5 → D6 → D7 The LSB (D0) is always transmitted first For 0xA5, the first bit on the wire is: 1 (LSB) Why LSB first? Early UART hardware used a shift register that naturally shifted bits out from the LSB end. This is opposite to the MSB-first convention most software developers expect — so always verify bit ordering explicitly in simulation waveforms before assuming the RX design is correct.\nParity Bit Optional field for single-bit error detection\nEven Parity Set parity bit so that the total number of 1s (data + parity) is even\nOdd Parity Set parity bit so that the total number of 1s (data + parity) is odd\nData (0b10010100) Count of 1s Even Parity Odd Parity 1 0 0 1 0 1 0 0 3 (odd) 1 (make even) 0 (keep odd) 1 2 3 4 // Even parity using reduction XOR parity_bit = ^tx_data; // 1 if count of 1s is odd // Odd parity parity_bit = ~^tx_data; Parity detects single-bit errors only. Any even number of bit errors (2, 4, …) cancel out and go undetected. For reliable data integrity over longer payloads, use a CRC checksum at the application layer.\nChecksum for Multi-Byte Data For longer payloads, use a Checksum instead of per-byte parity\nChecksum Calculation Example Data bytes: 0x12, 0x34, 0x56\rSum: 0x12 + 0x34 + 0x56 = 0x9C\rChecksum (1 byte): 0x9C (discard overflow beyond 1 byte) Advantages over Parity Block-level protection: verifies integrity of the entire data block Detects multiple bit errors that simple parity cannot catch Lower overhead for long transfers: one checksum per block UART Communication Overhead 8N1 format (8 data bits, No parity, 1 stop bit) — most common configuration\n$$\\text{Overhead} = \\frac{\\text{Non-data bits}}{\\text{Total bits}} = \\frac{2}{10} = 20%$$\nConfig Total Bits Data Bits Overhead 8N1 10 8 20% 8E1 11 8 27% 8N2 11 8 27% 7E1 10 7 30% Effective Throughput (115200 bps, 8N1) $$\\text{Effective throughput} = 115200 \\times \\frac{8}{10} = 92{,}160 \\text{ bps} = 11{,}520 \\text{ bytes/s}$$\nFrame Format Summary 115200 bps, 8E1:\rIdle │S│ D0 │ D1 │ D2 │ D3 │ D4 │ D5 │ D6 │ D7 │ Par│Stp│ Idle\r────────┘ └────┴────┴────┴────┴────┴────┴────┴────┴────┴───┘ ──────\r│←────────────────── 8.68µs × 11 = 95.5µs ──────────────→│\r1bit 8 data bits 1bit 1bit\r(Start) (Parity)(Stop) Key Points Start Bit: always 0, falling edge → timing synchronization Data Bits: 8 bits, LSB first, actual payload Parity Bit: even parity, detects 1-bit errors Stop Bit: always 1, returns to idle Episode 2 Summary UART frame = Start(1) + Data(5–9) + Parity(0–1) + Stop(1–2) Start Bit: always 0; falling edge resets receiver timing Data: LSB transmitted first; 8 bits is the standard Parity: even/odd for 1-bit error detection (optional) Stop Bit: always 1; returns line to idle 8N1 overhead: 20% (10 bits total, 8 data bits) Next Episode Episode 3: RS-232 \u0026 RS-485 Converting UART logic signals to physical electrical standards\nKey Takeaways UART frame = Start (1b, always 0) + Data (5–9b, LSB first) + Parity (1b, optional) + Stop (1–2b, always 1) — every field at exactly the right timing; missing any field causes a framing error LSB-first transmission is counterintuitive for software developers — verify the bit order explicitly in simulation before signing off on the RX design Even parity is the reduction XOR of all data bits: parity = ^data[7:0]; the receiver recalculates and compares on every received byte 8N1 carries 20% overhead (2 framing bits per 10-bit frame); 8E1 adds 1 more bit but enables hardware parity error detection at the receiver Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "942",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-15T12:00:00+09:00",
+  "dateModified": "2026-03-15T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep2/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UART Frame Format
+    </h1>
+    <div class="post-description">
+      A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.
+    </div>
+    <div class="post-meta"><span title='2026-03-15 12:00:00 +0900 KST'>March 15, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#uart-frame-format" aria-label="UART Frame Format">UART Frame Format</a><ul>
+                        
+                <li>
+                    <a href="#uart-frame-structure" aria-label="UART Frame Structure">UART Frame Structure</a></li>
+                <li>
+                    <a href="#frame-transmission--animated" aria-label="Frame Transmission — Animated">Frame Transmission — Animated</a></li>
+                <li>
+                    <a href="#start-bit--stop-bit" aria-label="Start Bit &amp; Stop Bit">Start Bit &amp; Stop Bit</a><ul>
+                        
+                <li>
+                    <a href="#start-bit" aria-label="Start Bit">Start Bit</a></li>
+                <li>
+                    <a href="#stop-bit" aria-label="Stop Bit">Stop Bit</a></li></ul>
+                </li>
+                <li>
+                    <a href="#data-bits--bit-order" aria-label="Data Bits &amp; Bit Order">Data Bits &amp; Bit Order</a><ul>
+                        
+                <li>
+                    <a href="#data-width-options" aria-label="Data Width Options">Data Width Options</a></li>
+                <li>
+                    <a href="#transmission-order-lsb-first" aria-label="Transmission Order: LSB First">Transmission Order: LSB First</a></li></ul>
+                </li>
+                <li>
+                    <a href="#parity-bit" aria-label="Parity Bit">Parity Bit</a><ul>
+                        
+                <li>
+                    <a href="#even-parity" aria-label="Even Parity">Even Parity</a></li>
+                <li>
+                    <a href="#odd-parity" aria-label="Odd Parity">Odd Parity</a></li></ul>
+                </li>
+                <li>
+                    <a href="#checksum-for-multi-byte-data" aria-label="Checksum for Multi-Byte Data">Checksum for Multi-Byte Data</a><ul>
+                        
+                <li>
+                    <a href="#checksum-calculation-example" aria-label="Checksum Calculation Example">Checksum Calculation Example</a></li>
+                <li>
+                    <a href="#advantages-over-parity" aria-label="Advantages over Parity">Advantages over Parity</a></li></ul>
+                </li>
+                <li>
+                    <a href="#uart-communication-overhead" aria-label="UART Communication Overhead">UART Communication Overhead</a><ul>
+                        
+                <li>
+                    <a href="#effective-throughput-115200-bps-8n1" aria-label="Effective Throughput (115200 bps, 8N1)">Effective Throughput (115200 bps, 8N1)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#frame-format-summary" aria-label="Frame Format Summary">Frame Format Summary</a><ul>
+                        
+                <li>
+                    <a href="#key-points" aria-label="Key Points">Key Points</a></li></ul>
+                </li>
+                <li>
+                    <a href="#episode-2-summary" aria-label="Episode 2 Summary">Episode 2 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="uart-frame-format">UART Frame Format<a hidden class="anchor" aria-hidden="true" href="#uart-frame-format">#</a></h1>
+<p>Each UART transmission carries data inside a precisely defined frame. Understanding the purpose of every field — not just its name — is what separates a developer who can implement UART from scratch from one who only configures a vendor IP. This episode dissects the frame bit by bit, covering the transmission order convention, parity computation, and the overhead implications of different format choices.</p>
+<h2 id="uart-frame-structure">UART Frame Structure<a hidden class="anchor" aria-hidden="true" href="#uart-frame-structure">#</a></h2>
+<p>Every UART transmission is based on a fixed <strong>Frame</strong> structure.</p>
+<pre tabindex="0"><code>  Idle  Start   D0   D1   D2   D3   D4   D5   D6   D7  Parity  Stop  Idle
+───────┐                                                                ┌────
+  1    │  0  │ b0 │ b1 │ b2 │ b3 │ b4 │ b5 │ b6 │ b7 │   P   │  1  │  1 |
+       └─────┴────┴────┴────┴────┴────┴────┴────┴────┴───────┴──────────┘
+            ←──────────────── 1 Frame ─────────────────────────────→
+              1bit   ←──── 8 bits (LSB first) ────→   1bit   1bit
+</code></pre><table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Bits</th>
+          <th>Value</th>
+          <th>Purpose</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Start Bit</strong></td>
+          <td>1</td>
+          <td>Always <strong>0</strong></td>
+          <td>Signals start of frame (falling edge)</td>
+      </tr>
+      <tr>
+          <td><strong>Data Bits</strong></td>
+          <td>5–9</td>
+          <td>Data</td>
+          <td>Actual data payload (LSB first)</td>
+      </tr>
+      <tr>
+          <td><strong>Parity Bit</strong></td>
+          <td>0–1</td>
+          <td>Even/Odd</td>
+          <td>Optional error detection</td>
+      </tr>
+      <tr>
+          <td><strong>Stop Bit</strong></td>
+          <td>1–2</td>
+          <td>Always <strong>1</strong></td>
+          <td>Signals end of frame, returns to idle</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="frame-transmission--animated">Frame Transmission — Animated<a hidden class="anchor" aria-hidden="true" href="#frame-transmission--animated">#</a></h2>
+<p><em>0xA5 frame (8E1) — bits transmitted one at a time, LSB first. Watch each field highlighted in sequence.</em></p>
+<iframe src="/uart-html/UART Frame Transmission.html" width="100%" height="400" style="border:none;border-radius:8px;display:block;margin:4px auto;"></iframe>
+<h2 id="start-bit--stop-bit">Start Bit &amp; Stop Bit<a hidden class="anchor" aria-hidden="true" href="#start-bit--stop-bit">#</a></h2>
+<h3 id="start-bit">Start Bit<a hidden class="anchor" aria-hidden="true" href="#start-bit">#</a></h3>
+<ul>
+<li>Line is normally <strong>High (1, Idle)</strong></li>
+<li>Transmission begins with a <strong>Low (0)</strong> → <strong>Falling Edge</strong></li>
+<li>Receiver uses this falling edge to <strong>re-synchronize its timing</strong></li>
+</ul>
+<h3 id="stop-bit">Stop Bit<a hidden class="anchor" aria-hidden="true" href="#stop-bit">#</a></h3>
+<ul>
+<li>Always <strong>High (1)</strong></li>
+<li>Returns the line to Idle state</li>
+<li><strong>1 Stop bit</strong> (standard), 2 Stop bits (legacy devices, slow MCUs)</li>
+</ul>
+<pre tabindex="0"><code>  Idle      Start      Data ...      Stop     Idle
+───┐          ↓                       ↑──────────
+   └──────────┘   ~~~data~~~   ───────┘
+       Falling Edge                  Back to High
+</code></pre><h2 id="data-bits--bit-order">Data Bits &amp; Bit Order<a hidden class="anchor" aria-hidden="true" href="#data-bits--bit-order">#</a></h2>
+<h3 id="data-width-options">Data Width Options<a hidden class="anchor" aria-hidden="true" href="#data-width-options">#</a></h3>
+<ul>
+<li><strong>5, 6, 7, 8</strong> bits — 8-bit is most common (ASCII, byte data)</li>
+<li><strong>9</strong> bits — special use (e.g., multi-drop address flag)</li>
+</ul>
+<h3 id="transmission-order-lsb-first">Transmission Order: LSB First<a hidden class="anchor" aria-hidden="true" href="#transmission-order-lsb-first">#</a></h3>
+<pre tabindex="0"><code>Data to send: 0xA5 = 1010_0101b
+
+Bit order:   D0  D1  D2  D3  D4  D5  D6  D7
+TX value:     1   0   1   0   0   1   0   1
+              ↑ LSB                  MSB ↑
+
+TX waveform: D0 → D1 → D2 → D3 → D4 → D5 → D6 → D7
+</code></pre><ul>
+<li>The <strong>LSB (D0)</strong> is always transmitted first</li>
+<li>For 0xA5, the first bit on the wire is: <strong>1</strong> (LSB)</li>
+</ul>
+<blockquote>
+<p><strong>Why LSB first?</strong> Early UART hardware used a shift register that naturally shifted bits out from the LSB end. This is opposite to the MSB-first convention most software developers expect — so always verify bit ordering explicitly in simulation waveforms before assuming the RX design is correct.</p>
+</blockquote>
+<h2 id="parity-bit">Parity Bit<a hidden class="anchor" aria-hidden="true" href="#parity-bit">#</a></h2>
+<p>Optional field for <strong>single-bit error detection</strong></p>
+<h3 id="even-parity">Even Parity<a hidden class="anchor" aria-hidden="true" href="#even-parity">#</a></h3>
+<p>Set parity bit so that the <strong>total number of 1s (data + parity) is even</strong></p>
+<h3 id="odd-parity">Odd Parity<a hidden class="anchor" aria-hidden="true" href="#odd-parity">#</a></h3>
+<p>Set parity bit so that the <strong>total number of 1s (data + parity) is odd</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Data (0b10010100)</th>
+          <th>Count of 1s</th>
+          <th>Even Parity</th>
+          <th>Odd Parity</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1 0 0 1 0 1 0 0</td>
+          <td>3 (odd)</td>
+          <td><strong>1</strong> (make even)</td>
+          <td><strong>0</strong> (keep odd)</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-systemverilog" data-lang="systemverilog"><span style="display:flex;"><span><span style="color:#75715e">// Even parity using reduction XOR
+</span></span></span><span style="display:flex;"><span>parity_bit <span style="color:#f92672">=</span> <span style="color:#f92672">^</span>tx_data;       <span style="color:#75715e">// 1 if count of 1s is odd
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Odd parity
+</span></span></span><span style="display:flex;"><span>parity_bit <span style="color:#f92672">=</span> <span style="color:#f92672">~^</span>tx_data;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Parity detects single-bit errors only. <strong>Any even number of bit errors</strong> (2, 4, &hellip;) cancel out and go undetected. For reliable data integrity over longer payloads, use a CRC checksum at the application layer.</p>
+</blockquote>
+<h2 id="checksum-for-multi-byte-data">Checksum for Multi-Byte Data<a hidden class="anchor" aria-hidden="true" href="#checksum-for-multi-byte-data">#</a></h2>
+<p>For longer payloads, use a <strong>Checksum</strong> instead of per-byte parity</p>
+<h3 id="checksum-calculation-example">Checksum Calculation Example<a hidden class="anchor" aria-hidden="true" href="#checksum-calculation-example">#</a></h3>
+<pre tabindex="0"><code>Data bytes: 0x12, 0x34, 0x56
+
+Sum:  0x12 + 0x34 + 0x56 = 0x9C
+
+Checksum (1 byte): 0x9C  (discard overflow beyond 1 byte)
+</code></pre><h3 id="advantages-over-parity">Advantages over Parity<a hidden class="anchor" aria-hidden="true" href="#advantages-over-parity">#</a></h3>
+<ul>
+<li><strong>Block-level protection</strong>: verifies integrity of the entire data block</li>
+<li><strong>Detects multiple bit errors</strong> that simple parity cannot catch</li>
+<li><strong>Lower overhead</strong> for long transfers: one checksum per block</li>
+</ul>
+<h2 id="uart-communication-overhead">UART Communication Overhead<a hidden class="anchor" aria-hidden="true" href="#uart-communication-overhead">#</a></h2>
+<p><strong>8N1 format</strong> (8 data bits, No parity, 1 stop bit) — most common configuration</p>
+<p>$$\text{Overhead} = \frac{\text{Non-data bits}}{\text{Total bits}} = \frac{2}{10} = 20%$$</p>
+<table>
+  <thead>
+      <tr>
+          <th>Config</th>
+          <th>Total Bits</th>
+          <th>Data Bits</th>
+          <th>Overhead</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>8N1</td>
+          <td>10</td>
+          <td>8</td>
+          <td><strong>20%</strong></td>
+      </tr>
+      <tr>
+          <td>8E1</td>
+          <td>11</td>
+          <td>8</td>
+          <td><strong>27%</strong></td>
+      </tr>
+      <tr>
+          <td>8N2</td>
+          <td>11</td>
+          <td>8</td>
+          <td><strong>27%</strong></td>
+      </tr>
+      <tr>
+          <td>7E1</td>
+          <td>10</td>
+          <td>7</td>
+          <td><strong>30%</strong></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="effective-throughput-115200-bps-8n1">Effective Throughput (115200 bps, 8N1)<a hidden class="anchor" aria-hidden="true" href="#effective-throughput-115200-bps-8n1">#</a></h3>
+<p>$$\text{Effective throughput} = 115200 \times \frac{8}{10} = 92{,}160 \text{ bps} = 11{,}520 \text{ bytes/s}$$</p>
+<h2 id="frame-format-summary">Frame Format Summary<a hidden class="anchor" aria-hidden="true" href="#frame-format-summary">#</a></h2>
+<pre tabindex="0"><code>115200 bps, 8E1:
+
+  Idle  │S│ D0 │ D1 │ D2 │ D3 │ D4 │ D5 │ D6 │ D7 │ Par│Stp│  Idle
+────────┘ └────┴────┴────┴────┴────┴────┴────┴────┴────┴───┘ ──────
+         │←────────────────── 8.68µs × 11 = 95.5µs ──────────────→│
+         1bit              8 data bits               1bit  1bit
+        (Start)                                    (Parity)(Stop)
+</code></pre><h3 id="key-points">Key Points<a hidden class="anchor" aria-hidden="true" href="#key-points">#</a></h3>
+<ul>
+<li><strong>Start Bit</strong>: always 0, falling edge → timing synchronization</li>
+<li><strong>Data Bits</strong>: 8 bits, LSB first, actual payload</li>
+<li><strong>Parity Bit</strong>: even parity, detects 1-bit errors</li>
+<li><strong>Stop Bit</strong>: always 1, returns to idle</li>
+</ul>
+<h2 id="episode-2-summary">Episode 2 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-2-summary">#</a></h2>
+<ul>
+<li>UART frame = Start(1) + Data(5–9) + Parity(0–1) + Stop(1–2)</li>
+<li><strong>Start Bit</strong>: always 0; falling edge resets receiver timing</li>
+<li><strong>Data</strong>: LSB transmitted first; 8 bits is the standard</li>
+<li><strong>Parity</strong>: even/odd for 1-bit error detection (optional)</li>
+<li><strong>Stop Bit</strong>: always 1; returns line to idle</li>
+<li><strong>8N1 overhead</strong>: 20% (10 bits total, 8 data bits)</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 3: RS-232 &amp; RS-485</strong>
+Converting UART logic signals to physical electrical standards</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>UART frame = Start (1b, always 0) + Data (5–9b, LSB first) + Parity (1b, optional) + Stop (1–2b, always 1) — every field at exactly the right timing; missing any field causes a framing error</li>
+<li>LSB-first transmission is counterintuitive for software developers — verify the bit order explicitly in simulation before signing off on the RX design</li>
+<li>Even parity is the reduction XOR of all data bits: <code>parity = ^data[7:0]</code>; the receiver recalculates and compares on every received byte</li>
+<li>8N1 carries 20% overhead (2 framing bits per 10-bit frame); 8E1 adds 1 more bit but enables hardware parity error detection at the receiver</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep3/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>RS-232 and RS-485 for UART Systems</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep1/">
+    <span class="title">Next »</span>
+    <br>
+    <span>What is UART?</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

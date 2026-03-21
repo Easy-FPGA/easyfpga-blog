@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>RS-232 and RS-485 for UART Systems | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, Xilinx, EasyFPGA">
+<meta name="description" content="How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep3/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep3/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep3/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="RS-232 and RS-485 for UART Systems">
+  <meta property="og:description" content="How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-16T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-16T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="Xilinx">
+    <meta property="article:tag" content="EasyFPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep5/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep4/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep2/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep1/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="RS-232 and RS-485 for UART Systems">
+  <meta name="twitter:description" content="How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "RS-232 and RS-485 for UART Systems",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep3/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "RS-232 and RS-485 for UART Systems",
+  "name": "RS-232 and RS-485 for UART Systems",
+  "description": "How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "Xilinx", "EasyFPGA"
+  ],
+  "articleBody": "RS-232 \u0026 RS-485 When FPGAs communicate with external devices over UART, the signal rarely stays at 3.3V CMOS all the way to the destination. RS-232 defines an electrical standard for single-ended serial links up to 15 m, while RS-485 uses differential signaling to reach 1,200 m on a multi-drop bus. The most important lesson of this episode: UART is a logical protocol, and RS-232/RS-485 are completely separate physical standards that FPGA GPIO cannot directly drive.\nUART vs RS-232 vs RS-485 UART = Logical protocol (3.3V/0V digital signal) RS-232 / RS-485 = Physical electrical standards (RS = Recommended Standard)\n┌──────────┐ UART logic ┌────────────┐ RS-232/485 signal ┌──────────┐\r│ FPGA ├────────────────►│ Transceiver├────────────────────►│ Device │\r│ (3.3V) │ TX/RX (CMOS) │ (MAX3232 / │ (±15V / ±5V diff) │ │\r└──────────┘ │ RS485) │ └──────────┘\r└────────────┘ FPGA outputs 3.3V CMOS UART signals A transceiver IC converts the signal for long-distance transmission RS-232 vs RS-485 Comparison Item RS-232 RS-485 Signal Type Single-ended (referenced to GND) Differential (A and B wires) Logic Levels 1 = −3V to −15V, 0 = +3V to +15V A−B \u003e +200mV = 0, A−B \u003c −200mV = 1 Max Distance Up to 15 m Up to 1,200 m Max Speed 115.2 kbps typical, ~1 Mbps (short range) 10 Mbps (short range) Multi-drop Not supported (1:1 only) Up to 32 nodes (1:N) Duplex Full-duplex (TX, RX, GND) Half-duplex (2-wire A/B) Connector DB-9 (9-pin) Terminal block, RJ45 RS-232 Details Electrical Characteristics Logic '1' (MARK) : −3V to −15V ← Negative voltage = logic 1 !\rLogic '0' (SPACE) : +3V to +15V ← Positive voltage = logic 0 ! Opposite polarity from TTL/CMOS — a transceiver is always required.\nWarning: RS-232 voltages (up to ±15V) will damage FPGA I/O pins rated for 3.3V. Never connect an RS-232 cable directly to FPGA GPIO without a MAX3232 or equivalent transceiver. The transceiver also performs the polarity inversion automatically — the FPGA side sees standard TTL levels.\nRS-232 Signal on Oscilloscope RS-232 UART Oscilloscope Screenshot by Haji Akhundov, licensed under CC BY-SA 3.0\nRepresentative Transceiver: MAX3232 (TI) Operates at 3.3V (internal charge pump generates ±5.5V) USB-UART bridge (FT232R, CP2102) can replace RS-232 for PC connection RS-485 Details Differential Signal Principle Data is determined by the voltage difference (A−B) Noise is injected equally into both A and B → cancels out in the difference (CMRR) Wiring Options 2-wire: A, B half-duplex — requires DE/RE direction control 4-wire: TX+/TX−, RX+/RX− full-duplex RS-485 Bus Topology 120Ω termination resistors: prevent signal reflections; placed at both ends Address-based protocols (e.g., Modbus RTU, DMX512) used with RS-485 DE/RE control: half-duplex requires direction switching USB-to-UART Bridge Modern PCs no longer have RS-232 ports → use a USB-UART bridge IC\nCommon ICs IC Manufacturer Notes FT232R FTDI Most widely used, stable drivers CP2102 Silicon Labs Compact, USB bus-powered CH340G WCH Low-cost, common on Chinese boards PL2303 Prolific Legacy, some compatibility issues PC USB ──► FT232R ──► UART TX/RX ──► FPGA / MCU Practical recommendation: For any new UART-to-PC connection, use a USB-UART bridge (FT232R or CP2102) rather than RS-232. Modern laptops have no RS-232 port; the bridge provides a clean 3.3V UART interface, draws power from USB, and installs standard CDC drivers automatically. FT232R has the most stable driver history; avoid PL2303 for new designs.\nPractical Summary RS-232 Connection (FPGA ↔ PC) FPGA 3.3V UART → MAX3232 → DB-9 (RS-232) → PC (or use USB-UART adapter) RS-485 Connection (FPGA ↔ Multiple Devices) FPGA UART → RS-485 driver → A/B bus → each node\r← 120Ω termination at each end ← Practical Tips RS-232: best for simple 1:1 debugging (USB-UART bridge preferred today) RS-485: ideal for factory floors, meters, elevators and long-distance comms Most FPGA boards have a built-in USB-UART bridge (FT232, CP2102) Episode 3 Summary UART = logical protocol; RS-232/485 = physical electrical standard RS-232: single-ended, ±15V, max 15 m, 1:1 only RS-485: differential, ±5V, max 1,200 m, up to 32 nodes Differential signaling: common-mode noise is cancelled (CMRR) Practical choice: USB-UART bridge (FT232, CP2102) for PC connection Next Episode Episode 4: UART Implementation Methods on FPGA Vendor IP, Soft Processor, and Custom RTL — which one to choose?\nKey Takeaways UART is a logical protocol (TTL/CMOS levels); RS-232 and RS-485 are physical electrical standards — a transceiver IC is always required between FPGA GPIO and the cable RS-232 uses inverted polarity: mark = negative voltage, space = positive — direct connection at ±15V will damage FPGA I/O; always use a MAX3232 or equivalent RS-485 differential signaling (A−B voltage) cancels common-mode noise (CMRR), enabling 1,200 m cable runs and 32-node multi-drop buses For PC-to-FPGA debug connections, skip RS-232 entirely — use a USB-UART bridge (FT232R or CP2102) for a direct 3.3V UART interface Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "788",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-16T12:00:00+09:00",
+  "dateModified": "2026-03-16T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep3/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      RS-232 and RS-485 for UART Systems
+    </h1>
+    <div class="post-description">
+      How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.
+    </div>
+    <div class="post-meta"><span title='2026-03-16 12:00:00 +0900 KST'>March 16, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#rs-232--rs-485" aria-label="RS-232 &amp; RS-485">RS-232 &amp; RS-485</a><ul>
+                        
+                <li>
+                    <a href="#uart-vs-rs-232-vs-rs-485" aria-label="UART vs RS-232 vs RS-485">UART vs RS-232 vs RS-485</a></li>
+                <li>
+                    <a href="#rs-232-vs-rs-485-comparison" aria-label="RS-232 vs RS-485 Comparison">RS-232 vs RS-485 Comparison</a></li>
+                <li>
+                    <a href="#rs-232-details" aria-label="RS-232 Details">RS-232 Details</a><ul>
+                        
+                <li>
+                    <a href="#electrical-characteristics" aria-label="Electrical Characteristics">Electrical Characteristics</a></li>
+                <li>
+                    <a href="#rs-232-signal-on-oscilloscope" aria-label="RS-232 Signal on Oscilloscope">RS-232 Signal on Oscilloscope</a></li>
+                <li>
+                    <a href="#representative-transceiver-max3232-ti" aria-label="Representative Transceiver: MAX3232 (TI)">Representative Transceiver: MAX3232 (TI)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#rs-485-details" aria-label="RS-485 Details">RS-485 Details</a><ul>
+                        
+                <li>
+                    <a href="#differential-signal-principle" aria-label="Differential Signal Principle">Differential Signal Principle</a></li>
+                <li>
+                    <a href="#wiring-options" aria-label="Wiring Options">Wiring Options</a></li></ul>
+                </li>
+                <li>
+                    <a href="#rs-485-bus-topology" aria-label="RS-485 Bus Topology">RS-485 Bus Topology</a></li>
+                <li>
+                    <a href="#usb-to-uart-bridge" aria-label="USB-to-UART Bridge">USB-to-UART Bridge</a><ul>
+                        
+                <li>
+                    <a href="#common-ics" aria-label="Common ICs">Common ICs</a></li></ul>
+                </li>
+                <li>
+                    <a href="#practical-summary" aria-label="Practical Summary">Practical Summary</a><ul>
+                        
+                <li>
+                    <a href="#rs-232-connection-fpga--pc" aria-label="RS-232 Connection (FPGA ↔ PC)">RS-232 Connection (FPGA ↔ PC)</a></li>
+                <li>
+                    <a href="#rs-485-connection-fpga--multiple-devices" aria-label="RS-485 Connection (FPGA ↔ Multiple Devices)">RS-485 Connection (FPGA ↔ Multiple Devices)</a></li>
+                <li>
+                    <a href="#practical-tips" aria-label="Practical Tips">Practical Tips</a></li></ul>
+                </li>
+                <li>
+                    <a href="#episode-3-summary" aria-label="Episode 3 Summary">Episode 3 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="rs-232--rs-485">RS-232 &amp; RS-485<a hidden class="anchor" aria-hidden="true" href="#rs-232--rs-485">#</a></h1>
+<p>When FPGAs communicate with external devices over UART, the signal rarely stays at 3.3V CMOS all the way to the destination. RS-232 defines an electrical standard for single-ended serial links up to 15 m, while RS-485 uses differential signaling to reach 1,200 m on a multi-drop bus. The most important lesson of this episode: UART is a logical protocol, and RS-232/RS-485 are completely separate physical standards that FPGA GPIO cannot directly drive.</p>
+<h2 id="uart-vs-rs-232-vs-rs-485">UART vs RS-232 vs RS-485<a hidden class="anchor" aria-hidden="true" href="#uart-vs-rs-232-vs-rs-485">#</a></h2>
+<blockquote>
+<p><strong>UART</strong> = Logical protocol (3.3V/0V digital signal)
+<strong>RS-232 / RS-485</strong> = Physical electrical standards (RS = Recommended Standard)</p>
+</blockquote>
+<pre tabindex="0"><code>┌──────────┐   UART logic    ┌────────────┐  RS-232/485 signal  ┌──────────┐
+│   FPGA   ├────────────────►│ Transceiver├────────────────────►│  Device  │
+│  (3.3V)  │  TX/RX (CMOS)   │ (MAX3232 / │  (±15V / ±5V diff)  │          │
+└──────────┘                 │  RS485)    │                     └──────────┘
+                             └────────────┘
+</code></pre><ul>
+<li>FPGA outputs <strong>3.3V CMOS</strong> UART signals</li>
+<li>A <strong>transceiver IC</strong> converts the signal for long-distance transmission</li>
+</ul>
+<h2 id="rs-232-vs-rs-485-comparison">RS-232 vs RS-485 Comparison<a hidden class="anchor" aria-hidden="true" href="#rs-232-vs-rs-485-comparison">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>RS-232</th>
+          <th>RS-485</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Signal Type</strong></td>
+          <td>Single-ended (referenced to GND)</td>
+          <td>Differential (A and B wires)</td>
+      </tr>
+      <tr>
+          <td><strong>Logic Levels</strong></td>
+          <td>1 = −3V to −15V, 0 = +3V to +15V</td>
+          <td>A−B &gt; +200mV = 0, A−B &lt; −200mV = 1</td>
+      </tr>
+      <tr>
+          <td><strong>Max Distance</strong></td>
+          <td>Up to <strong>15 m</strong></td>
+          <td>Up to <strong>1,200 m</strong></td>
+      </tr>
+      <tr>
+          <td><strong>Max Speed</strong></td>
+          <td>115.2 kbps typical, ~1 Mbps (short range)</td>
+          <td><strong>10 Mbps</strong> (short range)</td>
+      </tr>
+      <tr>
+          <td><strong>Multi-drop</strong></td>
+          <td>Not supported (1:1 only)</td>
+          <td>Up to <strong>32 nodes</strong> (1:N)</td>
+      </tr>
+      <tr>
+          <td><strong>Duplex</strong></td>
+          <td>Full-duplex (TX, RX, GND)</td>
+          <td>Half-duplex (2-wire A/B)</td>
+      </tr>
+      <tr>
+          <td><strong>Connector</strong></td>
+          <td>DB-9 (9-pin)</td>
+          <td>Terminal block, RJ45</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="rs-232-details">RS-232 Details<a hidden class="anchor" aria-hidden="true" href="#rs-232-details">#</a></h2>
+<h3 id="electrical-characteristics">Electrical Characteristics<a hidden class="anchor" aria-hidden="true" href="#electrical-characteristics">#</a></h3>
+<pre tabindex="0"><code>Logic &#39;1&#39; (MARK)  : −3V to −15V  ← Negative voltage = logic 1 !
+Logic &#39;0&#39; (SPACE) : +3V to +15V  ← Positive voltage = logic 0 !
+</code></pre><blockquote>
+<p><strong>Opposite polarity</strong> from TTL/CMOS — a transceiver is always required.</p>
+</blockquote>
+<blockquote>
+<p><strong>Warning</strong>: RS-232 voltages (up to ±15V) will damage FPGA I/O pins rated for 3.3V. Never connect an RS-232 cable directly to FPGA GPIO without a MAX3232 or equivalent transceiver. The transceiver also performs the polarity inversion automatically — the FPGA side sees standard TTL levels.</p>
+</blockquote>
+<iframe src="/uart-html/rs232_waveform.html" width="100%" height="175" frameborder="0" scrolling="no"></iframe>
+<h3 id="rs-232-signal-on-oscilloscope">RS-232 Signal on Oscilloscope<a hidden class="anchor" aria-hidden="true" href="#rs-232-signal-on-oscilloscope">#</a></h3>
+<p><img alt="RS-232 UART waveform on oscilloscope w:650" loading="lazy" src="/posts/uart-implementation-ep3/images/RS232%20waveform.png"></p>
+<p><small style="color:#888;font-size:0.7em;">RS-232 UART Oscilloscope Screenshot by Haji Akhundov, licensed under CC BY-SA 3.0</small></p>
+<h3 id="representative-transceiver-max3232-ti">Representative Transceiver: MAX3232 (TI)<a hidden class="anchor" aria-hidden="true" href="#representative-transceiver-max3232-ti">#</a></h3>
+<p><img alt="RS-232 Line Driver diagram w:750" loading="lazy" src="/posts/uart-implementation-ep3/images/RS232_line_driver.png"></p>
+<ul>
+<li>Operates at 3.3V (internal charge pump generates ±5.5V)</li>
+<li>USB-UART bridge (FT232R, CP2102) can replace RS-232 for PC connection</li>
+</ul>
+<h2 id="rs-485-details">RS-485 Details<a hidden class="anchor" aria-hidden="true" href="#rs-485-details">#</a></h2>
+<h3 id="differential-signal-principle">Differential Signal Principle<a hidden class="anchor" aria-hidden="true" href="#differential-signal-principle">#</a></h3>
+<iframe src="/uart-html/rs485_waveform.html" width="100%" height="260" frameborder="0" scrolling="no"></iframe>
+<ul>
+<li>Data is determined by the <strong>voltage difference (A−B)</strong></li>
+<li>Noise is injected <strong>equally</strong> into both A and B → cancels out in the difference (<strong>CMRR</strong>)</li>
+</ul>
+<h3 id="wiring-options">Wiring Options<a hidden class="anchor" aria-hidden="true" href="#wiring-options">#</a></h3>
+<p><img alt="RS-232 Line Driver diagram w:750" loading="lazy" src="/posts/uart-implementation-ep3/images/RS485_transceiver.png"></p>
+<ul>
+<li><strong>2-wire</strong>: A, B half-duplex — requires DE/RE direction control</li>
+<li><strong>4-wire</strong>: TX+/TX−, RX+/RX− full-duplex</li>
+</ul>
+<h2 id="rs-485-bus-topology">RS-485 Bus Topology<a hidden class="anchor" aria-hidden="true" href="#rs-485-bus-topology">#</a></h2>
+<iframe src="/uart-html/rs485_topology.html" width="100%" height="190" frameborder="0" scrolling="no"></iframe>
+<ul>
+<li><strong>120Ω termination resistors</strong>: prevent signal reflections; placed at both ends</li>
+<li><strong>Address-based protocols</strong> (e.g., Modbus RTU, DMX512) used with RS-485</li>
+<li><strong>DE/RE control</strong>: half-duplex requires direction switching</li>
+</ul>
+<h2 id="usb-to-uart-bridge">USB-to-UART Bridge<a hidden class="anchor" aria-hidden="true" href="#usb-to-uart-bridge">#</a></h2>
+<p>Modern PCs no longer have RS-232 ports → use a <strong>USB-UART bridge IC</strong></p>
+<h3 id="common-ics">Common ICs<a hidden class="anchor" aria-hidden="true" href="#common-ics">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>IC</th>
+          <th>Manufacturer</th>
+          <th>Notes</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>FT232R</strong></td>
+          <td>FTDI</td>
+          <td>Most widely used, stable drivers</td>
+      </tr>
+      <tr>
+          <td><strong>CP2102</strong></td>
+          <td>Silicon Labs</td>
+          <td>Compact, USB bus-powered</td>
+      </tr>
+      <tr>
+          <td><strong>CH340G</strong></td>
+          <td>WCH</td>
+          <td>Low-cost, common on Chinese boards</td>
+      </tr>
+      <tr>
+          <td><strong>PL2303</strong></td>
+          <td>Prolific</td>
+          <td>Legacy, some compatibility issues</td>
+      </tr>
+  </tbody>
+</table>
+<pre tabindex="0"><code>PC USB ──► FT232R ──► UART TX/RX ──► FPGA / MCU
+</code></pre><blockquote>
+<p><strong>Practical recommendation</strong>: For any new UART-to-PC connection, use a USB-UART bridge (FT232R or CP2102) rather than RS-232. Modern laptops have no RS-232 port; the bridge provides a clean 3.3V UART interface, draws power from USB, and installs standard CDC drivers automatically. FT232R has the most stable driver history; avoid PL2303 for new designs.</p>
+</blockquote>
+<h2 id="practical-summary">Practical Summary<a hidden class="anchor" aria-hidden="true" href="#practical-summary">#</a></h2>
+<h3 id="rs-232-connection-fpga--pc">RS-232 Connection (FPGA ↔ PC)<a hidden class="anchor" aria-hidden="true" href="#rs-232-connection-fpga--pc">#</a></h3>
+<pre tabindex="0"><code>FPGA 3.3V UART → MAX3232 → DB-9 (RS-232) → PC  (or use USB-UART adapter)
+</code></pre><h3 id="rs-485-connection-fpga--multiple-devices">RS-485 Connection (FPGA ↔ Multiple Devices)<a hidden class="anchor" aria-hidden="true" href="#rs-485-connection-fpga--multiple-devices">#</a></h3>
+<pre tabindex="0"><code>FPGA UART → RS-485 driver → A/B bus → each node
+                            ← 120Ω termination at each end ←
+</code></pre><h3 id="practical-tips">Practical Tips<a hidden class="anchor" aria-hidden="true" href="#practical-tips">#</a></h3>
+<ul>
+<li>RS-232: best for <strong>simple 1:1 debugging</strong> (USB-UART bridge preferred today)</li>
+<li>RS-485: ideal for <strong>factory floors, meters, elevators</strong> and long-distance comms</li>
+<li>Most FPGA boards have a <strong>built-in USB-UART bridge</strong> (FT232, CP2102)</li>
+</ul>
+<h2 id="episode-3-summary">Episode 3 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-3-summary">#</a></h2>
+<ul>
+<li><strong>UART</strong> = logical protocol; <strong>RS-232/485</strong> = physical electrical standard</li>
+<li><strong>RS-232</strong>: single-ended, ±15V, max 15 m, 1:1 only</li>
+<li><strong>RS-485</strong>: differential, ±5V, max 1,200 m, up to 32 nodes</li>
+<li>Differential signaling: common-mode noise is cancelled (CMRR)</li>
+<li>Practical choice: USB-UART bridge (FT232, CP2102) for PC connection</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 4: UART Implementation Methods on FPGA</strong>
+Vendor IP, Soft Processor, and Custom RTL — which one to choose?</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li>UART is a logical protocol (TTL/CMOS levels); RS-232 and RS-485 are physical electrical standards — a transceiver IC is always required between FPGA GPIO and the cable</li>
+<li>RS-232 uses inverted polarity: mark = negative voltage, space = positive — direct connection at ±15V will damage FPGA I/O; always use a MAX3232 or equivalent</li>
+<li>RS-485 differential signaling (A−B voltage) cancels common-mode noise (CMRR), enabling 1,200 m cable runs and 32-node multi-drop buses</li>
+<li>For PC-to-FPGA debug connections, skip RS-232 entirely — use a USB-UART bridge (FT232R or CP2102) for a direct 3.3V UART interface</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/easyfpga/">EasyFPGA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep4/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>UART Implementation Methods</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep2/">
+    <span class="title">Next »</span>
+    <br>
+    <span>UART Frame Format</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

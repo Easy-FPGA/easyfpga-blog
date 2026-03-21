@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Skew on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/skew/</link>
+    <description>Recent content in Skew on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/skew/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High-Speed Serial Interface: Why the World Moved Beyond Parallel</title>
+      <link>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</guid>
+      <description>Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.</description>
+    </item>
+    <item>
+      <title>Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync</title>
+      <link>https://easyfpga.blog/posts/source-synchronous-parallel-interface/</link>
+      <pubDate>Thu, 12 Mar 2026 10:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/source-synchronous-parallel-interface/</guid>
+      <description>Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&amp;#39;s DQ&#43;DQS pair solve the timing problem.</description>
+    </item>
+    <item>
+      <title>High-Speed Parallel Interface Design: Principles, Limitations, and Practice</title>
+      <link>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</link>
+      <pubDate>Thu, 12 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</guid>
+      <description>A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.</description>
+    </item>
+    <item>
+      <title>Skew Simulation</title>
+      <link>https://easyfpga.blog/posts/skew-simulation/</link>
+      <pubDate>Mon, 16 Jun 2025 23:09:38 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/skew-simulation/</guid>
+      <description>&lt;h2 id=&#34;what-is-skew&#34;&gt;What is Skew?&lt;/h2&gt;
+&lt;p&gt;Skew refers to the timing difference in signal arrival between multiple paths that are supposed to be synchronized.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;skew, waver form&#34; loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-10.png?w=848&#34;&gt;&lt;em&gt;shows a skewed waveform between data lines.&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;why-skew-simulation-is-necessary&#34;&gt;Why Skew Simulation Is Necessary&lt;/h2&gt;
+&lt;p&gt;If you simulate your design assuming everything is perfectly aligned, you may encounter issues during actual testing. In real PCBs, skew naturally exists, which is why techniques like length matching are necessary.&lt;/p&gt;
+&lt;p&gt;However, even with length matching, the impact of skew becomes more significant as signal speed increases. Therefore, it&amp;rsquo;s important to address skew issues during simulation.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

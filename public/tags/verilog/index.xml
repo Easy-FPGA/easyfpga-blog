@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Verilog on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/verilog/</link>
+    <description>Recent content in Verilog on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 30 Jun 2025 12:33:48 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/verilog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Understanding Active-Low Resets in HDL Design</title>
+      <link>https://easyfpga.blog/posts/active-low-reset/</link>
+      <pubDate>Mon, 30 Jun 2025 12:33:48 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/active-low-reset/</guid>
+      <description>&lt;p&gt;In HDL design (such as Verilog or VHDL), an &lt;strong&gt;active-low reset&lt;/strong&gt; means the reset signal is &lt;strong&gt;enabled when it is low (logic 0)&lt;/strong&gt;. It is widely used in both ASIC and FPGA designs for several practical and electrical reasons:&lt;/p&gt;
+&lt;h3 id=&#34;1-electrical-stability&#34;&gt;1. &lt;strong&gt;Electrical Stability&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Logic low (0 volts, GND) is generally &lt;strong&gt;more stable and noise-immune&lt;/strong&gt; than logic high (VCC).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;During power-up, signals tend to default to low due to internal pull-downs or the absence of a valid voltage, so using an active-low reset ensures that the system starts in a known, reset state.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Implementation of UART with Xilinx FPGA and AXI Uartlite IP</title>
+      <link>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</link>
+      <pubDate>Wed, 19 Mar 2025 21:25:52 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</guid>
+      <description>UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with</description>
+    </item>
+  </channel>
+</rss>

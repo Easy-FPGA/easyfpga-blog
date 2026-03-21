@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Posts | EasyFPGA</title>
+<meta name="keywords" content="">
+<meta name="description" content="Posts - EasyFPGA">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://easyfpga.blog/posts/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Posts">
+  <meta property="og:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Posts">
+  <meta name="twitter:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }
+  ]
+}
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span class="active">Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a></div>
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Board-Level Understanding and Debugging for FPGA Engineers
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>An FPGA does not work in isolation. No matter how correct your RTL is, the design will fail if the power supply is noisy, the clock does not reach the device cleanly, or a digital interface is mismatched at the board level. FPGA engineers who can diagnose hardware problems are significantly more effective than those who can only debug RTL in simulation.
+This post covers the board-level skills that separate a junior FPGA engineer from a senior one.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-02-13 12:11:04 +0000 +0000'>February 13, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Board-Level Understanding and Debugging for FPGA Engineers" href="https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>When selecting an AMD/Xilinx FPGA you must specify three attributes beyond logic capacity and memory size: Speed Grade, Temperature Range, and Reliability Grade. Understanding all three helps you choose the right device — and avoid paying for more than you need.
+AMD UltraScale&#43; Device Ordering Information (Product Selection Guide)
+Speed Grade Speed Grade is a post-fabrication classification (binning) that reflects the worst-case switching performance of a specific chip coming off the wafer. Even chips from the same wafer lot will have small transistor-level variations — some will reliably meet tighter timing margins than others. Chips that can do so are assigned a higher (faster) speed grade.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-01-17 00:06:06 +0000 +0000'>January 17, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Understanding FPGA Speed Grades, Temperature Ranges, and Reliability Grades" href="https://easyfpga.blog/posts/understanding-fpga-speed-grades/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Critical Path and Pipelining in FPGA Design
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What Is a Critical Path? The critical path is the longest combinational logic path between any two registers in a synchronous digital circuit — measured in propagation delay. It sets a hard lower bound on your clock period:
+$$T_{clk} \geq T_{critical_path} &#43; T_{setup} &#43; T_{hold}$$
+$$F_{max} = \frac{1}{T_{clk}}$$
+Everything else in your design can run faster. The critical path is the single bottleneck that caps the maximum clock frequency.
+A Concrete Example 1 2 3 4 // Bad: long critical path always_ff @(posedge clk) begin result &lt;= a &#43; b &#43; c &#43; d &#43; e &#43; f &#43; g &#43; h; // 7 chained additions end What happens in a single clock cycle:
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-11-28 22:09:14 +0000 +0000'>November 28, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Critical Path and Pipelining in FPGA Design" href="https://easyfpga.blog/posts/critical-path-and-pipelining/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Quantization for CNN Inference on FPGA
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What Is Quantization? In signal processing, quantization is the process of mapping a continuous range of values to a discrete (integer) set. In deep learning and hardware acceleration, it specifically refers to:
+Converting floating-point (FP32, FP16, or BF16) model weights and activations to lower-bit integers (INT8, INT4, etc.) in order to reduce memory footprint and computational cost.
+Quantization is the bridge that makes neural networks practical on resource-constrained hardware.
+Why Quantization Is Essential for FPGA CNN Implementation FPGAs have a fixed amount of logic, DSP slices, and BRAM. Floating-point arithmetic is expensive in all three dimensions:
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-11-24 23:03:14 +0000 +0000'>November 24, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Quantization for CNN Inference on FPGA" href="https://easyfpga.blog/posts/quantization-for-fpga-cnn/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">LeNet-5 Implementation on FPGA: An Overview
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What Is LeNet-5? LeNet-5 is a convolutional neural network (CNN) proposed by Yann LeCun and colleagues in 1998 for handwritten digit recognition (the MNIST dataset). It is widely regarded as the historical model that established the foundational concepts of modern deep learning: convolution, pooling, and hierarchical feature extraction.
+LeNet-5 architecture as shown in (LeCun et al., 1998)
+MNIST — 70,000 greyscale 28×28 images of handwritten digits
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-11-23 22:47:19 +0000 +0000'>November 23, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to LeNet-5 Implementation on FPGA: An Overview" href="https://easyfpga.blog/posts/lenet5-implementation-on-fpga/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Ethernet II vs IEEE 802.3: Key Differences Explained
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>If you have ever looked at an Ethernet frame in Wireshark and wondered why the 2-byte field at offset 12 is sometimes labelled “EtherType” and sometimes “Length”, this post explains the reason.
+1. Ethernet II (also called DIX Ethernet) Origin: Defined jointly by DEC, Intel, and Xerox in 1980 — hence the alternative name “DIX Ethernet”.
+Frame structure:
+Field Size Meaning Destination MAC 6 B Target station address Source MAC 6 B Sending station address EtherType 2 B Upper-layer protocol identifier Payload 46–1500 B Network-layer packet FCS (CRC-32) 4 B Frame check sequence The 2-byte field carries an EtherType value — a number that directly identifies which protocol is encapsulated in the payload:
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-09-22 14:42:35 +0000 +0000'>September 22, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Ethernet II vs IEEE 802.3: Key Differences Explained" href="https://easyfpga.blog/posts/ethernet-version-1-vs-2/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Ethernet II &#43; IPv4 &#43; UDP Frame Structure Reference
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>When implementing a network interface in RTL, you need a precise byte-offset map for every field in the frame. This post provides that reference for the most common combination: Ethernet II &#43; IPv4 &#43; UDP.
+Layer Stack [ Preamble (7B) &#43; SFD (1B) ] ← handled by PHY/MAC, not in user datapath[ Ethernet II header ][ IPv4 header ][ UDP header ][ Application data ][ FCS / CRC-32 (4B) ] ← often stripped/added by MAC IP(configurable option in Xilinx TEMAC / Tri-MAC) Note: The preamble, SFD, and inter-packet gap (IPG) are inserted and stripped by the PHY/MAC layer and are typically not visible in the AXI-Stream user interface of a MAC IP core.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-09-22 14:39:59 +0000 +0000'>September 22, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Ethernet II &#43; IPv4 &#43; UDP Frame Structure Reference" href="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-frame-structure/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Implementing a DDR Memory Interface on FPGA with Xilinx MIG
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>FPGAs are optimised for massive parallelism, but their on-chip memory resources are limited. Block RAM (BRAM) and UltraRAM (URAM) are fast and easy to use, but they typically provide only a few tens of megabits to a few hundred megabits of capacity. When your application needs gigabytes — high-resolution video frames, machine-learning weight tables, large look-up tables — external DDR memory becomes essential.
+Why External DDR Memory? Memory Type Location Typical Capacity Bandwidth Access Latency Distributed RAM On-chip (LUT-based) &lt; 1 MB Very high 1 cycle Block RAM (BRAM) On-chip (dedicated) up to ~200 MB High 1–2 cycles UltraRAM (URAM) On-chip (UltraScale&#43;) up to ~500 MB High 2–3 cycles External DDR Off-chip (dedicated chip) 1–16&#43; GB Medium-High ~50–100 ns For applications such as:
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-09-04 03:20:49 +0000 +0000'>September 4, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Implementing a DDR Memory Interface on FPGA with Xilinx MIG" href="https://easyfpga.blog/posts/ddr-memory-interface-fpga/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">FPGA Price Surge: Design Challenges and Alternative Strategies
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What Happened to FPGA Prices? Between 2020 and 2022, the semiconductor industry experienced what analysts called “chipflation” — a sustained, broad-based price increase driven by pandemic-related demand spikes, supply chain disruptions, and surging investment in AI and 5G infrastructure.
+FPGA manufacturers were not immune. AMD (Xilinx) and Intel (Altera) both cited rising TSMC wafer costs as justification for significant list-price increases — in some cases close to double the pre-pandemic price. Unlike commodity memory or microcontroller price spikes that eventually normalised, elevated FPGA prices have proven sticky.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-09-01 00:52:45 +0000 +0000'>September 1, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to FPGA Price Surge: Design Challenges and Alternative Strategies" href="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">The Role of Scrambling in High-Speed Serial Communication
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>In digital communication, data is represented as a binary bitstream of 0s and 1s. In practice, real-world data is rarely truly random — it often contains repetitive patterns, especially long runs of identical bits (e.g., ...000000... or ...111111...). At low speeds this causes no real harm, but at 1 Gbps and beyond, such patterns create critical signal integrity problems. At 1 Gbps, one bit period is just 1 nanosecond, so a run of tens or hundreds of identical bits means the signal voltage stays constant for a relatively long time.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-08-21 05:10:32 +0000 +0000'>August 21, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to The Role of Scrambling in High-Speed Serial Communication" href="https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="https://easyfpga.blog/posts/">
+      «&nbsp;Prev&nbsp;
+    </a>
+    <a class="next" href="https://easyfpga.blog/posts/page/3/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

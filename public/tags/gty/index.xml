@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>GTY on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/gty/</link>
+    <description>Recent content in GTY on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 05 Jun 2025 07:45:04 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/gty/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High Speed Serial Communication with AMD&#39;s Gigabit Transceiver</title>
+      <link>https://easyfpga.blog/posts/high-speed-serial-communication/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/high-speed-serial-communication/</guid>
+      <description>&lt;h2 id=&#34;what-is-the-high-speed-serial-communication&#34;&gt;What is the High Speed Serial Communication?&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;High-speed serial communication&lt;/strong&gt; is a method of transmitting data &lt;strong&gt;bit by bit&lt;/strong&gt; over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;1 Gbps - 10 Gbps&lt;/strong&gt; → Used in &lt;strong&gt;Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;10 Gbps - 25 Gbps&lt;/strong&gt; → Found in &lt;strong&gt;10GBASE-R Ethernet, PCIe Gen3, Fibre Channel&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

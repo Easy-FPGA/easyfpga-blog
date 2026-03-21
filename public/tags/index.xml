@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tags on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/</link>
+    <description>Recent content in Tags on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Clock Recovery</title>
+      <link>https://easyfpga.blog/tags/clock-recovery/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/clock-recovery/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>DDR</title>
+      <link>https://easyfpga.blog/tags/ddr/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/ddr/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Differential Signaling</title>
+      <link>https://easyfpga.blog/tags/differential-signaling/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/differential-signaling/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>EMI</title>
+      <link>https://easyfpga.blog/tags/emi/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/emi/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA</title>
+      <link>https://easyfpga.blog/tags/fpga/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/fpga/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Parallel Interface</title>
+      <link>https://easyfpga.blog/tags/parallel-interface/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/parallel-interface/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Protocol</title>
+      <link>https://easyfpga.blog/tags/protocol/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/protocol/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Serial Interface</title>
+      <link>https://easyfpga.blog/tags/serial-interface/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/serial-interface/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Skew</title>
+      <link>https://easyfpga.blog/tags/skew/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/skew/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>EasyFPGA</title>
+      <link>https://easyfpga.blog/tags/easyfpga/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/easyfpga/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RTL</title>
+      <link>https://easyfpga.blog/tags/rtl/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/rtl/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SystemVerilog</title>
+      <link>https://easyfpga.blog/tags/systemverilog/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/systemverilog/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>UART</title>
+      <link>https://easyfpga.blog/tags/uart/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/uart/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Xilinx</title>
+      <link>https://easyfpga.blog/tags/xilinx/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/xilinx/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>MicroBlaze</title>
+      <link>https://easyfpga.blog/tags/microblaze/</link>
+      <pubDate>Tue, 17 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/microblaze/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CRC</title>
+      <link>https://easyfpga.blog/tags/crc/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/crc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CRC-32</title>
+      <link>https://easyfpga.blog/tags/crc-32/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/crc-32/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Error Detection</title>
+      <link>https://easyfpga.blog/tags/error-detection/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/error-detection/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>DQS</title>
+      <link>https://easyfpga.blog/tags/dqs/</link>
+      <pubDate>Thu, 12 Mar 2026 10:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/dqs/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Signal Integrity</title>
+      <link>https://easyfpga.blog/tags/signal-integrity/</link>
+      <pubDate>Thu, 12 Mar 2026 10:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/signal-integrity/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Source-Synchronous</title>
+      <link>https://easyfpga.blog/tags/source-synchronous/</link>
+      <pubDate>Thu, 12 Mar 2026 10:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/source-synchronous/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>High-Speed</title>
+      <link>https://easyfpga.blog/tags/high-speed/</link>
+      <pubDate>Thu, 12 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/high-speed/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>PCB</title>
+      <link>https://easyfpga.blog/tags/pcb/</link>
+      <pubDate>Thu, 12 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/tags/pcb/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Code Quality</title>
+      <link>https://easyfpga.blog/tags/code-quality/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/code-quality/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Fix/Correct</title>
+      <link>https://easyfpga.blog/tags/fix/correct/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/fix/correct/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Optimize</title>
+      <link>https://easyfpga.blog/tags/optimize/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/optimize/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Refactor</title>
+      <link>https://easyfpga.blog/tags/refactor/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/refactor/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Refine</title>
+      <link>https://easyfpga.blog/tags/refine/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/refine/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Debug</title>
+      <link>https://easyfpga.blog/tags/debug/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/debug/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ILA</title>
+      <link>https://easyfpga.blog/tags/ila/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ila/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Oscilloscope</title>
+      <link>https://easyfpga.blog/tags/oscilloscope/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/oscilloscope/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Power Integrity</title>
+      <link>https://easyfpga.blog/tags/power-integrity/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/power-integrity/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Schematic</title>
+      <link>https://easyfpga.blog/tags/schematic/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/schematic/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SYSMON</title>
+      <link>https://easyfpga.blog/tags/sysmon/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/sysmon/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Trigger</title>
+      <link>https://easyfpga.blog/tags/trigger/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/trigger/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>XADC</title>
+      <link>https://easyfpga.blog/tags/xadc/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/xadc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>AMD</title>
+      <link>https://easyfpga.blog/tags/amd/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/amd/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Device Selection</title>
+      <link>https://easyfpga.blog/tags/device-selection/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/device-selection/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Speed Grade</title>
+      <link>https://easyfpga.blog/tags/speed-grade/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/speed-grade/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Temperature Range</title>
+      <link>https://easyfpga.blog/tags/temperature-range/</link>
+      <pubDate>Sat, 17 Jan 2026 00:06:06 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/temperature-range/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Critical Path</title>
+      <link>https://easyfpga.blog/tags/critical-path/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/critical-path/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGA Design</title>
+      <link>https://easyfpga.blog/tags/fpga-design/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/fpga-design/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Pipelining</title>
+      <link>https://easyfpga.blog/tags/pipelining/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/pipelining/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Timing Closure</title>
+      <link>https://easyfpga.blog/tags/timing-closure/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/timing-closure/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CNN</title>
+      <link>https://easyfpga.blog/tags/cnn/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/cnn/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Deep Learning</title>
+      <link>https://easyfpga.blog/tags/deep-learning/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/deep-learning/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Fixed-Point</title>
+      <link>https://easyfpga.blog/tags/fixed-point/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/fixed-point/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hardware Accelerator</title>
+      <link>https://easyfpga.blog/tags/hardware-accelerator/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/hardware-accelerator/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Quantization</title>
+      <link>https://easyfpga.blog/tags/quantization/</link>
+      <pubDate>Mon, 24 Nov 2025 23:03:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/quantization/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LeNet</title>
+      <link>https://easyfpga.blog/tags/lenet/</link>
+      <pubDate>Sun, 23 Nov 2025 22:47:19 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/lenet/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ethernet</title>
+      <link>https://easyfpga.blog/tags/ethernet/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ethernet/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ethernet II</title>
+      <link>https://easyfpga.blog/tags/ethernet-ii/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ethernet-ii/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ethernet Version</title>
+      <link>https://easyfpga.blog/tags/ethernet-version/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ethernet-version/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>EtherType</title>
+      <link>https://easyfpga.blog/tags/ethertype/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ethertype/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>IEEE 802.3</title>
+      <link>https://easyfpga.blog/tags/ieee-802.3/</link>
+      <pubDate>Mon, 22 Sep 2025 14:42:35 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ieee-802.3/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ethernet Frame</title>
+      <link>https://easyfpga.blog/tags/ethernet-frame/</link>
+      <pubDate>Mon, 22 Sep 2025 14:39:59 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ethernet-frame/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>IPv4</title>
+      <link>https://easyfpga.blog/tags/ipv4/</link>
+      <pubDate>Mon, 22 Sep 2025 14:39:59 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ipv4/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Packet Processing</title>
+      <link>https://easyfpga.blog/tags/packet-processing/</link>
+      <pubDate>Mon, 22 Sep 2025 14:39:59 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/packet-processing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>UDP</title>
+      <link>https://easyfpga.blog/tags/udp/</link>
+      <pubDate>Mon, 22 Sep 2025 14:39:59 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/udp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Memory Interface</title>
+      <link>https://easyfpga.blog/tags/memory-interface/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/memory-interface/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>MIG</title>
+      <link>https://easyfpga.blog/tags/mig/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/mig/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Vivado</title>
+      <link>https://easyfpga.blog/tags/vivado/</link>
+      <pubDate>Thu, 04 Sep 2025 03:20:49 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/vivado/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ASIC</title>
+      <link>https://easyfpga.blog/tags/asic/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/asic/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>BOM</title>
+      <link>https://easyfpga.blog/tags/bom/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/bom/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Cost</title>
+      <link>https://easyfpga.blog/tags/cost/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/cost/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Efinix</title>
+      <link>https://easyfpga.blog/tags/efinix/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/efinix/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Lattice</title>
+      <link>https://easyfpga.blog/tags/lattice/</link>
+      <pubDate>Mon, 01 Sep 2025 00:52:45 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/lattice/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CDR</title>
+      <link>https://easyfpga.blog/tags/cdr/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/cdr/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>High Speed Interface</title>
+      <link>https://easyfpga.blog/tags/high-speed-interface/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/high-speed-interface/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LFSR</title>
+      <link>https://easyfpga.blog/tags/lfsr/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/lfsr/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Scrambler</title>
+      <link>https://easyfpga.blog/tags/scrambler/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/scrambler/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SerDes</title>
+      <link>https://easyfpga.blog/tags/serdes/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/serdes/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>8B/10B</title>
+      <link>https://easyfpga.blog/tags/8b/10b/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/8b/10b/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>High Speed Communication</title>
+      <link>https://easyfpga.blog/tags/high-speed-communication/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/high-speed-communication/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Line Code</title>
+      <link>https://easyfpga.blog/tags/line-code/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/line-code/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Gigabit Transceiver</title>
+      <link>https://easyfpga.blog/tags/gigabit-transceiver/</link>
+      <pubDate>Thu, 21 Aug 2025 02:41:58 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/gigabit-transceiver/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LVDS</title>
+      <link>https://easyfpga.blog/tags/lvds/</link>
+      <pubDate>Thu, 21 Aug 2025 02:41:58 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/lvds/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>PAM4</title>
+      <link>https://easyfpga.blog/tags/pam4/</link>
+      <pubDate>Thu, 21 Aug 2025 02:41:58 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/pam4/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Parity</title>
+      <link>https://easyfpga.blog/tags/parity/</link>
+      <pubDate>Wed, 16 Jul 2025 12:02:34 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/parity/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Reset</title>
+      <link>https://easyfpga.blog/tags/reset/</link>
+      <pubDate>Mon, 30 Jun 2025 12:52:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/reset/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Active-Low Reset</title>
+      <link>https://easyfpga.blog/tags/active-low-reset/</link>
+      <pubDate>Mon, 30 Jun 2025 12:33:48 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/active-low-reset/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>HDL</title>
+      <link>https://easyfpga.blog/tags/hdl/</link>
+      <pubDate>Mon, 30 Jun 2025 12:33:48 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/hdl/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Verilog</title>
+      <link>https://easyfpga.blog/tags/verilog/</link>
+      <pubDate>Mon, 30 Jun 2025 12:33:48 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/verilog/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CMAC</title>
+      <link>https://easyfpga.blog/tags/cmac/</link>
+      <pubDate>Tue, 17 Jun 2025 12:21:53 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/cmac/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ERNIC</title>
+      <link>https://easyfpga.blog/tags/ernic/</link>
+      <pubDate>Tue, 17 Jun 2025 12:21:53 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ernic/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RoCEv2</title>
+      <link>https://easyfpga.blog/tags/rocev2/</link>
+      <pubDate>Tue, 17 Jun 2025 12:21:53 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/rocev2/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>VIO</title>
+      <link>https://easyfpga.blog/tags/vio/</link>
+      <pubDate>Tue, 10 Jun 2025 01:09:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/vio/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Virtual I/O</title>
+      <link>https://easyfpga.blog/tags/virtual-i/o/</link>
+      <pubDate>Tue, 10 Jun 2025 01:09:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/virtual-i/o/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>1000BASE-X</title>
+      <link>https://easyfpga.blog/tags/1000base-x/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/1000base-x/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>GTY</title>
+      <link>https://easyfpga.blog/tags/gty/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/gty/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Line Coding</title>
+      <link>https://easyfpga.blog/tags/line-coding/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/line-coding/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Transceiver</title>
+      <link>https://easyfpga.blog/tags/transceiver/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/transceiver/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>AXI</title>
+      <link>https://easyfpga.blog/tags/axi/</link>
+      <pubDate>Tue, 27 May 2025 05:10:47 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/axi/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Trigger at StartUp</title>
+      <link>https://easyfpga.blog/tags/trigger-at-startup/</link>
+      <pubDate>Fri, 28 Mar 2025 08:44:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/trigger-at-startup/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Gigabit Ethernet</title>
+      <link>https://easyfpga.blog/tags/gigabit-ethernet/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/gigabit-ethernet/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>MAC</title>
+      <link>https://easyfpga.blog/tags/mac/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/mac/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>PHY</title>
+      <link>https://easyfpga.blog/tags/phy/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/phy/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>TEMAC</title>
+      <link>https://easyfpga.blog/tags/temac/</link>
+      <pubDate>Fri, 21 Mar 2025 03:21:36 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/temac/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>TextEditer</title>
+      <link>https://easyfpga.blog/tags/textediter/</link>
+      <pubDate>Wed, 19 Mar 2025 21:38:24 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/textediter/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Vim</title>
+      <link>https://easyfpga.blog/tags/vim/</link>
+      <pubDate>Wed, 19 Mar 2025 21:38:24 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/vim/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>VisualStudioCode</title>
+      <link>https://easyfpga.blog/tags/visualstudiocode/</link>
+      <pubDate>Wed, 19 Mar 2025 21:38:24 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/visualstudiocode/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>AXIUartlite</title>
+      <link>https://easyfpga.blog/tags/axiuartlite/</link>
+      <pubDate>Wed, 19 Mar 2025 21:25:52 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/axiuartlite/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Artix</title>
+      <link>https://easyfpga.blog/tags/artix/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/artix/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Kintex</title>
+      <link>https://easyfpga.blog/tags/kintex/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/kintex/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Portfolio</title>
+      <link>https://easyfpga.blog/tags/portfolio/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/portfolio/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Spartan</title>
+      <link>https://easyfpga.blog/tags/spartan/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/spartan/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>UltraScale&#43;</title>
+      <link>https://easyfpga.blog/tags/ultrascale&#43;/</link>
+      <pubDate>Wed, 19 Mar 2025 04:30:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/ultrascale&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Altera</title>
+      <link>https://easyfpga.blog/tags/altera/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/altera/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Intel</title>
+      <link>https://easyfpga.blog/tags/intel/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/intel/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Key Players</title>
+      <link>https://easyfpga.blog/tags/key-players/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/key-players/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Manufacturer</title>
+      <link>https://easyfpga.blog/tags/manufacturer/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/manufacturer/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Microchip</title>
+      <link>https://easyfpga.blog/tags/microchip/</link>
+      <pubDate>Wed, 19 Mar 2025 04:18:12 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/microchip/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Application</title>
+      <link>https://easyfpga.blog/tags/application/</link>
+      <pubDate>Wed, 19 Mar 2025 04:15:08 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/application/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Advantages</title>
+      <link>https://easyfpga.blog/tags/advantages/</link>
+      <pubDate>Wed, 19 Mar 2025 04:12:25 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/advantages/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>FPGAvsASIC</title>
+      <link>https://easyfpga.blog/tags/fpgavsasic/</link>
+      <pubDate>Wed, 19 Mar 2025 04:09:07 +0000</pubDate>
+      <guid>https://easyfpga.blog/tags/fpgavsasic/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

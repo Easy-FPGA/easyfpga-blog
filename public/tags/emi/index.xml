@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>EMI on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/emi/</link>
+    <description>Recent content in EMI on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/emi/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High-Speed Serial Interface: Why the World Moved Beyond Parallel</title>
+      <link>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</guid>
+      <description>Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.</description>
+    </item>
+    <item>
+      <title>The Role of Scrambling in High-Speed Serial Communication</title>
+      <link>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</guid>
+      <description>Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.</description>
+    </item>
+  </channel>
+</rss>

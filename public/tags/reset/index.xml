@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Reset on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/reset/</link>
+    <description>Recent content in Reset on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 30 Jun 2025 12:52:30 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/reset/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Why AMD(Xilinx) Recommends Synchronous Resets</title>
+      <link>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</link>
+      <pubDate>Mon, 30 Jun 2025 12:52:30 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/why-amdxilinx-recommends-synchronous-resets/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&#34;&gt;https://docs.amd.com/r/2021.1-English/ug949-vivado-design-methodology/When-and-Where-to-Use-a-Reset&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;advantages-of-synchronous-resets&#34;&gt;Advantages of Synchronous Resets&lt;/h2&gt;
+&lt;p&gt;BenefitExplanation&lt;strong&gt;Better Resource Mapping&lt;/strong&gt;Synchronous resets can be mapped directly to more FPGA resources (e.g., flip-flops inside DSPs, BRAMs).&lt;strong&gt;Improved Logic Performance&lt;/strong&gt;Asynchronous resets can negatively affect general logic timing paths and increase routing complexity.&lt;strong&gt;Simpler Routing&lt;/strong&gt;A global asynchronous reset might not increase control sets but does require routing reset wires to many elements, which can become complex.&lt;strong&gt;Protects Memory Structures&lt;/strong&gt;Asynchronous resets may corrupt the contents of BRAMs, LUTRAMs, and SRLs during reset assertion—especially if those resources are driven by asynchronously reset registers.&lt;strong&gt;Placement Flexibility&lt;/strong&gt;With synchronous resets, the logic can be more easily remapped during implementation for better packing and performance.&lt;strong&gt;Compatibility with Dedicated Blocks&lt;/strong&gt;Some blocks like DSP48s and BRAMs only support synchronous resets, so using asynchronous resets can prevent proper inference into those blocks.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

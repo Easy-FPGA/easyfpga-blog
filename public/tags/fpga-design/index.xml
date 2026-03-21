@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>FPGA Design on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/fpga-design/</link>
+    <description>Recent content in FPGA Design on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Nov 2025 22:09:14 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/fpga-design/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Critical Path and Pipelining in FPGA Design</title>
+      <link>https://easyfpga.blog/posts/critical-path-and-pipelining/</link>
+      <pubDate>Fri, 28 Nov 2025 22:09:14 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/critical-path-and-pipelining/</guid>
+      <description>What a critical path is, how it limits your clock frequency, and how to fix it with pipelining — with SystemVerilog examples.</description>
+    </item>
+  </channel>
+</rss>

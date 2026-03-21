@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Simulation on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/simulation/</link>
+    <description>Recent content in Simulation on EasyFPGA</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 16 Jun 2025 23:09:38 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/simulation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Skew Simulation</title>
+      <link>https://easyfpga.blog/posts/skew-simulation/</link>
+      <pubDate>Mon, 16 Jun 2025 23:09:38 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/skew-simulation/</guid>
+      <description>&lt;h2 id=&#34;what-is-skew&#34;&gt;What is Skew?&lt;/h2&gt;
+&lt;p&gt;Skew refers to the timing difference in signal arrival between multiple paths that are supposed to be synchronized.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;skew, waver form&#34; loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-10.png?w=848&#34;&gt;&lt;em&gt;shows a skewed waveform between data lines.&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;why-skew-simulation-is-necessary&#34;&gt;Why Skew Simulation Is Necessary&lt;/h2&gt;
+&lt;p&gt;If you simulate your design assuming everything is perfectly aligned, you may encounter issues during actual testing. In real PCBs, skew naturally exists, which is why techniques like length matching are necessary.&lt;/p&gt;
+&lt;p&gt;However, even with length matching, the impact of skew becomes more significant as signal speed increases. Therefore, it&amp;rsquo;s important to address skew issues during simulation.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

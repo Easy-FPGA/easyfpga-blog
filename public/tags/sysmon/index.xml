@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SYSMON on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/sysmon/</link>
+    <description>Recent content in SYSMON on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 13 Feb 2026 12:11:04 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/sysmon/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Board-Level Understanding and Debugging for FPGA Engineers</title>
+      <link>https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/</link>
+      <pubDate>Fri, 13 Feb 2026 12:11:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/</guid>
+      <description>FPGA design is not just RTL — you need to understand power integrity, signal integrity, and hardware debugging techniques to ship working boards.</description>
+    </item>
+  </channel>
+</rss>

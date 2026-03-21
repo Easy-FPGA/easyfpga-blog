@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>UART on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/uart/</link>
+    <description>Recent content in UART on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Mar 2026 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/uart/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Custom RTL Design: TX &amp; RX</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep5/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep5/</guid>
+      <description>Implementing UART TX and RX entirely in SystemVerilog: baud rate generator design, TX FSM, center-sampling RX FSM, and loopback testbench strategy.</description>
+    </item>
+    <item>
+      <title>UART Implementation Methods</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep4/</link>
+      <pubDate>Tue, 17 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep4/</guid>
+      <description>Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.</description>
+    </item>
+    <item>
+      <title>RS-232 and RS-485 for UART Systems</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep3/</link>
+      <pubDate>Mon, 16 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep3/</guid>
+      <description>How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.</description>
+    </item>
+    <item>
+      <title>UART Frame Format</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep2/</link>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep2/</guid>
+      <description>A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.</description>
+    </item>
+    <item>
+      <title>What is UART?</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep1/</link>
+      <pubDate>Sat, 14 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep1/</guid>
+      <description>UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.</description>
+    </item>
+    <item>
+      <title>UART Parity Bit and Frame Structure</title>
+      <link>https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/</link>
+      <pubDate>Wed, 16 Jul 2025 12:02:34 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-parity-bit-and-frame-structure/</guid>
+      <description>UART frames consist of a start bit, data bits, an optional parity bit, and stop bit(s). Parity can be even, odd, or omitted. Even parity is calculated</description>
+    </item>
+    <item>
+      <title>Implementation of UART with Xilinx FPGA and AXI Uartlite IP</title>
+      <link>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</link>
+      <pubDate>Wed, 19 Mar 2025 21:25:52 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/</guid>
+      <description>UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with</description>
+    </item>
+  </channel>
+</rss>

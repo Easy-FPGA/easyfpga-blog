@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>High Speed Interface on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/high-speed-interface/</link>
+    <description>Recent content in High Speed Interface on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 21 Mar 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/high-speed-interface/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>High-Speed Serial Interface: Why the World Moved Beyond Parallel</title>
+      <link>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</link>
+      <pubDate>Sat, 21 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/</guid>
+      <description>Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.</description>
+    </item>
+    <item>
+      <title>Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync</title>
+      <link>https://easyfpga.blog/posts/source-synchronous-parallel-interface/</link>
+      <pubDate>Thu, 12 Mar 2026 10:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/source-synchronous-parallel-interface/</guid>
+      <description>Why global clock distribution fails at high speeds, and how source-synchronous interfaces like DDR&amp;#39;s DQ&#43;DQS pair solve the timing problem.</description>
+    </item>
+    <item>
+      <title>High-Speed Parallel Interface Design: Principles, Limitations, and Practice</title>
+      <link>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</link>
+      <pubDate>Thu, 12 Mar 2026 09:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/high-speed-parallel-interface-design/</guid>
+      <description>A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.</description>
+    </item>
+    <item>
+      <title>The Role of Scrambling in High-Speed Serial Communication</title>
+      <link>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:32 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/role-of-scrambling-in-high-speed-communication/</guid>
+      <description>Why scrambling is essential in multi-gigabit serial links — CDR starvation, EMI, and the shift from 8B/10B to 128B/130B encoding.</description>
+    </item>
+    <item>
+      <title>Line Coding (8B/10B)</title>
+      <link>https://easyfpga.blog/posts/line-coding-8b-10b/</link>
+      <pubDate>Thu, 21 Aug 2025 05:10:17 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/line-coding-8b-10b/</guid>
+      <description>&lt;p&gt;디지털 데이터는 본질적으로 이진 비트(0과 1)의 집합이지만, 이를 실제 물리적 전송 매체(구리선, 광섬유 등)를 통해 송수신하려면 전기적 또는 광학적 신호로 변환하는 과정이 필수적이다. 이 변환 과정은 단순히 비트를 전압 레벨로 바꾸는 것 이상의 복잡한 기술적 과제를 수반한다. 가장 주요한 두 가지 과제는 &lt;strong&gt;DC 성분(직류 성분)의 축적&lt;/strong&gt;과 &lt;strong&gt;수신기 클럭 동기화&lt;/strong&gt;이다. 동일한 비트(예: &amp;lsquo;00000&amp;hellip;&amp;rsquo; 또는 &amp;lsquo;11111&amp;hellip;&amp;rsquo;)가 장시간 연속되면 전압이 한쪽 극성으로만 유지되어 신호에 직류 성분이 누적된다. 또한, 신호의 전이(transition)가 사라져 수신기 측의 위상 동기 루프(Phase-Locked Loop, PLL) 회로가 클럭을 추출하지 못해 데이터 비트의 경계를 식별하는 데 실패한다. 이러한 문제들은 데이터 전송의 신뢰성과 무결성을 심각하게 저해한다.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>From Parallel Bus to High-Speed SERDES and Gigabit Transceivers</title>
+      <link>https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/</link>
+      <pubDate>Thu, 21 Aug 2025 02:41:58 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/from-parallel-to-serdes-and-gigabit-transceiver/</guid>
+      <description>Why parallel buses hit a wall at gigabit speeds, how SERDES solves the problem, and a look at AMD&amp;#39;s GTH, GTY, and GTM transceivers.</description>
+    </item>
+    <item>
+      <title>Skew Simulation</title>
+      <link>https://easyfpga.blog/posts/skew-simulation/</link>
+      <pubDate>Mon, 16 Jun 2025 23:09:38 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/skew-simulation/</guid>
+      <description>&lt;h2 id=&#34;what-is-skew&#34;&gt;What is Skew?&lt;/h2&gt;
+&lt;p&gt;Skew refers to the timing difference in signal arrival between multiple paths that are supposed to be synchronized.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;skew, waver form&#34; loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-10.png?w=848&#34;&gt;&lt;em&gt;shows a skewed waveform between data lines.&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;why-skew-simulation-is-necessary&#34;&gt;Why Skew Simulation Is Necessary&lt;/h2&gt;
+&lt;p&gt;If you simulate your design assuming everything is perfectly aligned, you may encounter issues during actual testing. In real PCBs, skew naturally exists, which is why techniques like length matching are necessary.&lt;/p&gt;
+&lt;p&gt;However, even with length matching, the impact of skew becomes more significant as signal speed increases. Therefore, it&amp;rsquo;s important to address skew issues during simulation.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>High Speed Serial Communication with AMD&#39;s Gigabit Transceiver</title>
+      <link>https://easyfpga.blog/posts/high-speed-serial-communication/</link>
+      <pubDate>Thu, 05 Jun 2025 07:45:04 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/high-speed-serial-communication/</guid>
+      <description>&lt;h2 id=&#34;what-is-the-high-speed-serial-communication&#34;&gt;What is the High Speed Serial Communication?&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;High-speed serial communication&lt;/strong&gt; is a method of transmitting data &lt;strong&gt;bit by bit&lt;/strong&gt; over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;1 Gbps - 10 Gbps&lt;/strong&gt; → Used in &lt;strong&gt;Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;10 Gbps - 25 Gbps&lt;/strong&gt; → Found in &lt;strong&gt;10GBASE-R Ethernet, PCIe Gen3, Fibre Channel&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

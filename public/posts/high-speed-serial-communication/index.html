@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>High Speed Serial Communication with AMD&#39;s Gigabit Transceiver | EasyFPGA</title>
+<meta name="keywords" content="1000BASE-X, 8B/10B, GTY, High Speed Communication, Line Coding, Scrambler, Transceiver">
+<meta name="description" content="What is the High Speed Serial Communication?
+High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability
+
+
+1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0
+
+
+10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/high-speed-serial-communication/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/high-speed-serial-communication/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/high-speed-serial-communication/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="High Speed Serial Communication with AMD&#39;s Gigabit Transceiver">
+  <meta property="og:description" content="What is the High Speed Serial Communication? High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability
+1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0
+10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-06-05T07:45:04+00:00">
+    <meta property="article:modified_time" content="2025-06-05T07:45:04+00:00">
+    <meta property="article:tag" content="1000BASE-X">
+    <meta property="article:tag" content="8B/10B">
+    <meta property="article:tag" content="GTY">
+    <meta property="article:tag" content="High Speed Communication">
+    <meta property="article:tag" content="Line Coding">
+    <meta property="article:tag" content="Scrambler">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="High Speed Serial Communication with AMD&#39;s Gigabit Transceiver">
+  <meta name="twitter:description" content="What is the High Speed Serial Communication? High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability
+1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0
+10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "High Speed Serial Communication with AMD's Gigabit Transceiver",
+      "item": "https://easyfpga.blog/posts/high-speed-serial-communication/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "High Speed Serial Communication with AMD's Gigabit Transceiver",
+  "name": "High Speed Serial Communication with AMD\u0027s Gigabit Transceiver",
+  "description": "What is the High Speed Serial Communication? High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability\n1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0\n10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel\n",
+  "keywords": [
+    "1000BASE-X", "8B/10B", "GTY", "High Speed Communication", "Line Coding", "Scrambler", "Transceiver"
+  ],
+  "articleBody": "What is the High Speed Serial Communication? High-speed serial communication is a method of transmitting data bit by bit over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability\n1 Gbps - 10 Gbps → Used in Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0\n10 Gbps - 25 Gbps → Found in 10GBASE-R Ethernet, PCIe Gen3, Fibre Channel\n25 Gbps - 100 Gbps → Used in PCIe Gen4/5, 100G Ethernet, InfiniBand\nBeyond 100 Gbps → Applied in Terabit optical networks, advanced data centers\nSystem Architecture of High Speed Serial Communication\nFeatures Differential Signaling Uses two complementary signals to reduce noise and improve signal integrity.\nSerializer / De-serializer (SerDes) Serializer\nConverts parallel data into serial bitstream for trasmission\nDeserializer Converts serial stream back into parallel data on receive side.\nClock and Data Recovery (CDR) Instead of transmitting a separate clock signal, the receiver extracts timing information from the data stream.\nEncoding Techniques 8B/10B Encoding (used in PCIe, Gigabit Ethernet) ensures DC balance and clock recovery.\n64B/66B Encoding (used in 10G Ethernet) improve efficiency while maintaining synchronization.\nGearbox\nConverts data between different widths to match the requirements of the internal parallel processing logic and the serial interface.\nIt is essential when the internal data-path width (e.g., 64bit) does not match the encoding or serialization width (e.g., 66-bit for 64b/66b or 10-bit for 8b/10b).\nSignal Integrity and EMI Reduction\nTechniques like pre-emphasis, equalization, and scrambling help maintain signal quality.\nScrambling randomizes data patterns to reduce electromagnetic interference (EMI). Common Protocols ProtocolUse CaseEncoding MethodSpeed RangePCI Express (PCIe)GPU, SSDs, accelerators8b/10b (Gen1/2), scrambling (Gen3+)2.5–64 GT/s per laneSATA/SASStorage drives8b/10b1.5–12 GbpsEthernetNetworking8b/10b, 64b/66b1G, 10G, 25G, 100G+USB 3.x / 4General I/O8b/10b + scrambling5–40 GbpsHDMI / DisplayPortVideo outputTMDS (transition-minimized)3–48 GbpsThunderboltUniversal data/videoPCIe + DisplayPort + USBUp to 80 GbpsAuroraFPGA serial linksOptional (Xilinx proprietary)Flexible\nGigabit Transceiver AMD’s Transceiver (GTY/GYH/GYX) plays a crucial role in enabling high speed serial communication within FPGA systems, facilitating efficient data exchange between external devices.\nKey Features of GTY Transceivers Supports speed up to 32.75 Gbps for UltraScale+ FPGAs, 30.5 Gbps for UltraScale FPGAs\nBroad Protocol Support: Compatible with PCIe Gen3, Ethernet, Interlaken, SDI, and other high-speed serial protocols.\nAdaptive Equalization\nClock Recovery \u0026 Jitter Reduction\nEncoding and Decoding: 8B/10B, 64B/66B and 64B/67B support, 128B/130B for PCI Express Gen3\nEnhanced 64B/66B and 64B/67B gearbox support.\nLow Power Consumption\nBackplane \u0026 Optical Interconnects\nSeamless FPGA Integration\nFPGA transceivers support various features required for high-speed serial communication, including clock recovery, adaptive equalization, encoding and decoding, and multi-protocol compatibility. These transceivers support reliable and efficient data transfer in applications such as networking, data centers, and high-performance computing.\n",
+  "wordCount" : "443",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-06-05T07:45:04Z",
+  "dateModified": "2025-06-05T07:45:04Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/high-speed-serial-communication/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      High Speed Serial Communication with AMD&#39;s Gigabit Transceiver
+    </h1>
+    <div class="post-meta"><span title='2025-06-05 07:45:04 +0000 +0000'>June 5, 2025</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-the-high-speed-serial-communication" aria-label="What is the High Speed Serial Communication?">What is the High Speed Serial Communication?</a></li>
+                <li>
+                    <a href="#features" aria-label="Features">Features</a></li>
+                <li>
+                    <a href="#common-protocols" aria-label="Common Protocols">Common Protocols</a></li>
+                <li>
+                    <a href="#gigabit-transceiver" aria-label="Gigabit Transceiver">Gigabit Transceiver</a><ul>
+                        
+                <li>
+                    <a href="#key-features-of-gty-transceivers" aria-label="Key Features of GTY Transceivers">Key Features of GTY Transceivers</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="what-is-the-high-speed-serial-communication">What is the High Speed Serial Communication?<a hidden class="anchor" aria-hidden="true" href="#what-is-the-high-speed-serial-communication">#</a></h2>
+<p><strong>High-speed serial communication</strong> is a method of transmitting data <strong>bit by bit</strong> over a single or multiple lanes at very high speeds. It is widely used in modern computing, networking, and embedded systems due to its efficiency and scalability</p>
+<ul>
+<li>
+<p><strong>1 Gbps - 10 Gbps</strong> → Used in <strong>Gigabit Ethernet (1000BASE-X), PCIe Gen1/2, SATA, USB 3.0</strong></p>
+</li>
+<li>
+<p><strong>10 Gbps - 25 Gbps</strong> → Found in <strong>10GBASE-R Ethernet, PCIe Gen3, Fibre Channel</strong></p>
+</li>
+<li>
+<p><strong>25 Gbps - 100 Gbps</strong> → Used in <strong>PCIe Gen4/5, 100G Ethernet, InfiniBand</strong></p>
+</li>
+<li>
+<p><strong>Beyond 100 Gbps</strong> → Applied in <strong>Terabit optical networks, advanced data centers</strong></p>
+</li>
+</ul>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-1.png?w=1024"><em>System Architecture of High Speed Serial Communication</em></p>
+<h2 id="features">Features<a hidden class="anchor" aria-hidden="true" href="#features">#</a></h2>
+<ul>
+<li>Differential Signaling</li>
+</ul>
+<p>Uses two complementary signals to reduce noise and improve signal integrity.</p>
+<ul>
+<li>Serializer / De-serializer (SerDes)</li>
+</ul>
+<p>Serializer</p>
+<p>Converts parallel data into serial bitstream for trasmission</p>
+<ul>
+<li>Deserializer</li>
+</ul>
+<p>Converts serial stream back into parallel data on receive side.</p>
+<ul>
+<li>Clock and Data Recovery (CDR)</li>
+</ul>
+<p>Instead of transmitting a separate clock signal, the receiver extracts timing information from the data stream.</p>
+<ul>
+<li>Encoding Techniques</li>
+</ul>
+<p>8B/10B Encoding (used in PCIe, Gigabit Ethernet) ensures DC balance and clock recovery.</p>
+<ul>
+<li>
+<p>64B/66B Encoding (used in 10G Ethernet) improve efficiency while maintaining synchronization.</p>
+</li>
+<li>
+<p>Gearbox</p>
+</li>
+</ul>
+<p>Converts data between different widths to match the requirements of the internal parallel processing logic and the serial interface.</p>
+<ul>
+<li>
+<p>It is essential when the internal data-path width (e.g., 64bit) does not match the encoding or serialization width (e.g., 66-bit for 64b/66b or 10-bit for 8b/10b).</p>
+</li>
+<li>
+<p>Signal Integrity and EMI Reduction</p>
+</li>
+</ul>
+<p>Techniques like pre-emphasis, equalization, and scrambling help maintain signal quality.</p>
+<ul>
+<li>Scrambling randomizes data patterns to reduce electromagnetic interference (EMI).</li>
+</ul>
+<h2 id="common-protocols">Common Protocols<a hidden class="anchor" aria-hidden="true" href="#common-protocols">#</a></h2>
+<p>ProtocolUse CaseEncoding MethodSpeed Range<strong>PCI Express</strong> (PCIe)GPU, SSDs, accelerators8b/10b (Gen1/2), scrambling (Gen3+)2.5–64 GT/s per lane<strong>SATA/SAS</strong>Storage drives8b/10b1.5–12 Gbps<strong>Ethernet</strong>Networking8b/10b, 64b/66b1G, 10G, 25G, 100G+<strong>USB 3.x / 4</strong>General I/O8b/10b + scrambling5–40 Gbps<strong>HDMI / DisplayPort</strong>Video outputTMDS (transition-minimized)3–48 Gbps<strong>Thunderbolt</strong>Universal data/videoPCIe + DisplayPort + USBUp to 80 Gbps<strong>Aurora</strong>FPGA serial linksOptional (Xilinx proprietary)Flexible</p>
+<h2 id="gigabit-transceiver">Gigabit Transceiver<a hidden class="anchor" aria-hidden="true" href="#gigabit-transceiver">#</a></h2>
+<p>AMD&rsquo;s Transceiver (GTY/GYH/GYX) plays a crucial role in enabling high speed serial communication within FPGA systems, facilitating efficient data exchange between external devices.</p>
+<h3 id="key-features-of-gty-transceivers">Key Features of GTY Transceivers<a hidden class="anchor" aria-hidden="true" href="#key-features-of-gty-transceivers">#</a></h3>
+<ul>
+<li>
+<p>Supports speed up to 32.75 Gbps for UltraScale+ FPGAs, 30.5 Gbps for UltraScale FPGAs</p>
+</li>
+<li>
+<p>Broad Protocol Support: Compatible with PCIe Gen3, Ethernet, Interlaken, SDI, and other high-speed serial protocols.</p>
+</li>
+<li>
+<p>Adaptive Equalization</p>
+</li>
+<li>
+<p>Clock Recovery &amp; Jitter Reduction</p>
+</li>
+<li>
+<p>Encoding and Decoding: 8B/10B, 64B/66B and 64B/67B support, 128B/130B for PCI Express Gen3</p>
+</li>
+<li>
+<p>Enhanced 64B/66B and 64B/67B gearbox support.</p>
+</li>
+<li>
+<p>Low Power Consumption</p>
+</li>
+<li>
+<p>Backplane &amp; Optical Interconnects</p>
+</li>
+<li>
+<p>Seamless FPGA Integration</p>
+</li>
+</ul>
+<p>FPGA transceivers support various features required for high-speed serial communication, including clock recovery, adaptive equalization, encoding and decoding, and multi-protocol compatibility. These transceivers support reliable and efficient data transfer in applications such as networking, data centers, and high-performance computing.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/1000base-x/">1000BASE-X</a></li>
+      <li><a href="https://easyfpga.blog/tags/8b/10b/">8B/10B</a></li>
+      <li><a href="https://easyfpga.blog/tags/gty/">GTY</a></li>
+      <li><a href="https://easyfpga.blog/tags/high-speed-communication/">High Speed Communication</a></li>
+      <li><a href="https://easyfpga.blog/tags/line-coding/">Line Coding</a></li>
+      <li><a href="https://easyfpga.blog/tags/scrambler/">Scrambler</a></li>
+      <li><a href="https://easyfpga.blog/tags/transceiver/">Transceiver</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/virtual-input-output/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Virtual Input/Output</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/understanding-axi-the-core-of-fpga-and-soc-designs/">
+    <span class="title">Next »</span>
+    <br>
+    <span>AXI with FPGA and SoC</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

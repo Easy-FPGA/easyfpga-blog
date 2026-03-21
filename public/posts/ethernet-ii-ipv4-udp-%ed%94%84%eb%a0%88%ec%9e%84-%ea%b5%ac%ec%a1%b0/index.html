@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Ethernet II &#43; IPv4 &#43; UDP 프레임 구조 | EasyFPGA</title>
+<meta name="keywords" content="Ethernet Frame, FPGA, IPv4, RTL, UDP">
+<meta name="description" content="1) 전체 레이어
+[Ethernet II]
+  Byte0–5
+  Byte6–11
+  Byte12–13
+  Byte14–(n)
+  마지막 4바이트
+
+
+
+
+  Destination MAC (6B)
+  Source MAC (6B)
+  EtherType (2B, 0x0800=IPv4)
+  Payload (IPv4 Packet …)
+  FCS CRC32 (4B)
+
+Payload = [IPv4]
+  Byte0
+  Byte1
+  Byte2–3
+
+
+
+
+  Version / IHL (1B)
+  TOS (1B)
+  Total Length (2B)
+
+
+  Byte4–5
+  Byte6–7
+
+
+  Identification (2B)
+  Flags (3b) &#43; Fragment Offset (13b)
+
+
+  Byte8
+  Byte9
+  Byte10–11
+
+
+  TTL (1B)
+  Protocol (1B, 17=UDP)
+  Header Checksum (2B)
+
+
+  Byte12–15
+
+
+  Source IP (4B)
+
+
+  Byte16–19
+
+
+  Destination IP (4B)
+
+
+  옵션 (0~40B)
+
+IPv4 Payload = [UDP]
+  Byte0–1
+  Byte2–3
+  Byte4–5
+  Byte6–7
+
+
+
+
+  Source Port (2B)
+  Destination Port (2B)
+  Length (2B)
+  Checksum (2B)
+
+
+  Byte8 ~ (8&#43;N-1)
+
+
+  Data (N = UDP Length - 8)
+
+
+
+물리 계층의 Preamble(7) &#43; SFD(1), 그리고 IPG(Inter-Packet Gap) 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 노출되지 않습니다.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-%ed%94%84%eb%a0%88%ec%9e%84-%ea%b5%ac%ec%a1%b0/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-%ed%94%84%eb%a0%88%ec%9e%84-%ea%b5%ac%ec%a1%b0/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-%ed%94%84%eb%a0%88%ec%9e%84-%ea%b5%ac%ec%a1%b0/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Ethernet II &#43; IPv4 &#43; UDP 프레임 구조">
+  <meta property="og:description" content="1) 전체 레이어 [Ethernet II] Byte0–5Byte6–11Byte12–13Byte14–(n)마지막 4바이트Destination MAC (6B)Source MAC (6B)EtherType (2B, 0x0800=IPv4)Payload (IPv4 Packet …)FCS CRC32 (4B)Payload = [IPv4] Byte0Byte1Byte2–3Version / IHL (1B)TOS (1B)Total Length (2B)Byte4–5Byte6–7Identification (2B)Flags (3b) &#43; Fragment Offset (13b)Byte8Byte9Byte10–11TTL (1B)Protocol (1B, 17=UDP)Header Checksum (2B)Byte12–15Source IP (4B)Byte16–19Destination IP (4B)옵션 (0~40B)IPv4 Payload = [UDP] Byte0–1Byte2–3Byte4–5Byte6–7Source Port (2B)Destination Port (2B)Length (2B)Checksum (2B)Byte8 ~ (8&#43;N-1)Data (N = UDP Length - 8)물리 계층의 Preamble(7) &#43; SFD(1), 그리고 IPG(Inter-Packet Gap) 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 노출되지 않습니다.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-09-22T14:39:59+00:00">
+    <meta property="article:modified_time" content="2025-09-22T14:39:59+00:00">
+    <meta property="article:tag" content="Ethernet Frame">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="IPv4">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="UDP">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ethernet II &#43; IPv4 &#43; UDP 프레임 구조">
+  <meta name="twitter:description" content="1) 전체 레이어 [Ethernet II] Byte0–5Byte6–11Byte12–13Byte14–(n)마지막 4바이트Destination MAC (6B)Source MAC (6B)EtherType (2B, 0x0800=IPv4)Payload (IPv4 Packet …)FCS CRC32 (4B)Payload = [IPv4] Byte0Byte1Byte2–3Version / IHL (1B)TOS (1B)Total Length (2B)Byte4–5Byte6–7Identification (2B)Flags (3b) &#43; Fragment Offset (13b)Byte8Byte9Byte10–11TTL (1B)Protocol (1B, 17=UDP)Header Checksum (2B)Byte12–15Source IP (4B)Byte16–19Destination IP (4B)옵션 (0~40B)IPv4 Payload = [UDP] Byte0–1Byte2–3Byte4–5Byte6–7Source Port (2B)Destination Port (2B)Length (2B)Checksum (2B)Byte8 ~ (8&#43;N-1)Data (N = UDP Length - 8)물리 계층의 Preamble(7) &#43; SFD(1), 그리고 IPG(Inter-Packet Gap) 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 노출되지 않습니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Ethernet II + IPv4 + UDP 프레임 구조",
+      "item": "https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-%ed%94%84%eb%a0%88%ec%9e%84-%ea%b5%ac%ec%a1%b0/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Ethernet II + IPv4 + UDP 프레임 구조",
+  "name": "Ethernet II \u002b IPv4 \u002b UDP 프레임 구조",
+  "description": "1) 전체 레이어 [Ethernet II] Byte0–5\rByte6–11\rByte12–13\rByte14–(n)\r마지막 4바이트\rDestination MAC (6B)\rSource MAC (6B)\rEtherType (2B, 0x0800=IPv4)\rPayload (IPv4 Packet …)\rFCS CRC32 (4B)\rPayload = [IPv4] Byte0\rByte1\rByte2–3\rVersion / IHL (1B)\rTOS (1B)\rTotal Length (2B)\rByte4–5\rByte6–7\rIdentification (2B)\rFlags (3b) + Fragment Offset (13b)\rByte8\rByte9\rByte10–11\rTTL (1B)\rProtocol (1B, 17=UDP)\rHeader Checksum (2B)\rByte12–15\rSource IP (4B)\rByte16–19\rDestination IP (4B)\r옵션 (0~40B)\rIPv4 Payload = [UDP] Byte0–1\rByte2–3\rByte4–5\rByte6–7\rSource Port (2B)\rDestination Port (2B)\rLength (2B)\rChecksum (2B)\rByte8 ~ (8+N-1)\rData (N = UDP Length - 8)\r물리 계층의 Preamble(7) + SFD(1), 그리고 IPG(Inter-Packet Gap) 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 노출되지 않습니다.\n",
+  "keywords": [
+    "Ethernet Frame", "FPGA", "IPv4", "RTL", "UDP"
+  ],
+  "articleBody": "1) 전체 레이어 [Ethernet II] Byte0–5\rByte6–11\rByte12–13\rByte14–(n)\r마지막 4바이트\rDestination MAC (6B)\rSource MAC (6B)\rEtherType (2B, 0x0800=IPv4)\rPayload (IPv4 Packet …)\rFCS CRC32 (4B)\rPayload = [IPv4] Byte0\rByte1\rByte2–3\rVersion / IHL (1B)\rTOS (1B)\rTotal Length (2B)\rByte4–5\rByte6–7\rIdentification (2B)\rFlags (3b) + Fragment Offset (13b)\rByte8\rByte9\rByte10–11\rTTL (1B)\rProtocol (1B, 17=UDP)\rHeader Checksum (2B)\rByte12–15\rSource IP (4B)\rByte16–19\rDestination IP (4B)\r옵션 (0~40B)\rIPv4 Payload = [UDP] Byte0–1\rByte2–3\rByte4–5\rByte6–7\rSource Port (2B)\rDestination Port (2B)\rLength (2B)\rChecksum (2B)\rByte8 ~ (8+N-1)\rData (N = UDP Length - 8)\r물리 계층의 Preamble(7) + SFD(1), 그리고 IPG(Inter-Packet Gap) 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 노출되지 않습니다.\n많은 MAC IP는 FCS(4B) 를 자동으로 붙이고/검사하며, 사용자 스트림에서 FCS를 제거해 줍니다(옵션).\n2) Ethernet II 프레임 (Data Link) 오프셋 기준(프레임 시작) 0–5 : Dest MAC (6B)\n6–11: Src MAC (6B)\n12–13: EtherType (2B) — IPv4는 0x0800\n14–...: Payload (여기서는 IPv4 패킷)\n마지막 4B: FCS(CRC-32)\n최소 길이: 헤더(14) + 페이로드(최소 46) + FCS(4) = 64B → IP/UDP가 짧으면 MAC이 패딩(0x00) 을 삽입하여 46B 페이로드를 맞춥니다.\nFCS(CRC-32) 요약\n다항식: 0x04C11DB7, 초기값 0xFFFFFFFF, 최종 XOR 0xFFFFFFFF\n계산 범위: Dest MAC부터 마지막 페이로드/패딩 바이트까지(FCS 제외)\nPHY 선로 비트 순서는 바이트 내 LSB-first(표준 이더넷 규칙), 스트림에서는 바이트 단위 Big-Endian 순서로 보는 것이 일반적\nRTL: TX 쪽은 스트리밍 계산 후 부착, RX 쪽은 MAC이 검사/드롭 을 맡기면 상위 RTL은 단순화\n3) IPv4 헤더 (Network) 시작 오프셋: 이더넷 헤더 14B 뒤 → offset 14\n일반(옵션 없음) 길이: 20B (IHL=5)\n오프셋(프레임 기준)길이필드비고141Version(4) + IHL(4)보통 4/5 (20B 헤더)151TOS(DSCP/ECN)QoS 필요 시 DSCP 사용16–172Total LengthIP 헤더+데이터 총길이18–192Identification(조각화 시) 식별자20–212Flags(3) + Frag Offset(13)**DF=1 권장(조각화 금지)221TTL보통 64/128231Protocol17(UDP)24–252Header ChecksumIP 헤더만** 대상26–294Src IP네트워크 바이트 오더30–334Dst IP″\n조각화(Fragments) 머신 비전 스트리밍은 성능/신뢰성 이유로 반드시 DF=1 을 권장(라우터가 조각화하지 않도록).\n조각화되면 첫 조각만 UDP 헤더를 포함, 나머지는 데이터 조각 → 구현 복잡/손실 시 전체 무효. 4) UDP 헤더 (Transport) 시작 오프셋: 14 + (IHL*4) → 보통 offset 34\n길이: 8B (고정)\n오프셋(프레임 기준)길이필드비고34–352Src Port발신 포트36–372Dst Port수신(애플리케이션) 포트38–392LengthUDP 헤더+데이터 길이40–412ChecksumIPv4에서 0=비사용 허용\nUDP Length 일관성: UDP Length == (IP TotalLen - IP HeaderLen)\nUDP Checksum\n계산 대상: 의사 헤더(pseudo-header)(SrcIP, DstIP, 0x00, Protocol=17, UDP Length) + UDP 헤더+데이터(홀수 길이면 1B 패딩)\nIPv4에서는 0으로 비활성화 가능(고속 스트리밍에서 종종 사용), 신뢰성 중시 시 사용 권장 5) 계층별 바이트 맵(옵션/VLAN 없음, IHL=5) 0–5 : Dest MAC\n6–11: Src MAC\n12–13: EtherType = 0x0800 (IPv4)\n14–33: IPv4 헤더(20B)\n34–41: UDP 헤더(8B)\n42–(41+N): UDP 데이터(N = UDP Length-8)\n(필요 시) 패딩 → 이더넷 페이로드가 최소 46B 되도록\n(MAC 설정에 따라) 마지막 4B FCS\n예시(표준 MTU 1500)\n최대 UDP 페이로드 = 1500 - 20(IP) - 8(UDP) = 1472B\n자주 쓰는 값: 1440~1472B(여유/헤더 추가 고려)\n프레임 총 길이(헤더+FCS 포함)는 MAC 설정(FCS 포함/제거)에 따라 스트림에서 달리 보일 수 있음\n점보 프레임(예: MTU 9000)\n최대 UDP 페이로드 ≈ 9000 - 20 - 8 = 8972B\n스위치/ NIC/ 호스트가 모두 동일 MTU 지원해야 함\n6) 엔디안/정렬/버스 매핑(AXI-Stream 관점) 네트워크 바이트 오더 = Big-Endian 16/32비트 필드는 MSB 바이트가 먼저 옴 (예: EtherType 0x0800 → 08 00)\nAXI-Stream 정렬 프레임 시작이 데이터 버스의 lane 0 에 정렬되는 모드가 일반적\n이더넷 헤더 14B는 4/8B 경계에 걸쳐짐 → 필드가 비트/바이트 경계를 넘어갈 수 있음\ntkeep(유효 바이트 마스크), tlast(프레임 종단) 처리 필수\n실무 팁\n바이트 카운터 기반 파서: 특정 오프셋(1213 EtherType, 23 Protocol, 3839 UDP Len…)에서 바이트를 집계해 필드 완성\n또는 소형 버퍼로 16/32비트 정렬 후 추출\n메모리에 쓰는 경우 IP 헤더 시작이 +14B 로 2B 미정렬 → 임베디드 SW가 접근 시 유의\n7) CRC(FCS) \u0026 체크섬 구현 포인트 Ethernet FCS (CRC-32) TX: 스트리밍 계산(LFSR) → 프레임 끝에 4B FCS 부착(대부분 MAC이 자동)\nRX: MAC이 에러 프레임을 드롭/표시 하면 상층은 단순화\n직접 구현 시: 마지막 비트까지 포함해 계산 후 최종 XOR 적용, 마지막 워드 tkeep 반영\nIPv4 Header Checksum 대상: IP 헤더만(20B)\n1’s complement sum(16비트 단위, end-around carry) → 1’s complement\n라우터가 TTL 감소 시 재계산된다는 점만 이해하면 됨\nUDP Checksum Pseudo-header + UDP 헤더/데이터 대상\n고속 스트리밍에서 0(비활성화) 선택 가능(IPv4 한정)\n사용 시: 16비트 누산기 파이프라인으로 라인레이트 대응 가능\nTX에서 헤더 내 2바이트 위치에 값을 넣어야 하므로 버퍼링 또는 2-패스 고려(복잡하면 0 사용)\n8) MTU, 조각화, 점보 프레임 전략 (비전 스트리밍 최적화) 권장: DF(Don’t Fragment)=1 + 애플리케이션 레벨 세그멘테이션(프레임을 다수 UDP 패킷으로 분할)\n이유\n조각화 시 한 조각 손실 = 전체 UDP 손실\n리어셈블 비용/지연 증가\n표준 MTU(1500) 에서 1472B 이내 페이로드로 패킷화\n점보 MTU(예: 9000) 지원 시 8972B까지 활용해 헤더/인터럽트 오버헤드 감소\nGigE Vision(GVSP 등)은 페이로드 안에 시퀀스/블록 ID를 넣어 재조립/손실 검출(애플리케이션 레벨) → RTL 수신기가 이 페이로드 헤더를 파싱해 프레임 버퍼에 주소 배치 가능\n9) RTL 구현 체크리스트 파서/상태기계 상태: ETH → IP → UDP → PAYLOAD\n검사: EtherType=0x0800, Ver=4/IHL, Protocol=17, (선택) IP 헤더 체크섬\n필터: Dst MAC/IP/Port 매칭(목적지 미스매치 시 드롭)\n길이 일관성: UDP Len == IP TotalLen - IPHdrLen 확인\nAXI-Stream 인터페이스 tvalid/tready 백프레셔 설계, tlast/tkeep 처리\n패딩 여부: MAC이 패딩 제거/유지 여부 문서 확인(많은 MAC은 페이로드만 내보냄)\n연속 프레임 처리: 프레임 경계 카운터 초기화 타이밍 주의\n버퍼링/메모리 수신 페이로드를 DDR/URAM/BRAM 으로 DMA 저장\n점보 대응: 카운터/ FIFO 폭 충분(≥ 9KB)\n프레임 재조립: 페이로드 내 시퀀스/오프셋으로 프레임 버퍼 주소 산출\n성능/신뢰성 Throughput: MTU/점보, 연속 패킷 사이 IPG 고려\n에러 처리: FCS 불일치, IP/UDP 길이 불일치 즉시 드롭\n검증: Wireshark 캡처, 트래픽 제너레이터(iperf/Scapy 등)로 가장자리 케이스(홀수 길이, 작은 패킷, 최대 페이로드)\n10) 머신 비전 특화 팁 타임스탬프/트리거: 카메라 입력 전단에서 PTP(IEEE 1588) 타임스탬프 삽입/추출 블록을 두면 지연 측정/동기에 유리\n멀티 스트림: 여러 센서 샤딩 시 포트/멀티캐스트 MAC로 분리, 수신기 쪽에서는 포트 기반 라우팅\n손실 처리: 애플리케이션(예: GVSP) 헤더의 패킷 ID 누락 감지→프레임 드롭 또는 요청 재전송(하드웨어만으로는 재전송 어려움)\n페이로드 크기 튜닝: 호스트 NIC/OS 드라이버, CPU/GPU 경로에서 최적의 패킷당 바이트를 실험으로 결정(14401472, 혹은 점보 환경에서 89KB)\n11) 설계자가 바로 쓰는 요약 EtherType=0x0800, Protocol=17, DF=1, UDP Length = IP TotalLen - IPHdrLen\n최대 UDP 페이로드: 1472B(MTU 1500), ~8972B(MTU 9000)\nFCS(CRC-32): 이더넷 헤더~페이로드에 대해 계산(보통 MAC이 처리)\nUDP 체크섬: IPv4에서는 0 허용(고속 스트림에서 단순화), 사용 시 pseudo-header 포함\nAXI-Stream: tkeep/tlast 철저 처리, 14B 이더넷 헤더로 인한 정렬 어긋남 대응\n파서 FSM: 바이트 카운터로 필드 분리·필터링·일관성 체크, 에러 즉시 드롭\n",
+  "wordCount" : "985",
+  "inLanguage": "en",
+  "datePublished": "2025-09-22T14:39:59Z",
+  "dateModified": "2025-09-22T14:39:59Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-%ed%94%84%eb%a0%88%ec%9e%84-%ea%b5%ac%ec%a1%b0/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Ethernet II &#43; IPv4 &#43; UDP 프레임 구조
+    </h1>
+    <div class="post-meta"><span title='2025-09-22 14:39:59 +0000 +0000'>September 22, 2025</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-%ec%a0%84%ec%b2%b4-%eb%a0%88%ec%9d%b4%ec%96%b4" aria-label="1) 전체 레이어">1) 전체 레이어</a><ul>
+                        
+                <li>
+                    <a href="#heading" aria-label="[Ethernet II]">[Ethernet II]</a></li>
+                <li>
+                    <a href="#payload--" aria-label="Payload = [IPv4]">Payload = [IPv4]</a></li>
+                <li>
+                    <a href="#ipv4-payload--" aria-label="IPv4 Payload = [UDP]">IPv4 Payload = [UDP]</a></li></ul>
+                </li>
+                <li>
+                    <a href="#2-ethernet-ii-%ed%94%84%eb%a0%88%ec%9e%84-data-link" aria-label="2) Ethernet II 프레임 (Data Link)">2) Ethernet II 프레임 (Data Link)</a></li>
+                <li>
+                    <a href="#3-ipv4-%ed%97%a4%eb%8d%94-network" aria-label="3) IPv4 헤더 (Network)">3) IPv4 헤더 (Network)</a></li>
+                <li>
+                    <a href="#4-udp-%ed%97%a4%eb%8d%94-transport" aria-label="4) UDP 헤더 (Transport)">4) UDP 헤더 (Transport)</a></li>
+                <li>
+                    <a href="#5-%ea%b3%84%ec%b8%b5%eb%b3%84-%eb%b0%94%ec%9d%b4%ed%8a%b8-%eb%a7%b5%ec%98%b5%ec%85%98vlan-%ec%97%86%ec%9d%8c-ihl5" aria-label="5) 계층별 바이트 맵(옵션/VLAN 없음, IHL=5)">5) 계층별 바이트 맵(옵션/VLAN 없음, IHL=5)</a></li>
+                <li>
+                    <a href="#6-%ec%97%94%eb%94%94%ec%95%88%ec%a0%95%eb%a0%ac%eb%b2%84%ec%8a%a4-%eb%a7%a4%ed%95%91axi-stream-%ea%b4%80%ec%a0%90" aria-label="6) 엔디안/정렬/버스 매핑(AXI-Stream 관점)">6) 엔디안/정렬/버스 매핑(AXI-Stream 관점)</a></li>
+                <li>
+                    <a href="#7-crcfcs--%ec%b2%b4%ed%81%ac%ec%84%ac-%ea%b5%ac%ed%98%84-%ed%8f%ac%ec%9d%b8%ed%8a%b8" aria-label="7) CRC(FCS) &amp; 체크섬 구현 포인트">7) CRC(FCS) &amp; 체크섬 구현 포인트</a><ul>
+                        
+                <li>
+                    <a href="#ethernet-fcs-crc-32" aria-label="Ethernet FCS (CRC-32)">Ethernet FCS (CRC-32)</a></li>
+                <li>
+                    <a href="#ipv4-header-checksum" aria-label="IPv4 Header Checksum">IPv4 Header Checksum</a></li>
+                <li>
+                    <a href="#udp-checksum" aria-label="UDP Checksum">UDP Checksum</a></li></ul>
+                </li>
+                <li>
+                    <a href="#8-mtu-%ec%a1%b0%ea%b0%81%ed%99%94-%ec%a0%90%eb%b3%b4-%ed%94%84%eb%a0%88%ec%9e%84-%ec%a0%84%eb%9e%b5-%eb%b9%84%ec%a0%84-%ec%8a%a4%ed%8a%b8%eb%a6%ac%eb%b0%8d-%ec%b5%9c%ec%a0%81%ed%99%94" aria-label="8) MTU, 조각화, 점보 프레임 전략 (비전 스트리밍 최적화)">8) MTU, 조각화, 점보 프레임 전략 (비전 스트리밍 최적화)</a></li>
+                <li>
+                    <a href="#9-rtl-%ea%b5%ac%ed%98%84-%ec%b2%b4%ed%81%ac%eb%a6%ac%ec%8a%a4%ed%8a%b8" aria-label="9) RTL 구현 체크리스트">9) RTL 구현 체크리스트</a><ul>
+                        
+                <li>
+                    <a href="#%ed%8c%8c%ec%84%9c%ec%83%81%ed%83%9c%ea%b8%b0%ea%b3%84" aria-label="파서/상태기계">파서/상태기계</a></li>
+                <li>
+                    <a href="#axi-stream-%ec%9d%b8%ed%84%b0%ed%8e%98%ec%9d%b4%ec%8a%a4" aria-label="AXI-Stream 인터페이스">AXI-Stream 인터페이스</a></li>
+                <li>
+                    <a href="#%eb%b2%84%ed%8d%bc%eb%a7%81%eb%a9%94%eb%aa%a8%eb%a6%ac" aria-label="버퍼링/메모리">버퍼링/메모리</a></li>
+                <li>
+                    <a href="#%ec%84%b1%eb%8a%a5%ec%8b%a0%eb%a2%b0%ec%84%b1" aria-label="성능/신뢰성">성능/신뢰성</a></li></ul>
+                </li>
+                <li>
+                    <a href="#10-%eb%a8%b8%ec%8b%a0-%eb%b9%84%ec%a0%84-%ed%8a%b9%ed%99%94-%ed%8c%81" aria-label="10) 머신 비전 특화 팁">10) 머신 비전 특화 팁</a></li>
+                <li>
+                    <a href="#11-%ec%84%a4%ea%b3%84%ec%9e%90%ea%b0%80-%eb%b0%94%eb%a1%9c-%ec%93%b0%eb%8a%94-%ec%9a%94%ec%95%bd" aria-label="11) 설계자가 바로 쓰는 요약">11) 설계자가 바로 쓰는 요약</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="1-전체-레이어">1) 전체 레이어<a hidden class="anchor" aria-hidden="true" href="#1-전체-레이어">#</a></h2>
+<h3 id="heading"><strong>[Ethernet II]</strong><a hidden class="anchor" aria-hidden="true" href="#heading">#</a></h3>
+<pre><code>  Byte0–5
+  Byte6–11
+  Byte12–13
+  Byte14–(n)
+  마지막 4바이트
+
+
+
+
+  Destination MAC (6B)
+  Source MAC (6B)
+  EtherType (2B, 0x0800=IPv4)
+  Payload (IPv4 Packet …)
+  FCS CRC32 (4B)
+</code></pre>
+<h3 id="payload--"><strong>Payload = [IPv4]</strong><a hidden class="anchor" aria-hidden="true" href="#payload--">#</a></h3>
+<pre><code>  Byte0
+  Byte1
+  Byte2–3
+
+
+
+
+  Version / IHL (1B)
+  TOS (1B)
+  Total Length (2B)
+
+
+  Byte4–5
+  Byte6–7
+
+
+  Identification (2B)
+  Flags (3b) + Fragment Offset (13b)
+
+
+  Byte8
+  Byte9
+  Byte10–11
+
+
+  TTL (1B)
+  Protocol (1B, 17=UDP)
+  Header Checksum (2B)
+
+
+  Byte12–15
+
+
+  Source IP (4B)
+
+
+  Byte16–19
+
+
+  Destination IP (4B)
+
+
+  옵션 (0~40B)
+</code></pre>
+<h3 id="ipv4-payload--"><strong>IPv4 Payload = [UDP]</strong><a hidden class="anchor" aria-hidden="true" href="#ipv4-payload--">#</a></h3>
+<pre><code>  Byte0–1
+  Byte2–3
+  Byte4–5
+  Byte6–7
+
+
+
+
+  Source Port (2B)
+  Destination Port (2B)
+  Length (2B)
+  Checksum (2B)
+
+
+  Byte8 ~ (8+N-1)
+
+
+  Data (N = UDP Length - 8)
+</code></pre>
+<ul>
+<li>
+<p>물리 계층의 <strong>Preamble(7) + SFD(1)</strong>, 그리고 <strong>IPG(Inter-Packet Gap)</strong> 는 PHY/ MAC 레벨에서 처리되며, 일반적으로 사용자 스트림에는 <strong>노출되지 않습니다</strong>.</p>
+</li>
+<li>
+<p>많은 MAC IP는 <strong>FCS(4B)</strong> 를 자동으로 붙이고/검사하며, 사용자 스트림에서 <strong>FCS를 제거</strong>해 줍니다(옵션).</p>
+</li>
+</ul>
+<h2 id="2-ethernet-ii-프레임-data-link">2) Ethernet II 프레임 (Data Link)<a hidden class="anchor" aria-hidden="true" href="#2-ethernet-ii-프레임-data-link">#</a></h2>
+<ul>
+<li><strong>오프셋 기준(프레임 시작)</strong></li>
+</ul>
+<p><code>0–5</code> : <strong>Dest MAC</strong> (6B)</p>
+<ul>
+<li>
+<p><code>6–11</code>: <strong>Src MAC</strong> (6B)</p>
+</li>
+<li>
+<p><code>12–13</code>: <strong>EtherType</strong> (2B) — IPv4는 <code>0x0800</code></p>
+</li>
+<li>
+<p><code>14–...</code>: <strong>Payload</strong> (여기서는 IPv4 패킷)</p>
+</li>
+<li>
+<p><strong>마지막 4B</strong>: <strong>FCS(CRC-32)</strong></p>
+</li>
+<li>
+<p><strong>최소 길이</strong>: 헤더(14) + 페이로드(최소 46) + FCS(4) = <strong>64B</strong>
+→ IP/UDP가 짧으면 <strong>MAC이 패딩(0x00)</strong> 을 삽입하여 46B 페이로드를 맞춥니다.</p>
+</li>
+<li>
+<p><strong>FCS(CRC-32) 요약</strong></p>
+</li>
+</ul>
+<p>다항식: <code>0x04C11DB7</code>, 초기값 <code>0xFFFFFFFF</code>, 최종 XOR <code>0xFFFFFFFF</code></p>
+<ul>
+<li>
+<p>계산 범위: <strong>Dest MAC부터 마지막 페이로드/패딩 바이트까지</strong>(FCS 제외)</p>
+</li>
+<li>
+<p>PHY 선로 비트 순서는 바이트 내 <strong>LSB-first</strong>(표준 이더넷 규칙), 스트림에서는 <strong>바이트 단위 Big-Endian 순서</strong>로 보는 것이 일반적</p>
+</li>
+<li>
+<p>RTL: TX 쪽은 <strong>스트리밍 계산 후 부착</strong>, RX 쪽은 MAC이 <strong>검사/드롭</strong> 을 맡기면 상위 RTL은 단순화</p>
+</li>
+</ul>
+<h2 id="3-ipv4-헤더-network">3) IPv4 헤더 (Network)<a hidden class="anchor" aria-hidden="true" href="#3-ipv4-헤더-network">#</a></h2>
+<ul>
+<li>
+<p><strong>시작 오프셋</strong>: 이더넷 헤더 14B 뒤 → <strong>offset 14</strong></p>
+</li>
+<li>
+<p><strong>일반(옵션 없음) 길이</strong>: <strong>20B</strong> (IHL=5)</p>
+</li>
+</ul>
+<p>오프셋(프레임 기준)길이필드비고141<strong>Version(4)</strong> + <strong>IHL(4)<strong>보통 <code>4</code>/<code>5</code> (20B 헤더)151</strong>TOS(DSCP/ECN)<strong>QoS 필요 시 DSCP 사용16–172</strong>Total Length</strong>IP 헤더+데이터 총길이18–192<strong>Identification</strong>(조각화 시) 식별자20–212<strong>Flags(3)</strong> + <strong>Frag Offset(13)**<strong>DF=1</strong> 권장(조각화 금지)221</strong>TTL<strong>보통 64/128231</strong>Protocol<strong><strong>17(UDP)<strong>24–252</strong>Header Checksum</strong></strong>IP 헤더만** 대상26–294<strong>Src IP</strong>네트워크 바이트 오더30–334<strong>Dst IP</strong>″</p>
+<ul>
+<li><strong>조각화(Fragments)</strong></li>
+</ul>
+<p>머신 비전 스트리밍은 <strong>성능/신뢰성</strong> 이유로 <strong>반드시 DF=1</strong> 을 권장(라우터가 조각화하지 않도록).</p>
+<ul>
+<li>조각화되면 <strong>첫 조각만 UDP 헤더</strong>를 포함, 나머지는 데이터 조각 → 구현 복잡/손실 시 전체 무효.</li>
+</ul>
+<h2 id="4-udp-헤더-transport">4) UDP 헤더 (Transport)<a hidden class="anchor" aria-hidden="true" href="#4-udp-헤더-transport">#</a></h2>
+<ul>
+<li>
+<p><strong>시작 오프셋</strong>: <code>14 + (IHL*4)</code> → 보통 <strong>offset 34</strong></p>
+</li>
+<li>
+<p><strong>길이</strong>: <strong>8B</strong> (고정)</p>
+</li>
+</ul>
+<p>오프셋(프레임 기준)길이필드비고34–352<strong>Src Port</strong>발신 포트36–372<strong>Dst Port</strong>수신(애플리케이션) 포트38–392<strong>Length</strong>UDP 헤더+데이터 길이40–412<strong>Checksum</strong>IPv4에서 <strong>0=비사용</strong> 허용</p>
+<ul>
+<li>
+<p><strong>UDP Length 일관성</strong>: <code>UDP Length == (IP TotalLen - IP HeaderLen)</code></p>
+</li>
+<li>
+<p><strong>UDP Checksum</strong></p>
+</li>
+</ul>
+<p>계산 대상: <strong>의사 헤더(pseudo-header)</strong>(SrcIP, DstIP, 0x00, Protocol=17, UDP Length) + <strong>UDP 헤더+데이터</strong>(홀수 길이면 1B 패딩)</p>
+<ul>
+<li>IPv4에서는 <strong>0</strong>으로 비활성화 가능(고속 스트리밍에서 종종 사용), <strong>신뢰성 중시</strong> 시 사용 권장</li>
+</ul>
+<h2 id="5-계층별-바이트-맵옵션vlan-없음-ihl5">5) 계층별 바이트 맵(옵션/VLAN 없음, IHL=5)<a hidden class="anchor" aria-hidden="true" href="#5-계층별-바이트-맵옵션vlan-없음-ihl5">#</a></h2>
+<ul>
+<li>
+<p><code>0–5</code> : Dest MAC</p>
+</li>
+<li>
+<p><code>6–11</code>: Src MAC</p>
+</li>
+<li>
+<p><code>12–13</code>: EtherType = <code>0x0800</code> (IPv4)</p>
+</li>
+<li>
+<p><code>14–33</code>: IPv4 헤더(20B)</p>
+</li>
+<li>
+<p><code>34–41</code>: UDP 헤더(8B)</p>
+</li>
+<li>
+<p><code>42–(41+N)</code>: <strong>UDP 데이터(N = UDP Length-8)</strong></p>
+</li>
+<li>
+<p>(필요 시) 패딩 → 이더넷 페이로드가 <strong>최소 46B</strong> 되도록</p>
+</li>
+<li>
+<p>(MAC 설정에 따라) 마지막 4B FCS</p>
+</li>
+</ul>
+<p><strong>예시(표준 MTU 1500)</strong></p>
+<ul>
+<li>
+<p>최대 UDP 페이로드 = <code>1500 - 20(IP) - 8(UDP) = 1472B</code></p>
+</li>
+<li>
+<p>자주 쓰는 값: <strong>1440~1472B</strong>(여유/헤더 추가 고려)</p>
+</li>
+<li>
+<p>프레임 총 길이(헤더+FCS 포함)는 MAC 설정(FCS 포함/제거)에 따라 스트림에서 달리 보일 수 있음</p>
+</li>
+</ul>
+<p><strong>점보 프레임(예: MTU 9000)</strong></p>
+<ul>
+<li>
+<p>최대 UDP 페이로드 ≈ <code>9000 - 20 - 8 = 8972B</code></p>
+</li>
+<li>
+<p>스위치/ NIC/ 호스트가 <strong>모두 동일 MTU</strong> 지원해야 함</p>
+</li>
+</ul>
+<h2 id="6-엔디안정렬버스-매핑axi-stream-관점">6) 엔디안/정렬/버스 매핑(AXI-Stream 관점)<a hidden class="anchor" aria-hidden="true" href="#6-엔디안정렬버스-매핑axi-stream-관점">#</a></h2>
+<ul>
+<li><strong>네트워크 바이트 오더 = Big-Endian</strong></li>
+</ul>
+<p>16/32비트 필드는 MSB 바이트가 먼저 옴 (예: EtherType <code>0x0800</code> → <code>08 00</code>)</p>
+<ul>
+<li><strong>AXI-Stream 정렬</strong></li>
+</ul>
+<p>프레임 시작이 데이터 버스의 <strong>lane 0</strong> 에 정렬되는 모드가 일반적</p>
+<ul>
+<li>
+<p>이더넷 헤더 14B는 4/8B 경계에 <strong>걸쳐짐</strong> → <strong>필드가 비트/바이트 경계를 넘어갈 수 있음</strong></p>
+</li>
+<li>
+<p><strong>tkeep</strong>(유효 바이트 마스크), <strong>tlast</strong>(프레임 종단) 처리 필수</p>
+</li>
+<li>
+<p><strong>실무 팁</strong></p>
+</li>
+</ul>
+<p><strong>바이트 카운터 기반 파서</strong>: 특정 오프셋(12<del>13 EtherType, 23 Protocol, 38</del>39 UDP Len…)에서 바이트를 집계해 필드 완성</p>
+<ul>
+<li>
+<p>또는 <strong>소형 버퍼</strong>로 16/32비트 정렬 후 추출</p>
+</li>
+<li>
+<p>메모리에 쓰는 경우 IP 헤더 시작이 <strong>+14B</strong> 로 2B 미정렬 → 임베디드 SW가 접근 시 유의</p>
+</li>
+</ul>
+<h2 id="7-crcfcs--체크섬-구현-포인트">7) CRC(FCS) &amp; 체크섬 구현 포인트<a hidden class="anchor" aria-hidden="true" href="#7-crcfcs--체크섬-구현-포인트">#</a></h2>
+<h3 id="ethernet-fcs-crc-32">Ethernet FCS (CRC-32)<a hidden class="anchor" aria-hidden="true" href="#ethernet-fcs-crc-32">#</a></h3>
+<ul>
+<li>
+<p><strong>TX</strong>: 스트리밍 계산(LFSR) → 프레임 끝에 4B FCS 부착(대부분 MAC이 자동)</p>
+</li>
+<li>
+<p><strong>RX</strong>: MAC이 에러 프레임을 <strong>드롭/표시</strong> 하면 상층은 단순화</p>
+</li>
+<li>
+<p>직접 구현 시: 마지막 비트까지 포함해 계산 후 <strong>최종 XOR</strong> 적용, <strong>마지막 워드 tkeep</strong> 반영</p>
+</li>
+</ul>
+<h3 id="ipv4-header-checksum">IPv4 Header Checksum<a hidden class="anchor" aria-hidden="true" href="#ipv4-header-checksum">#</a></h3>
+<ul>
+<li>
+<p><strong>대상: IP 헤더만</strong>(20B)</p>
+</li>
+<li>
+<p><strong>1’s complement sum</strong>(16비트 단위, end-around carry) → <strong>1’s complement</strong></p>
+</li>
+<li>
+<p>라우터가 TTL 감소 시 재계산된다는 점만 이해하면 됨</p>
+</li>
+</ul>
+<h3 id="udp-checksum">UDP Checksum<a hidden class="anchor" aria-hidden="true" href="#udp-checksum">#</a></h3>
+<ul>
+<li>
+<p><strong>Pseudo-header + UDP 헤더/데이터</strong> 대상</p>
+</li>
+<li>
+<p>고속 스트리밍에서 <strong>0(비활성화)</strong> 선택 가능(IPv4 한정)</p>
+</li>
+<li>
+<p>사용 시: 16비트 누산기 파이프라인으로 <strong>라인레이트</strong> 대응 가능</p>
+</li>
+<li>
+<p>TX에서 헤더 내 2바이트 위치에 값을 넣어야 하므로 <strong>버퍼링 또는 2-패스</strong> 고려(복잡하면 0 사용)</p>
+</li>
+</ul>
+<h2 id="8-mtu-조각화-점보-프레임-전략-비전-스트리밍-최적화">8) MTU, 조각화, 점보 프레임 전략 (비전 스트리밍 최적화)<a hidden class="anchor" aria-hidden="true" href="#8-mtu-조각화-점보-프레임-전략-비전-스트리밍-최적화">#</a></h2>
+<ul>
+<li>
+<p><strong>권장</strong>: <strong>DF(Don&rsquo;t Fragment)=1</strong> + 애플리케이션 레벨 <strong>세그멘테이션</strong>(프레임을 다수 UDP 패킷으로 분할)</p>
+</li>
+<li>
+<p>이유</p>
+</li>
+</ul>
+<p>조각화 시 <strong>한 조각 손실 = 전체 UDP 손실</strong></p>
+<ul>
+<li>
+<p>리어셈블 비용/지연 증가</p>
+</li>
+<li>
+<p><strong>표준 MTU(1500)</strong> 에서 <strong>1472B</strong> 이내 페이로드로 패킷화</p>
+</li>
+<li>
+<p><strong>점보 MTU(예: 9000)</strong> 지원 시 <strong>8972B</strong>까지 활용해 헤더/인터럽트 오버헤드 감소</p>
+</li>
+<li>
+<p>GigE Vision(GVSP 등)은 페이로드 안에 <strong>시퀀스/블록 ID</strong>를 넣어 <strong>재조립/손실 검출</strong>(애플리케이션 레벨) → RTL 수신기가 이 <strong>페이로드 헤더</strong>를 파싱해 <strong>프레임 버퍼에 주소 배치</strong> 가능</p>
+</li>
+</ul>
+<h2 id="9-rtl-구현-체크리스트">9) RTL 구현 체크리스트<a hidden class="anchor" aria-hidden="true" href="#9-rtl-구현-체크리스트">#</a></h2>
+<h3 id="파서상태기계">파서/상태기계<a hidden class="anchor" aria-hidden="true" href="#파서상태기계">#</a></h3>
+<ul>
+<li>
+<p>상태: <code>ETH</code> → <code>IP</code> → <code>UDP</code> → <code>PAYLOAD</code></p>
+</li>
+<li>
+<p>검사: EtherType=0x0800, Ver=4/IHL, <strong>Protocol=17</strong>, (선택) IP 헤더 체크섬</p>
+</li>
+<li>
+<p>필터: Dst MAC/IP/Port 매칭(목적지 미스매치 시 <strong>드롭</strong>)</p>
+</li>
+<li>
+<p>길이 일관성: <code>UDP Len == IP TotalLen - IPHdrLen</code> 확인</p>
+</li>
+</ul>
+<h3 id="axi-stream-인터페이스">AXI-Stream 인터페이스<a hidden class="anchor" aria-hidden="true" href="#axi-stream-인터페이스">#</a></h3>
+<ul>
+<li>
+<p><strong>tvalid/tready</strong> 백프레셔 설계, <strong>tlast/tkeep</strong> 처리</p>
+</li>
+<li>
+<p><strong>패딩 여부</strong>: MAC이 패딩 제거/유지 여부 문서 확인(많은 MAC은 페이로드만 내보냄)</p>
+</li>
+<li>
+<p>연속 프레임 처리: 프레임 경계 카운터 <strong>초기화 타이밍</strong> 주의</p>
+</li>
+</ul>
+<h3 id="버퍼링메모리">버퍼링/메모리<a hidden class="anchor" aria-hidden="true" href="#버퍼링메모리">#</a></h3>
+<ul>
+<li>
+<p>수신 페이로드를 <strong>DDR/URAM/BRAM</strong> 으로 DMA 저장</p>
+</li>
+<li>
+<p><strong>점보 대응</strong>: 카운터/ FIFO 폭 충분(≥ 9KB)</p>
+</li>
+<li>
+<p><strong>프레임 재조립</strong>: 페이로드 내 시퀀스/오프셋으로 <strong>프레임 버퍼 주소 산출</strong></p>
+</li>
+</ul>
+<h3 id="성능신뢰성">성능/신뢰성<a hidden class="anchor" aria-hidden="true" href="#성능신뢰성">#</a></h3>
+<ul>
+<li>
+<p>Throughput: MTU/점보, 연속 패킷 사이 IPG 고려</p>
+</li>
+<li>
+<p>에러 처리: <strong>FCS 불일치, IP/UDP 길이 불일치</strong> 즉시 드롭</p>
+</li>
+<li>
+<p>검증: <strong>Wireshark</strong> 캡처, 트래픽 제너레이터(iperf/Scapy 등)로 가장자리 케이스(홀수 길이, 작은 패킷, 최대 페이로드)</p>
+</li>
+</ul>
+<h2 id="10-머신-비전-특화-팁">10) 머신 비전 특화 팁<a hidden class="anchor" aria-hidden="true" href="#10-머신-비전-특화-팁">#</a></h2>
+<ul>
+<li>
+<p><strong>타임스탬프/트리거</strong>: 카메라 입력 전단에서 <strong>PTP(IEEE 1588)</strong> 타임스탬프 삽입/추출 블록을 두면 <strong>지연 측정/동기</strong>에 유리</p>
+</li>
+<li>
+<p><strong>멀티 스트림</strong>: 여러 센서 샤딩 시 포트/멀티캐스트 MAC로 분리, 수신기 쪽에서는 포트 기반 라우팅</p>
+</li>
+<li>
+<p><strong>손실 처리</strong>: 애플리케이션(예: GVSP) 헤더의 <strong>패킷 ID 누락 감지→프레임 드롭 또는 요청 재전송</strong>(하드웨어만으로는 재전송 어려움)</p>
+</li>
+<li>
+<p><strong>페이로드 크기 튜닝</strong>: 호스트 NIC/OS 드라이버, CPU/GPU 경로에서 최적의 <strong>패킷당 바이트</strong>를 실험으로 결정(1440<del>1472, 혹은 점보 환경에서 8</del>9KB)</p>
+</li>
+</ul>
+<h2 id="11-설계자가-바로-쓰는-요약">11) 설계자가 바로 쓰는 요약<a hidden class="anchor" aria-hidden="true" href="#11-설계자가-바로-쓰는-요약">#</a></h2>
+<ul>
+<li>
+<p><strong>EtherType=0x0800</strong>, <strong>Protocol=17</strong>, <strong>DF=1</strong>, <strong>UDP Length = IP TotalLen - IPHdrLen</strong></p>
+</li>
+<li>
+<p><strong>최대 UDP 페이로드</strong>: <code>1472B</code>(MTU 1500), <code>~8972B</code>(MTU 9000)</p>
+</li>
+<li>
+<p><strong>FCS(CRC-32)</strong>: 이더넷 헤더~페이로드에 대해 계산(보통 MAC이 처리)</p>
+</li>
+<li>
+<p><strong>UDP 체크섬</strong>: IPv4에서는 <strong>0 허용</strong>(고속 스트림에서 단순화), 사용 시 pseudo-header 포함</p>
+</li>
+<li>
+<p><strong>AXI-Stream</strong>: <strong>tkeep/tlast</strong> 철저 처리, 14B 이더넷 헤더로 인한 <strong>정렬 어긋남</strong> 대응</p>
+</li>
+<li>
+<p><strong>파서 FSM</strong>: 바이트 카운터로 필드 분리·필터링·일관성 체크, 에러 즉시 드롭</p>
+</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/ethernet-frame/">Ethernet Frame</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/ipv4/">IPv4</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/udp/">UDP</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/ethernet-%eb%b2%84%ec%a0%84-1-2-%ec%b0%a8%ec%9d%b4/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Ethernet 버전 1/2 차이</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga%ec%97%90%ec%84%9c-ddr-%eb%a9%94%eb%aa%a8%eb%a6%ac-%ec%97%b0%ea%b2%b0-%ea%b5%ac%ed%98%84-1/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA에서 DDR 메모리 연결 구현</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

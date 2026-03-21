@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Posts | EasyFPGA</title>
+<meta name="keywords" content="">
+<meta name="description" content="Posts - EasyFPGA">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://easyfpga.blog/posts/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Posts">
+  <meta property="og:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Posts">
+  <meta name="twitter:description" content="FPGA Tutorials, RTL Design, and IP Cores">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }
+  ]
+}
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span class="active">Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a></div>
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">High-Speed Serial Interface: Why the World Moved Beyond Parallel
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>High-Speed Serial Interface Why Serial Interface? Summary of Parallel Interface Limitations 1 2 3 4 5 6 Parallel (8-bit @ 1GHz) Serial (1-bit @ 8GHz) ├─ Requires 9&#43; pins ├─ Requires 2 pins (Diff Pair) ├─ Severe skew issues ├─ No skew issues ├─ High EMI ├─ Low EMI (differential signal) ├─ High board complexity ├─ Simple board └─ Limited high-speed scaling └─ Easy high-speed scaling Paradigm Shift “Multiple slow lanes” → “One fast lane”
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-21 09:00:00 +0900 KST'>March 21, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to High-Speed Serial Interface: Why the World Moved Beyond Parallel" href="https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Custom RTL Design: TX &amp; RX
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Custom RTL Design: TX &amp; RX This is the first hands-on RTL episode. We translate the UART protocol specification directly into synthesizable SystemVerilog — starting from the mathematical relationship between clock frequency and baud rate, then building the TX FSM and RX center-sampling logic. Each design decision is derived from first principles so you can reproduce and modify it for any FPGA or baud rate.
+Design Requirements Target: 50 MHz system clock, 8E1 format
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-18 12:00:00 +0900 KST'>March 18, 2026</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Custom RTL Design: TX & RX" href="https://easyfpga.blog/posts/uart-implementation-ep5/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UART Implementation Methods
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>UART Implementation Methods FPGA engineers implementing UART face three choices — each suited to a different project context and level of control. Choosing the wrong approach wastes time: a vendor IP that cannot be customized, or a full processor SoC for a task that needs only a 100-line state machine. This episode provides the decision framework and maps the course structure to each approach.
+Three Approaches to UART on FPGA ┌─────────────────────────────────────────────────────────┐│ UART on FPGA — 3 Methods │├─────────────────┬──────────────────┬────────────────────┤│ Method 1 │ Method 2 │ Method 3 ││ Vendor IP Core │ Soft Processor │ Custom RTL ││ │ &#43; UART IP │ Design │├─────────────────┼──────────────────┼────────────────────┤│ Easy &amp; fast │ Software-driven │ Full control ││ AXI-compatible │ Highly scalable │ Best performance ││ Limited flex │ High resources │ Longer dev time │└─────────────────┴──────────────────┴────────────────────┘ Method 1: Vendor IP Core Use a verified UART IP from Xilinx/Intel — add via IP Catalog with a few clicks
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-17 12:00:00 +0900 KST'>March 17, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to UART Implementation Methods" href="https://easyfpga.blog/posts/uart-implementation-ep4/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">RS-232 and RS-485 for UART Systems
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>RS-232 &amp; RS-485 When FPGAs communicate with external devices over UART, the signal rarely stays at 3.3V CMOS all the way to the destination. RS-232 defines an electrical standard for single-ended serial links up to 15 m, while RS-485 uses differential signaling to reach 1,200 m on a multi-drop bus. The most important lesson of this episode: UART is a logical protocol, and RS-232/RS-485 are completely separate physical standards that FPGA GPIO cannot directly drive.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-16 12:00:00 +0900 KST'>March 16, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to RS-232 and RS-485 for UART Systems" href="https://easyfpga.blog/posts/uart-implementation-ep3/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UART Frame Format
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>UART Frame Format Each UART transmission carries data inside a precisely defined frame. Understanding the purpose of every field — not just its name — is what separates a developer who can implement UART from scratch from one who only configures a vendor IP. This episode dissects the frame bit by bit, covering the transmission order convention, parity computation, and the overhead implications of different format choices.
+UART Frame Structure Every UART transmission is based on a fixed Frame structure.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-15 12:00:00 +0900 KST'>March 15, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to UART Frame Format" href="https://easyfpga.blog/posts/uart-implementation-ep2/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">What is UART?
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What is UART? UART — Universal Asynchronous Receiver/Transmitter
+A hardware communication protocol for serial communication between two devices.
+UART is one of the oldest digital communication protocols still in active use. Despite being designed alongside early teletype systems, it appears in virtually every FPGA board, microcontroller, and development kit — because it needs only two wires and every terminal emulator on every operating system speaks it. This episode covers the fundamentals: what asynchronous communication really means, how baud rate works, and why clock drift is the central engineering challenge when implementing UART from scratch.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-14 12:00:00 +0900 KST'>March 14, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to What is UART?" href="https://easyfpga.blog/posts/uart-implementation-ep1/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">CRC Calculator &amp; RTL Generator: Complete Guide
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>CRC (Cyclic Redundancy Check) is the most widely used error-detection mechanism in digital communication — from Ethernet frames to USB packets to SSD data integrity. This post explains how CRC works mathematically and shows how to use the free online CRC Calculator &amp; RTL Generator to produce ready-to-simulate SystemVerilog code for your FPGA design.
+What Is CRC? CRC appends a checksum to a data block so the receiver can detect corruption. The transmitter computes a CRC value over the data and appends it; the receiver recomputes the CRC and compares. A mismatch means a transmission error occurred.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-13 00:00:00 +0000 +0000'>March 13, 2026</span>&nbsp;·&nbsp;<span>7 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to CRC Calculator & RTL Generator: Complete Guide" href="https://easyfpga.blog/posts/crc-calculator-guide/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Overview As parallel interfaces push to higher speeds, keeping all data bits synchronized becomes increasingly difficult. This post explains why global clock distribution hits a wall — and how source-synchronous signaling solves it.
+Signal Propagation on PCB Before diving into timing, it helps to understand how fast signals actually travel on a PCB:
+Typical propagation speed on FR4: 15–17 cm/ns A 1 cm trace length difference ≈ 60–70 ps of timing skew At 1 GHz (1 ns period), 70 ps of skew already consumes 7% of your entire timing budget from a single centimeter of mismatch. As data rates climb, this becomes unmanageable.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-12 10:00:00 +0900 KST'>March 12, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync" href="https://easyfpga.blog/posts/source-synchronous-parallel-interface/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">High-Speed Parallel Interface Design: Principles, Limitations, and Practice
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>1. What Is a Parallel Interface? A parallel interface transmits multiple bits simultaneously across multiple data lines. As shown below, there are 8 to 32 or more data wires (D[7:0], D[31:0], etc.) between transmitter and receiver, along with a shared clock and control signals such as VALID and READY.
+┌─────────────┐ ┌─────────────┐│ Transmitter │ D[7:0] │ Receiver ││ ├────────►│ ││ │ CLK │ ││ ├────────►│ ││ │ VALID │ ││ ├────────►│ │└─────────────┘ └─────────────┘ Parallel Bus — 8 data bits transferred simultaneously each clock cycle■ CLK■ D[7:0] data■ VALIDAdvantages:
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-12 09:00:00 +0900 KST'>March 12, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to High-Speed Parallel Interface Design: Principles, Limitations, and Practice" href="https://easyfpga.blog/posts/high-speed-parallel-interface-design/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>In FPGA and RTL development, four terms are frequently used to describe code changes: refactor, refine, fix/correct, and optimize. They are often used interchangeably in casual conversation, but they mean distinctly different things. Using the right term helps your team understand immediately what kind of change is being made — and whether to expect any behavioural differences.
+Refactor Definition: Restructure internal implementation without changing externally observable behaviour.
+A refactored module passes the same test vectors before and after the change. Simulation output is bit-identical. Timing may or may not improve.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-02-19 00:47:21 +0000 +0000'>February 19, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span></footer>
+  <a class="entry-link" aria-label="post link to Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development" href="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="https://easyfpga.blog/posts/page/2/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

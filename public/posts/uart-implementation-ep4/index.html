@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>UART Implementation Methods | EasyFPGA</title>
+<meta name="keywords" content="FPGA, UART, RTL, MicroBlaze, Xilinx">
+<meta name="description" content="Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/uart-implementation-ep4/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/uart-implementation-ep4/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/uart-implementation-ep4/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="UART Implementation Methods">
+  <meta property="og:description" content="Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-17T12:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-17T12:00:00+09:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="MicroBlaze">
+    <meta property="article:tag" content="Xilinx">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep5/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep3/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep2/">
+      <meta property="og:see_also" content="https://easyfpga.blog/posts/uart-implementation-ep1/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="UART Implementation Methods">
+  <meta name="twitter:description" content="Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "UART Implementation Methods",
+      "item": "https://easyfpga.blog/posts/uart-implementation-ep4/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "UART Implementation Methods",
+  "name": "UART Implementation Methods",
+  "description": "Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.",
+  "keywords": [
+    "FPGA", "UART", "RTL", "MicroBlaze", "Xilinx"
+  ],
+  "articleBody": "UART Implementation Methods FPGA engineers implementing UART face three choices — each suited to a different project context and level of control. Choosing the wrong approach wastes time: a vendor IP that cannot be customized, or a full processor SoC for a task that needs only a 100-line state machine. This episode provides the decision framework and maps the course structure to each approach.\nThree Approaches to UART on FPGA ┌─────────────────────────────────────────────────────────┐\r│ UART on FPGA — 3 Methods │\r├─────────────────┬──────────────────┬────────────────────┤\r│ Method 1 │ Method 2 │ Method 3 │\r│ Vendor IP Core │ Soft Processor │ Custom RTL │\r│ │ + UART IP │ Design │\r├─────────────────┼──────────────────┼────────────────────┤\r│ Easy \u0026 fast │ Software-driven │ Full control │\r│ AXI-compatible │ Highly scalable │ Best performance │\r│ Limited flex │ High resources │ Longer dev time │\r└─────────────────┴──────────────────┴────────────────────┘ Method 1: Vendor IP Core Use a verified UART IP from Xilinx/Intel — add via IP Catalog with a few clicks\nPros Quick integration: drag-and-drop from IP Catalog AXI-compatible: connects directly to MicroBlaze, Zynq ARM via AXI4-Lite Pre-verified: stable, vendor-tested IP Interrupt support: built-in hardware interrupt Low resource usage: optimized implementation Cons Limited flexibility: hard to modify baud rate or interface behavior No software stack: requires a processor for control logic Vendor lock-in: Xilinx/Intel specific Method 2: Soft Processor + UART Peripheral Connect UART IP to a soft-core CPU (MicroBlaze / Nios II) via AXI bus\nPros Software-driven control: implement complex logic in C code OS support: FreeRTOS or bare-metal Scalable: connect multiple peripherals via AXI interconnect Cons High resource usage: CPU + BRAM + peripherals Latency: software scheduling adds delay Toolchain complexity: requires both Vivado and Vitis MicroBlaze ──AXI4-Lite──► AXI UART Lite ──► TX/RX Method 3: Custom RTL Design Implement UART TX/RX directly in Verilog/SystemVerilog\nPros Full control: customize timing, bit width, parity, and more Lightweight: only the logic you need → minimal resource usage Best performance: cycle-accurate operation Portable: works on any FPGA platform (Xilinx, Intel, Lattice…) Educational: builds deep understanding of FSM and timing design Cons Development time: requires design, simulation, and verification Debug complexity: needs ILA or oscilloscope to troubleshoot Full Comparison Feature Vendor IP Soft Processor + IP Custom RTL Ease of Use Very high (drag-and-drop) Medium (HW+SW integration) Low (requires expertise) Customization Limited High (via software) Complete control Performance High, deterministic Depends on SW efficiency Highest, cycle-accurate Resource Usage Low High (CPU + memory) Low to moderate AXI Integration Native Native via processor Manual Learning Value Low Medium High Quick prototype → Vendor IP Software control needed → Soft Processor Learning / optimization / portability → Custom RTL\nDecision Guide Requirement Best Method Working in 30 minutes Vendor IP (Method 1) Multi-peripheral SoC Soft Processor (Method 2) Understand UART deeply Custom RTL (Method 3) Vendor-agnostic, portable Custom RTL (Method 3) Strict latency or resource limit Custom RTL (Method 3) Lecture Structure Episodes 5–7: Custom RTL Design\r(Baud Generator, TX FSM, RX FSM, Testbench, FPGA implementation)\rEpisodes 9–13: MicroBlaze + AXI UART Lite IP\r(Block Design, Vitis C Code, Co-Simulation)\rEpisode 15: Final comparison and recap Episode 4 Summary Method 1 (Vendor IP): fast, pre-verified, native AXI support Method 2 (Soft Processor): C code control, highly extensible Method 3 (Custom RTL): full control, best performance, highest learning value This lecture covers both RTL design and MicroBlaze approaches Next Episode Episode 5: Custom RTL Design Requirements → TX FSM → RX FSM → Verilog implementation\nKey Takeaways Vendor IP (Method 1): fastest path to a working UART, but opaque and tied to the vendor’s synthesis tool Soft Processor + UART IP (Method 2): enables C software control and AXI peripheral integration, but requires significant BRAM/LUT resources for the CPU Custom RTL (Method 3): complete control, smallest footprint, vendor-agnostic — and the only method that builds a real understanding of UART timing and FSM design This course covers both approaches (RTL in EP05–08, MicroBlaze in EP09–14) — comparing them on the same hardware is the most instructive outcome Code and References RTL source repository: https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git YouTube: https://www.youtube.com/@easy-fpga ",
+  "wordCount" : "671",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-17T12:00:00+09:00",
+  "dateModified": "2026-03-17T12:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/uart-implementation-ep4/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UART Implementation Methods
+    </h1>
+    <div class="post-description">
+      Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.
+    </div>
+    <div class="post-meta"><span title='2026-03-17 12:00:00 +0900 KST'>March 17, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#uart-implementation-methods" aria-label="UART Implementation Methods">UART Implementation Methods</a><ul>
+                        
+                <li>
+                    <a href="#three-approaches-to-uart-on-fpga" aria-label="Three Approaches to UART on FPGA">Three Approaches to UART on FPGA</a></li>
+                <li>
+                    <a href="#method-1-vendor-ip-core" aria-label="Method 1: Vendor IP Core">Method 1: Vendor IP Core</a><ul>
+                        
+                <li>
+                    <a href="#pros" aria-label="Pros">Pros</a></li>
+                <li>
+                    <a href="#cons" aria-label="Cons">Cons</a></li></ul>
+                </li>
+                <li>
+                    <a href="#method-2-soft-processor--uart-peripheral" aria-label="Method 2: Soft Processor &#43; UART Peripheral">Method 2: Soft Processor + UART Peripheral</a><ul>
+                        
+                <li>
+                    <a href="#pros-1" aria-label="Pros">Pros</a></li>
+                <li>
+                    <a href="#cons-1" aria-label="Cons">Cons</a></li></ul>
+                </li>
+                <li>
+                    <a href="#method-3-custom-rtl-design" aria-label="Method 3: Custom RTL Design">Method 3: Custom RTL Design</a><ul>
+                        
+                <li>
+                    <a href="#pros-2" aria-label="Pros">Pros</a></li>
+                <li>
+                    <a href="#cons-2" aria-label="Cons">Cons</a></li></ul>
+                </li>
+                <li>
+                    <a href="#full-comparison" aria-label="Full Comparison">Full Comparison</a><ul>
+                        
+                <li>
+                    <a href="#decision-guide" aria-label="Decision Guide">Decision Guide</a></li></ul>
+                </li>
+                <li>
+                    <a href="#lecture-structure" aria-label="Lecture Structure">Lecture Structure</a></li>
+                <li>
+                    <a href="#episode-4-summary" aria-label="Episode 4 Summary">Episode 4 Summary</a><ul>
+                        
+                <li>
+                    <a href="#next-episode" aria-label="Next Episode">Next Episode</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-takeaways" aria-label="Key Takeaways">Key Takeaways</a></li>
+                <li>
+                    <a href="#code-and-references" aria-label="Code and References">Code and References</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="uart-implementation-methods">UART Implementation Methods<a hidden class="anchor" aria-hidden="true" href="#uart-implementation-methods">#</a></h1>
+<p>FPGA engineers implementing UART face three choices — each suited to a different project context and level of control. Choosing the wrong approach wastes time: a vendor IP that cannot be customized, or a full processor SoC for a task that needs only a 100-line state machine. This episode provides the decision framework and maps the course structure to each approach.</p>
+<h2 id="three-approaches-to-uart-on-fpga">Three Approaches to UART on FPGA<a hidden class="anchor" aria-hidden="true" href="#three-approaches-to-uart-on-fpga">#</a></h2>
+<pre tabindex="0"><code>┌─────────────────────────────────────────────────────────┐
+│                 UART on FPGA — 3 Methods                │
+├─────────────────┬──────────────────┬────────────────────┤
+│  Method 1       │  Method 2        │  Method 3          │
+│  Vendor IP Core │  Soft Processor  │  Custom RTL        │
+│                 │  + UART IP       │  Design            │
+├─────────────────┼──────────────────┼────────────────────┤
+│  Easy &amp; fast    │  Software-driven │  Full control      │
+│  AXI-compatible │  Highly scalable │  Best performance  │
+│  Limited flex   │  High resources  │  Longer dev time   │
+└─────────────────┴──────────────────┴────────────────────┘
+</code></pre><h2 id="method-1-vendor-ip-core">Method 1: Vendor IP Core<a hidden class="anchor" aria-hidden="true" href="#method-1-vendor-ip-core">#</a></h2>
+<p><strong>Use a verified UART IP from Xilinx/Intel — add via IP Catalog with a few clicks</strong></p>
+<h3 id="pros">Pros<a hidden class="anchor" aria-hidden="true" href="#pros">#</a></h3>
+<ul>
+<li><strong>Quick integration</strong>: drag-and-drop from IP Catalog</li>
+<li><strong>AXI-compatible</strong>: connects directly to MicroBlaze, Zynq ARM via AXI4-Lite</li>
+<li><strong>Pre-verified</strong>: stable, vendor-tested IP</li>
+<li><strong>Interrupt support</strong>: built-in hardware interrupt</li>
+<li><strong>Low resource usage</strong>: optimized implementation</li>
+</ul>
+<h3 id="cons">Cons<a hidden class="anchor" aria-hidden="true" href="#cons">#</a></h3>
+<ul>
+<li><strong>Limited flexibility</strong>: hard to modify baud rate or interface behavior</li>
+<li><strong>No software stack</strong>: requires a processor for control logic</li>
+<li><strong>Vendor lock-in</strong>: Xilinx/Intel specific</li>
+</ul>
+<h2 id="method-2-soft-processor--uart-peripheral">Method 2: Soft Processor + UART Peripheral<a hidden class="anchor" aria-hidden="true" href="#method-2-soft-processor--uart-peripheral">#</a></h2>
+<p><strong>Connect UART IP to a soft-core CPU (MicroBlaze / Nios II) via AXI bus</strong></p>
+<h3 id="pros-1">Pros<a hidden class="anchor" aria-hidden="true" href="#pros-1">#</a></h3>
+<ul>
+<li><strong>Software-driven control</strong>: implement complex logic in C code</li>
+<li><strong>OS support</strong>: FreeRTOS or bare-metal</li>
+<li><strong>Scalable</strong>: connect multiple peripherals via AXI interconnect</li>
+</ul>
+<h3 id="cons-1">Cons<a hidden class="anchor" aria-hidden="true" href="#cons-1">#</a></h3>
+<ul>
+<li><strong>High resource usage</strong>: CPU + BRAM + peripherals</li>
+<li><strong>Latency</strong>: software scheduling adds delay</li>
+<li><strong>Toolchain complexity</strong>: requires both Vivado and Vitis</li>
+</ul>
+<pre tabindex="0"><code>MicroBlaze ──AXI4-Lite──► AXI UART Lite ──► TX/RX
+</code></pre><h2 id="method-3-custom-rtl-design">Method 3: Custom RTL Design<a hidden class="anchor" aria-hidden="true" href="#method-3-custom-rtl-design">#</a></h2>
+<p><strong>Implement UART TX/RX directly in Verilog/SystemVerilog</strong></p>
+<h3 id="pros-2">Pros<a hidden class="anchor" aria-hidden="true" href="#pros-2">#</a></h3>
+<ul>
+<li><strong>Full control</strong>: customize timing, bit width, parity, and more</li>
+<li><strong>Lightweight</strong>: only the logic you need → minimal resource usage</li>
+<li><strong>Best performance</strong>: cycle-accurate operation</li>
+<li><strong>Portable</strong>: works on any FPGA platform (Xilinx, Intel, Lattice&hellip;)</li>
+<li><strong>Educational</strong>: builds deep understanding of FSM and timing design</li>
+</ul>
+<h3 id="cons-2">Cons<a hidden class="anchor" aria-hidden="true" href="#cons-2">#</a></h3>
+<ul>
+<li><strong>Development time</strong>: requires design, simulation, and verification</li>
+<li><strong>Debug complexity</strong>: needs ILA or oscilloscope to troubleshoot</li>
+</ul>
+<h2 id="full-comparison">Full Comparison<a hidden class="anchor" aria-hidden="true" href="#full-comparison">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Feature</th>
+          <th>Vendor IP</th>
+          <th>Soft Processor + IP</th>
+          <th>Custom RTL</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Ease of Use</strong></td>
+          <td>Very high (drag-and-drop)</td>
+          <td>Medium (HW+SW integration)</td>
+          <td>Low (requires expertise)</td>
+      </tr>
+      <tr>
+          <td><strong>Customization</strong></td>
+          <td>Limited</td>
+          <td>High (via software)</td>
+          <td>Complete control</td>
+      </tr>
+      <tr>
+          <td><strong>Performance</strong></td>
+          <td>High, deterministic</td>
+          <td>Depends on SW efficiency</td>
+          <td>Highest, cycle-accurate</td>
+      </tr>
+      <tr>
+          <td><strong>Resource Usage</strong></td>
+          <td>Low</td>
+          <td>High (CPU + memory)</td>
+          <td>Low to moderate</td>
+      </tr>
+      <tr>
+          <td><strong>AXI Integration</strong></td>
+          <td>Native</td>
+          <td>Native via processor</td>
+          <td>Manual</td>
+      </tr>
+      <tr>
+          <td><strong>Learning Value</strong></td>
+          <td>Low</td>
+          <td>Medium</td>
+          <td><strong>High</strong></td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>Quick prototype</strong> → Vendor IP
+<strong>Software control needed</strong> → Soft Processor
+<strong>Learning / optimization / portability</strong> → Custom RTL</p>
+</blockquote>
+<h3 id="decision-guide">Decision Guide<a hidden class="anchor" aria-hidden="true" href="#decision-guide">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Requirement</th>
+          <th>Best Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Working in 30 minutes</td>
+          <td>Vendor IP (Method 1)</td>
+      </tr>
+      <tr>
+          <td>Multi-peripheral SoC</td>
+          <td>Soft Processor (Method 2)</td>
+      </tr>
+      <tr>
+          <td>Understand UART deeply</td>
+          <td>Custom RTL (Method 3)</td>
+      </tr>
+      <tr>
+          <td>Vendor-agnostic, portable</td>
+          <td>Custom RTL (Method 3)</td>
+      </tr>
+      <tr>
+          <td>Strict latency or resource limit</td>
+          <td>Custom RTL (Method 3)</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="lecture-structure">Lecture Structure<a hidden class="anchor" aria-hidden="true" href="#lecture-structure">#</a></h2>
+<pre tabindex="0"><code>Episodes 5–7:   Custom RTL Design
+                (Baud Generator, TX FSM, RX FSM, Testbench, FPGA implementation)
+
+Episodes 9–13:  MicroBlaze + AXI UART Lite IP
+                (Block Design, Vitis C Code, Co-Simulation)
+
+Episode 15:     Final comparison and recap
+</code></pre><h2 id="episode-4-summary">Episode 4 Summary<a hidden class="anchor" aria-hidden="true" href="#episode-4-summary">#</a></h2>
+<ul>
+<li><strong>Method 1 (Vendor IP)</strong>: fast, pre-verified, native AXI support</li>
+<li><strong>Method 2 (Soft Processor)</strong>: C code control, highly extensible</li>
+<li><strong>Method 3 (Custom RTL)</strong>: full control, best performance, highest learning value</li>
+<li>This lecture covers <strong>both RTL design and MicroBlaze</strong> approaches</li>
+</ul>
+<h3 id="next-episode">Next Episode<a hidden class="anchor" aria-hidden="true" href="#next-episode">#</a></h3>
+<blockquote>
+<p><strong>Episode 5: Custom RTL Design</strong>
+Requirements → TX FSM → RX FSM → Verilog implementation</p>
+</blockquote>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ul>
+<li><strong>Vendor IP</strong> (Method 1): fastest path to a working UART, but opaque and tied to the vendor&rsquo;s synthesis tool</li>
+<li><strong>Soft Processor + UART IP</strong> (Method 2): enables C software control and AXI peripheral integration, but requires significant BRAM/LUT resources for the CPU</li>
+<li><strong>Custom RTL</strong> (Method 3): complete control, smallest footprint, vendor-agnostic — and the only method that builds a real understanding of UART timing and FSM design</li>
+<li>This course covers both approaches (RTL in EP05–08, MicroBlaze in EP09–14) — comparing them on the same hardware is the most instructive outcome</li>
+</ul>
+<h2 id="code-and-references">Code and References<a hidden class="anchor" aria-hidden="true" href="#code-and-references">#</a></h2>
+<ul>
+<li>RTL source repository: <a href="https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git">https://github.com/Easy-FPGA/easyfpga-uart-core-sv.git</a></li>
+<li>YouTube: <a href="https://www.youtube.com/@easy-fpga">https://www.youtube.com/@easy-fpga</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/microblaze/">MicroBlaze</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/uart-implementation-ep5/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Custom RTL Design: TX &amp; RX</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep3/">
+    <span class="title">Next »</span>
+    <br>
+    <span>RS-232 and RS-485 for UART Systems</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

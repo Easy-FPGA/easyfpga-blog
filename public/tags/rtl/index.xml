@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>RTL on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/rtl/</link>
+    <description>Recent content in RTL on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 18 Mar 2026 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/rtl/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Custom RTL Design: TX &amp; RX</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep5/</link>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep5/</guid>
+      <description>Implementing UART TX and RX entirely in SystemVerilog: baud rate generator design, TX FSM, center-sampling RX FSM, and loopback testbench strategy.</description>
+    </item>
+    <item>
+      <title>UART Implementation Methods</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep4/</link>
+      <pubDate>Tue, 17 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep4/</guid>
+      <description>Three practical ways to build UART on FPGA: vendor IP, soft processor plus UART IP, and custom RTL, with trade-offs in flexibility, performance, and development effort.</description>
+    </item>
+    <item>
+      <title>RS-232 and RS-485 for UART Systems</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep3/</link>
+      <pubDate>Mon, 16 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep3/</guid>
+      <description>How UART logic maps to physical layers: RS-232 versus RS-485 wiring, voltage levels, distance, noise tolerance, and deployment trade-offs.</description>
+    </item>
+    <item>
+      <title>UART Frame Format</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep2/</link>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep2/</guid>
+      <description>A practical guide to UART frame fields: start/data/parity/stop bits, LSB-first ordering, overhead, and throughput implications.</description>
+    </item>
+    <item>
+      <title>What is UART?</title>
+      <link>https://easyfpga.blog/posts/uart-implementation-ep1/</link>
+      <pubDate>Sat, 14 Mar 2026 12:00:00 +0900</pubDate>
+      <guid>https://easyfpga.blog/posts/uart-implementation-ep1/</guid>
+      <description>UART fundamentals for FPGA engineers: asynchronous communication basics, frame structure intuition, baud rate, clock drift, and practical use cases.</description>
+    </item>
+    <item>
+      <title>CRC Calculator &amp; RTL Generator: Complete Guide</title>
+      <link>https://easyfpga.blog/posts/crc-calculator-guide/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/crc-calculator-guide/</guid>
+      <description>&lt;p&gt;CRC (Cyclic Redundancy Check) is the most widely used error-detection mechanism in digital communication — from Ethernet frames to USB packets to SSD data integrity. This post explains how CRC works mathematically and shows how to use the &lt;a href=&#34;https://easyfpga.blog/tools/crc-calculator/&#34;&gt;free online CRC Calculator &amp;amp; RTL Generator&lt;/a&gt; to produce ready-to-simulate SystemVerilog code for your FPGA design.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;what-is-crc&#34;&gt;What Is CRC?&lt;/h2&gt;
+&lt;p&gt;CRC appends a checksum to a data block so the receiver can detect corruption. The transmitter computes a CRC value over the data and appends it; the receiver recomputes the CRC and compares. A mismatch means a transmission error occurred.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development</title>
+      <link>https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/</link>
+      <pubDate>Thu, 19 Feb 2026 00:47:21 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/</guid>
+      <description>Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.</description>
+    </item>
+    <item>
+      <title>Ethernet II &#43; IPv4 &#43; UDP Frame Structure Reference</title>
+      <link>https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-frame-structure/</link>
+      <pubDate>Mon, 22 Sep 2025 14:39:59 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-frame-structure/</guid>
+      <description>A complete byte-level breakdown of an Ethernet II / IPv4 / UDP frame — the essential reference for FPGA-based network packet processing.</description>
+    </item>
+  </channel>
+</rss>

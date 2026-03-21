@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Implementation of UART with Xilinx FPGA and AXI Uartlite IP | EasyFPGA</title>
+<meta name="keywords" content="AMD, AXIUartlite, FPGA, MicroBlaze, UART, Verilog, Xilinx">
+<meta name="description" content="UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Implementation of UART with Xilinx FPGA and AXI Uartlite IP">
+  <meta property="og:description" content="UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-03-19T21:25:52+00:00">
+    <meta property="article:modified_time" content="2025-03-19T21:25:52+00:00">
+    <meta property="article:tag" content="AMD">
+    <meta property="article:tag" content="AXIUartlite">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="MicroBlaze">
+    <meta property="article:tag" content="UART">
+    <meta property="article:tag" content="Verilog">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Implementation of UART with Xilinx FPGA and AXI Uartlite IP">
+  <meta name="twitter:description" content="UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Implementation of UART with Xilinx FPGA and AXI Uartlite IP",
+      "item": "https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Implementation of UART with Xilinx FPGA and AXI Uartlite IP",
+  "name": "Implementation of UART with Xilinx FPGA and AXI Uartlite IP",
+  "description": "UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with",
+  "keywords": [
+    "AMD", "AXIUartlite", "FPGA", "MicroBlaze", "UART", "Verilog", "Xilinx"
+  ],
+  "articleBody": "Overview\nWhat is UART?\nUART (Universal Asynchronous Receiver/Transmitter) is a hardware communication protocol used for serial communication between two devices. It is called asynchronous because it does not require a separate clock signal like SPI or I2C. Instead, both devices agree on a common data rate (baud rate) to ensure correct data transmission.\nHow Does UART Work? UART consists of two main data lines:\nTX (Transmitter) Line – Sends data.\nRX (Receiver) Line – Receives data.\nData is transmitted bit by bit in a frame format, which includes:\nStart Bit (1 bit)\nData Bits (5 to 9 bits)\nParity Bit (Optional, 1 bits)\nStop Bit (1 or 2 bits)\nSince UART is asynchronous, both devices must be configured with the same baud rate (e.g., 9600, 115200 bps).\nStartD0D1D2D3D4D5D6D7Stop0101100101\nStart Bit = Always 0 (Indicated beginning of transmission).\nData Bit = Actual data to be transmitted.\nParity Bit = Optional error-checking mechanism.\nStop Bit = Always 1 (Marks the end of the frame).\nKey Features of UART Full-duplex communication (TX and RX operate simultaneously).\nBaud rate must match on both sender and receiver.\nNo clock signal needed (unlike SPI/I2C).\nError detection using parity bits and stop bits.\nAdvantages and Disadvantages of UART advantages:\nsimple and widely used.\nRequires only two wires (TX, RX).\nNo clock synchronization needed.\ndisadvantages:\nLimited speed compared to SPI/I2C.\nOnly supports communication between two devices (point-to-point)\nData frame overhead due to start, stop, and parity bits.\nWhere is UART Used?\nIndustrial applications (e.g., RS-232, RS-485).\nEmbedded systems (e.g., microcontrollers, FPGA, and SoC communication).\nSerial devices (e.g., GPS modules, Bluetooth, and Wi-Fi modules).\nPC Communication (e.g., USB-to-serial converters for debugging).\nTwo Ways to Implement UART Using AMD FPGA There are two main approaches to implementing UART on a AMD FPGA:\nUsing AMD’s IP AXI Uartlite + RTL Controller\nAXI Uartlite + MicroBlaze\nRTL Development\nImplementing UART using an IP core means utilizing pre-designed RTL hardware. You only designing the external interface that controls it (in this case, the AXI-Lite interface and control module).\nTherefore, if you consider ‘How can this be designed in RTL?’, you can understand of the control mechanism of the IP’s interface and registers.\nAMD’s IP + AXI-Lite Controller ADM provides the AXI Uartlite IP, which allows UART implementation through an AXI-Lite interface.\nTo use this IP, you need to:\nOpen Vivado’s IP Catalog and generate the AXI UART Lite IP.\nConfigure parameters such as the baud rate and other settings.\nThis approach simplifies development, as it leverages AMD’s built-in IP instead of designing a custom UART controller from scratch.\nIf you search for ‘UART’ in the IP Catalog, you will find two IPs. You can easily implement UART using AXI Uartlite.\nConfiguring parameters such as Baud Rate and others\nAXI CLK: This IP utilizes AXI4-Lite as the user interface. Since UART control is managed through AXI4-Lite, you need to specify the AXI4-Lite clock frequency. By default, a 100 MHz clock is commonly used in AMD designs with MicroBlaze. You can keep this setting unchanged.\nBaud Rate: The baud rate determines the communication speed of the UART interface. It should be set to a value that is compatible with the receiving device to ensure proper communication.\nData Bits: The number of data bits can be configured between 5 and 8. In most cases, 8 bits is the standard setting. This defines the number of bits transmitted between the Start and Stop bits.\nParity: A parity bit can be added to detect errors in data transmission. This helps in verifying the integrity of the transmitted data.\nBlock Diagram of AXI UART Lite\nAXI4-Lite interface is connected to the internal UART Lite Register, and the Register is connected to the UART Control block. In other words, the UART is controlled by configuring the Register.\nYou need to understand the UART Register and its operation by referring to the next IP document.\nIP related document: https://docs.amd.com/v/u/en-US/pg142-axi-uartlite\nExample Design\nThe easiest and quickest way to understand the design is by utilizing the Example Design of the generated IP.\nBy running the simulation in the Example Design project, you can understand the basic operation and flow.\nCreate IP example design\nBlock Diagram of Example Design\nThrough test bench code and simulation waveform, you can obtain information such as the sequences of command and registers access.\nWrite (0x04, 0x00000041) through the AXI Lite Bus. Address 0x04 is the Tx FIFO.\nYou can notice the signal being output through the UART TX port. By checking the length of the Start Bit period, you can find the baud rate. 104.17 us → 9600 baud rate.\nIn the case of the AXI UART Lite IP, a value is written to the TX FIFO register. Then, the data is transmitted through the tx port.\nLooking at the testbench code, the 0x41 data is successfully sent, and the simulation ends\nThrough simulation, you can understand the basic control method of how the UART IP operates.\nThe important part of the above method is designing the AXI-Lite interface. A control interface is ultimately needed. It should write or get data through the UART. This data must control the UART Register via AXI-Lite. One way to make this process easier is by using a micro-controller like MicroBlaze.\nAXI-Lite + Micro Blaze\nSince UART does not need high-speed signal processing, using a micro-controller to control it is also a feasible choice. This way, UART can be easily controlled using simple C code.\nBlock design for controlling UART\nMicroBlaze and the AXI UART Lite IP are connected through the AXI Interconnect. In other words, peripheral devices connected to the AXI Interconnect are controlled based on the Address-Mapping.\nIn Vivado, you can export the hardware design to generate an XSA (Xilinx Support Archive) file. Then, using AMD’s integrated development environment, Vitis IDE, you can run C projects based on this hardware.\nHow to Export a Hardware Design Created in Vivado\nThe development method using MicroBlaze can be referenced in the next document:\nhttps://docs.amd.com/r/en-US/ug1579-microblaze-embedded-design\nWhen you create a project in Vitis, the Board Support Package provides example code for each IP. The path to the example folder is as follows.\nExample design: C:\\Xilinx\\Vitis\\2022.2\\data\\embeddedsw\\XilinxProcessorIPLib\\drivers\\uartlite_v3_7\\examples\n(The above path varies depending on the Vitis’s version or installation directory)\nThe Low-Level example stores the data to be transmitted in a buffer. It then places the data into the TX FIFO of the AXI UART Lite.\nThe design can be easily created using the above example code. You can build the design and then use the generated ELF file for simulation.\n",
+  "wordCount" : "1084",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-03-19T21:25:52Z",
+  "dateModified": "2025-03-19T21:25:52Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/implementation-of-uart-using-axi-uartlite-ip/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Implementation of UART with Xilinx FPGA and AXI Uartlite IP
+    </h1>
+    <div class="post-description">
+      UART (Universal Asynchronous Receiver/Transmitter) is a serial communication protocol that enables asynchronous data transmission between devices with
+    </div>
+    <div class="post-meta"><span title='2025-03-19 21:25:52 +0000 +0000'>March 19, 2025</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#how-does-uart-work" aria-label="How Does UART Work?">How Does UART Work?</a></li>
+                <li>
+                    <a href="#key-features-of-uart" aria-label="Key Features of UART">Key Features of UART</a></li>
+                <li>
+                    <a href="#advantages-and-disadvantages-of-uart" aria-label="Advantages and Disadvantages of UART">Advantages and Disadvantages of UART</a></li>
+                <li>
+                    <a href="#two-ways-to-implement-uart-using-amd-fpga" aria-label="Two Ways to Implement UART Using AMD FPGA">Two Ways to Implement UART Using AMD FPGA</a></li>
+                <li>
+                    <a href="#amds-ip--axi-lite-controller" aria-label="AMD’s IP &#43; AXI-Lite Controller">AMD’s IP + AXI-Lite Controller</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>Overview</p>
+<p><strong>What is UART?</strong></p>
+<p>UART (Universal Asynchronous Receiver/Transmitter) is a hardware communication protocol used for serial communication between two devices. It is called asynchronous because it does not require a separate clock signal like SPI or I2C. Instead, both devices agree on a common data rate (<strong>baud rate</strong>) to ensure correct data transmission.</p>
+<h3 id="how-does-uart-work"><strong>How Does UART Work?</strong><a hidden class="anchor" aria-hidden="true" href="#how-does-uart-work">#</a></h3>
+<p>UART consists of two main data lines:</p>
+<ul>
+<li>
+<p>TX (Transmitter) Line – Sends data.</p>
+</li>
+<li>
+<p>RX (Receiver) Line – Receives data.</p>
+</li>
+</ul>
+<p>Data is transmitted bit by bit in a frame format, which includes:</p>
+<ul>
+<li>
+<p>Start Bit (1 bit)</p>
+</li>
+<li>
+<p>Data Bits (5 to 9 bits)</p>
+</li>
+<li>
+<p>Parity Bit (Optional, 1 bits)</p>
+</li>
+<li>
+<p>Stop Bit (1 or 2 bits)</p>
+</li>
+</ul>
+<p>Since UART is asynchronous, both devices must be configured with the same baud rate (e.g., 9600, 115200 bps).</p>
+<p>StartD0D1D2D3D4D5D6D7Stop0101100101</p>
+<ul>
+<li>
+<p>Start Bit = Always 0 (Indicated beginning of transmission).</p>
+</li>
+<li>
+<p>Data Bit = Actual data to be transmitted.</p>
+</li>
+<li>
+<p>Parity Bit = Optional error-checking mechanism.</p>
+</li>
+<li>
+<p>Stop Bit = Always 1 (Marks the end of the frame).</p>
+</li>
+</ul>
+<h3 id="key-features-of-uart"><strong>Key Features of UART</strong><a hidden class="anchor" aria-hidden="true" href="#key-features-of-uart">#</a></h3>
+<ul>
+<li>
+<p>Full-duplex communication (TX and RX operate simultaneously).</p>
+</li>
+<li>
+<p>Baud rate must match on both sender and receiver.</p>
+</li>
+<li>
+<p>No clock signal needed (unlike SPI/I2C).</p>
+</li>
+<li>
+<p>Error detection using parity bits and stop bits.</p>
+</li>
+</ul>
+<h3 id="advantages-and-disadvantages-of-uart"><strong>Advantages and Disadvantages of UART</strong><a hidden class="anchor" aria-hidden="true" href="#advantages-and-disadvantages-of-uart">#</a></h3>
+<p>advantages:</p>
+<ul>
+<li>
+<p>simple and widely used.</p>
+</li>
+<li>
+<p>Requires only two wires (TX, RX).</p>
+</li>
+<li>
+<p>No clock synchronization needed.</p>
+</li>
+</ul>
+<p>disadvantages:</p>
+<ul>
+<li>
+<p>Limited speed compared to SPI/I2C.</p>
+</li>
+<li>
+<p>Only supports communication between two devices (point-to-point)</p>
+</li>
+<li>
+<p>Data frame overhead due to start, stop, and parity bits.</p>
+</li>
+</ul>
+<p><strong>Where is UART Used?</strong></p>
+<ul>
+<li>
+<p>Industrial applications (e.g., RS-232, RS-485).</p>
+</li>
+<li>
+<p>Embedded systems (e.g., microcontrollers, FPGA, and SoC communication).</p>
+</li>
+<li>
+<p>Serial devices (e.g., GPS modules, Bluetooth, and Wi-Fi modules).</p>
+</li>
+<li>
+<p>PC Communication (e.g., USB-to-serial converters for debugging).</p>
+</li>
+</ul>
+<h3 id="two-ways-to-implement-uart-using-amd-fpga">Two Ways to Implement UART Using AMD FPGA<a hidden class="anchor" aria-hidden="true" href="#two-ways-to-implement-uart-using-amd-fpga">#</a></h3>
+<p>There are two main approaches to implementing UART on a AMD FPGA:</p>
+<ul>
+<li><strong>Using AMD’s IP</strong></li>
+</ul>
+<p>AXI Uartlite + RTL Controller</p>
+<ul>
+<li>
+<p>AXI Uartlite + MicroBlaze</p>
+</li>
+<li>
+<p><strong>RTL Development</strong></p>
+</li>
+</ul>
+<p>Implementing UART using an IP core means utilizing pre-designed RTL hardware. You only designing the external interface that controls it (in this case, the AXI-Lite interface and control module).</p>
+<p>Therefore, if you consider <strong>&lsquo;How can this be designed in RTL</strong>?&rsquo;, you can understand of the control mechanism of the IP’s interface and registers.</p>
+<h3 id="amds-ip--axi-lite-controller">AMD’s IP + AXI-Lite Controller<a hidden class="anchor" aria-hidden="true" href="#amds-ip--axi-lite-controller">#</a></h3>
+<p>ADM provides the <strong>AXI Uartlite IP</strong>, which allows UART implementation through an AXI-Lite interface.</p>
+<p>To use this IP, you need to:</p>
+<ul>
+<li>
+<p>Open <strong>Vivado’s IP Catalog</strong> and generate the <strong>AXI UART Lite</strong> <strong>IP</strong>.</p>
+</li>
+<li>
+<p>Configure parameters such as the <strong>baud rate</strong> and other settings.</p>
+</li>
+</ul>
+<p>This approach simplifies development, as it leverages AMD’s built-in IP instead of designing a custom UART controller from scratch.</p>
+<p><img alt="Vivado UART IP Caltalog" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image.png?w=855"><em>If you search for &lsquo;UART&rsquo; in the IP Catalog, you will find two IPs. You can easily implement UART using AXI Uartlite.</em></p>
+<p><img alt="AXI Uartlite Customize IP" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-1.png?w=1024"><em>Configuring parameters such as Baud Rate and others</em></p>
+<ul>
+<li>
+<p>AXI CLK: This IP utilizes AXI4-Lite as the user interface. Since UART control is managed through AXI4-Lite, you need to specify the AXI4-Lite clock frequency. By default, a 100 MHz clock is commonly used in AMD designs with MicroBlaze. You can keep this setting unchanged.</p>
+</li>
+<li>
+<p>Baud Rate: The baud rate determines the communication speed of the UART interface. It should be set to a value that is compatible with the receiving device to ensure proper communication.</p>
+</li>
+<li>
+<p>Data Bits: The number of data bits can be configured between 5 and 8. In most cases, 8 bits is the standard setting. This defines the number of bits transmitted between the Start and Stop bits.</p>
+</li>
+<li>
+<p>Parity: A parity bit can be added to detect errors in data transmission. This helps in verifying the integrity of the transmitted data.</p>
+</li>
+</ul>
+<p><img alt="Block Diagram of AXI UART Lite" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-2.png?w=927"><em>Block Diagram of AXI UART Lite</em></p>
+<p>AXI4-Lite interface is connected to the internal UART Lite Register, and the Register is connected to the UART Control block. In other words, the UART is controlled by configuring the Register.</p>
+<p>You need to understand the UART Register and its operation by referring to the next IP document.</p>
+<p>IP related document: <a href="https://docs.amd.com/v/u/en-US/pg142-axi-uartlite">https://docs.amd.com/v/u/en-US/pg142-axi-uartlite</a></p>
+<p><strong>Example Design</strong></p>
+<p>The easiest and quickest way to understand the design is by utilizing the Example Design of the generated IP.</p>
+<p>By running the simulation in the Example Design project, you can understand the basic operation and flow.</p>
+<p><img alt="How to execute &ldquo;Open IP Example Design&rdquo;" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-3.png?w=533"><em>Create IP example design</em></p>
+<p><img alt="Block Diagram of UART Example Design" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-4.png?w=703"><em>Block Diagram of Example Design</em></p>
+<p>Through test bench code and simulation waveform, you can obtain information such as the sequences of command and registers access.</p>
+<p><img alt="UART Simulation wave form" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-5.png?w=1024"><em>Write (0x04, 0x00000041) through the AXI Lite Bus. Address 0x04 is the Tx FIFO.</em></p>
+<p><img alt="UART Simulation wave form" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-6.png?w=1024"><em>You can notice the signal being output through the UART TX port. By checking the length of the Start Bit period, you can find the baud rate. 104.17 us → 9600 baud rate.</em></p>
+<p>In the case of the AXI UART Lite IP, a value is written to the TX FIFO register. Then, the data is transmitted through the <strong>tx</strong> port.</p>
+<p><img alt="Shows the test bench code of the UART example" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-7.png?w=580"><em>Looking at the testbench code, the 0x41 data is successfully sent, and the simulation ends</em></p>
+<p>Through simulation, you can understand the basic control method of how the UART IP operates.</p>
+<p>The important part of the above method is designing the AXI-Lite interface. A control interface is ultimately needed. It should write or get data through the UART. This data must control the UART Register via AXI-Lite. One way to make this process easier is by using a micro-controller like <strong>MicroBlaze</strong>.</p>
+<p>AXI-Lite + Micro Blaze</p>
+<p>Since UART does not need high-speed signal processing, using a micro-controller to control it is also a feasible choice. This way, UART can be easily controlled using simple C code.</p>
+<p><img alt="A specific block design that includes Micro-Blaze and UART IP block." loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-8.png?w=1024"><em>Block design for controlling UART</em></p>
+<p>MicroBlaze and the AXI UART Lite IP are connected through the AXI Interconnect. In other words, peripheral devices connected to the AXI Interconnect are controlled based on the Address-Mapping.</p>
+<p><img loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-13.png?w=1024"></p>
+<p>In Vivado, you can export the hardware design to generate an XSA (Xilinx Support Archive) file. Then, using AMD&rsquo;s integrated development environment, Vitis IDE, you can run C projects based on this hardware.</p>
+<p><img alt="Vivado captrue of executing &ldquo;Export Hardware&rdquo;" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-9.png?w=433"><em>How to Export a Hardware Design Created in Vivado</em></p>
+<p>The development method using MicroBlaze can be referenced in the next document:</p>
+<p><a href="https://docs.amd.com/r/en-US/ug1579-microblaze-embedded-design">https://docs.amd.com/r/en-US/ug1579-microblaze-embedded-design</a></p>
+<p>When you create a project in Vitis, the Board Support Package provides example code for each IP. The path to the example folder is as follows.</p>
+<p>Example design: C:\Xilinx\Vitis\2022.2\data\embeddedsw\XilinxProcessorIPLib\drivers\uartlite_v3_7\examples</p>
+<p>(The above path varies depending on the Vitis&rsquo;s version or installation directory)</p>
+<p><img alt="Low Level Example Code" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/03/image-10.png?w=597"><em>The Low-Level example stores the data to be transmitted in a buffer. It then places the data into the TX FIFO of the AXI UART Lite.</em></p>
+<p>The design can be easily created using the above example code. You can build the design and then use the generated ELF file for simulation.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/amd/">AMD</a></li>
+      <li><a href="https://easyfpga.blog/tags/axiuartlite/">AXIUartlite</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/microblaze/">MicroBlaze</a></li>
+      <li><a href="https://easyfpga.blog/tags/uart/">UART</a></li>
+      <li><a href="https://easyfpga.blog/tags/verilog/">Verilog</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/essential-tips-for-using-vivados-text-editor/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Vivado’s Text Editor</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga-product-lines/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA product lines</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

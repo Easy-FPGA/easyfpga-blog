@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>CMAC on EasyFPGA</title>
+    <link>https://easyfpga.blog/tags/cmac/</link>
+    <description>Recent content in CMAC on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 17 Jun 2025 12:21:53 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/tags/cmac/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FPGA Implementation of RoCEv2</title>
+      <link>https://easyfpga.blog/posts/fpga-implementation-of-rocev2/</link>
+      <pubDate>Tue, 17 Jun 2025 12:21:53 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/fpga-implementation-of-rocev2/</guid>
+      <description>&lt;h2 id=&#34;what-is-the-roce-v2&#34;&gt;What is the RoCE v2?&lt;/h2&gt;
+&lt;p&gt;RoCEv2, or RDMA over Converged Ethernet version2 is a network protocol that enable Remote Direct Memory Access (RDMA) over standard Ethernet networks using UDP/IP. It&amp;rsquo;s designed to deliver high-throughput, low-latency communication while minimizing CPU usage-making it ideal for data centers, high-performance computing, and storage systems.&lt;/p&gt;
+&lt;p&gt;The link below is a lecture on RDMA. It provides a lot of useful information. &lt;a href=&#34;https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info&#34;&gt;https://www.coursera.org/learn/the-fundamentals-of-rdma-programming/home/info&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;rocev2-packet-format&#34;&gt;RoCEv2 Packet Format&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/06/image-13.png?w=867&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ethernet Header&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Standard Ethernet frame header.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

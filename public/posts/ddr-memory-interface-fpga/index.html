@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Implementing a DDR Memory Interface on FPGA with Xilinx MIG | EasyFPGA</title>
+<meta name="keywords" content="AMD, DDR, FPGA, MIG, Vivado, Xilinx, Memory Interface">
+<meta name="description" content="Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/ddr-memory-interface-fpga/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/ddr-memory-interface-fpga/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/ddr-memory-interface-fpga/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Implementing a DDR Memory Interface on FPGA with Xilinx MIG">
+  <meta property="og:description" content="Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-09-04T03:20:49+00:00">
+    <meta property="article:modified_time" content="2025-09-04T03:20:49+00:00">
+    <meta property="article:tag" content="AMD">
+    <meta property="article:tag" content="DDR">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="MIG">
+    <meta property="article:tag" content="Vivado">
+    <meta property="article:tag" content="Xilinx">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Implementing a DDR Memory Interface on FPGA with Xilinx MIG">
+  <meta name="twitter:description" content="Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Implementing a DDR Memory Interface on FPGA with Xilinx MIG",
+      "item": "https://easyfpga.blog/posts/ddr-memory-interface-fpga/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Implementing a DDR Memory Interface on FPGA with Xilinx MIG",
+  "name": "Implementing a DDR Memory Interface on FPGA with Xilinx MIG",
+  "description": "Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.",
+  "keywords": [
+    "AMD", "DDR", "FPGA", "MIG", "Vivado", "Xilinx", "Memory Interface"
+  ],
+  "articleBody": "FPGAs are optimised for massive parallelism, but their on-chip memory resources are limited. Block RAM (BRAM) and UltraRAM (URAM) are fast and easy to use, but they typically provide only a few tens of megabits to a few hundred megabits of capacity. When your application needs gigabytes — high-resolution video frames, machine-learning weight tables, large look-up tables — external DDR memory becomes essential.\nWhy External DDR Memory? Memory Type Location Typical Capacity Bandwidth Access Latency Distributed RAM On-chip (LUT-based) \u003c 1 MB Very high 1 cycle Block RAM (BRAM) On-chip (dedicated) up to ~200 MB High 1–2 cycles UltraRAM (URAM) On-chip (UltraScale+) up to ~500 MB High 2–3 cycles External DDR Off-chip (dedicated chip) 1–16+ GB Medium-High ~50–100 ns For applications such as:\nHD/4K video frame buffers Neural network weight storage for inference Radar/sonar data logging High-speed data recording …external DDR is not optional — it is a mandatory component.\nDDR Memory Types Type Supply Voltage Max Data Rate Channels per Chip Typical Applications DDR3 1.5 V ~2,133 MT/s 1 Consumer, video processing DDR4 1.2 V ~3,200 MT/s 1 High-performance servers, DSP, AI DDR5 1.1 V ~8,400 MT/s 2 Next-gen servers, data centres LPDDR4/4X 1.1 V / 0.6 V ~4,266 MT/s 2 Mobile, battery-powered embedded HBM2e 1.2 V ~3.2 Gbps/pin 8 AI accelerators, HPC MT/s = MegaTransfers per second. DDR memory transfers data on both the rising and falling edge of the clock, so a 1600 MHz DDR4 clock yields 3200 MT/s.\nEffective bandwidth formula:\n$$\\text{Bandwidth (MB/s)} = \\text{MT/s} \\times \\frac{\\text{Bus width (bits)}}{8}$$\nExample: DDR4-3200 with a 32-bit bus → 3200 × 4 = 12,800 MB/s = 12.5 GB/s\nChoosing the Right DDR Type High bandwidth (DSP, AI, radar): DDR4 or DDR5. HBM offers up to 18× higher bandwidth than DDR5 but only appears in high-end Versal / Alveo devices.\nPower efficiency (battery-powered systems): LPDDR4/4X. Originally designed for mobile, LPDDR is increasingly being evaluated for data-centre rack servers where power-per-performance is a key metric.\nLegacy / cost-sensitive: DDR3 remains widely available and sufficient for many video and networking applications.\nDDR Chips and Modules A single DDR chip typically has an ×8 (8-bit) or ×16 (16-bit) data bus width. To get wider buses:\nDIMM (Desktop/Server): 8× ×8-bit chips in parallel → 64-bit bus. FPGA board design: Connect 1–4 chips directly to the FPGA for 8, 16, 32, or 64-bit buses. The bus width is a key design decision — it directly scales the available bandwidth. FPGA–DDR Interface Implementation Routing dozens of DDR signals with precisely matched trace lengths, implementing the DDR PHY, and managing bank activation, refresh, and command scheduling are all extremely complex tasks. FPGA vendors solve this with dedicated Memory Interface IP cores.\nAMD/Xilinx Memory Interface Generator (MIG): MIG generates a complete DDR controller plus PHY for Xilinx 7-Series, UltraScale, and UltraScale+ FPGAs. It handles:\nMemory initialisation sequence Bank and row management Command reordering and scheduling Read/write levelling and training Optional ECC (Error Correcting Code) The user interface presented by MIG is a simple AXI4 or native port — you do not need to understand the DDR command protocol to use it.\nIntegrating MIG in Vivado Open the IP Catalog in Vivado and search for “Memory Interface Generator”. Select MIG 7-Series or UltraScale MIS depending on your device. In the configuration wizard, choose your DDR type, data width, and target speed. MIG in the Vivado IP Catalog\nKey parameter: Memory Device Interface Speed. At 1066 MHz → 2132 MT/s. With an 8-bit data width, theoretical bandwidth = 2.132 GB/s.\nTip: To increase bandwidth, widen the data bus — use 16, 32, or 64-bit configurations rather than running at a higher clock rate.\nThe user logic connects to the left side of the MIG block; the MIG drives the DDR bus directly.\nDDR Efficiency Considerations The theoretical peak bandwidth is rarely achievable in practice. Actual efficiency depends on:\nAccess pattern: Sequential burst reads/writes achieve the highest efficiency. Random access (especially read-write mixing to the same bank) incurs additional precharge and activate latency. Bank conflicts: Accessing multiple rows in the same bank forces a precharge–activate sequence between commands, reducing throughput. Refresh cycles: DDR requires periodic refresh commands that temporarily suspend access. Efficiency varies significantly by access pattern. Random mixed read/write to the same bank is worst-case. (AMD reference)\nDesign recommendation: Profile your application’s access pattern early. If random access is unavoidable, consider adding a reorder buffer in your FPGA logic to coalesce requests into sequential bursts before sending them to the MIG.\nReferences Xilinx/AMD UltraScale Memory Interface Solutions (PG150) Zynq-7000 SoC Technical Reference Manual — Theoretical Bandwidth ",
+  "wordCount" : "756",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-09-04T03:20:49Z",
+  "dateModified": "2025-09-04T03:20:49Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/ddr-memory-interface-fpga/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Implementing a DDR Memory Interface on FPGA with Xilinx MIG
+    </h1>
+    <div class="post-description">
+      Why external DDR memory is essential for FPGA designs, how to choose the right DDR type, and how to integrate it using the Xilinx Memory Interface Generator (MIG) IP.
+    </div>
+    <div class="post-meta"><span title='2025-09-04 03:20:49 +0000 +0000'>September 4, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#why-external-ddr-memory" aria-label="Why External DDR Memory?">Why External DDR Memory?</a></li>
+                <li>
+                    <a href="#ddr-memory-types" aria-label="DDR Memory Types">DDR Memory Types</a></li>
+                <li>
+                    <a href="#choosing-the-right-ddr-type" aria-label="Choosing the Right DDR Type">Choosing the Right DDR Type</a></li>
+                <li>
+                    <a href="#ddr-chips-and-modules" aria-label="DDR Chips and Modules">DDR Chips and Modules</a></li>
+                <li>
+                    <a href="#fpgaddr-interface-implementation" aria-label="FPGA–DDR Interface Implementation">FPGA–DDR Interface Implementation</a><ul>
+                        
+                <li>
+                    <a href="#integrating-mig-in-vivado" aria-label="Integrating MIG in Vivado">Integrating MIG in Vivado</a></li></ul>
+                </li>
+                <li>
+                    <a href="#ddr-efficiency-considerations" aria-label="DDR Efficiency Considerations">DDR Efficiency Considerations</a></li>
+                <li>
+                    <a href="#references" aria-label="References">References</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>FPGAs are optimised for massive parallelism, but their on-chip memory resources are limited. Block RAM (BRAM) and UltraRAM (URAM) are fast and easy to use, but they typically provide only a few tens of megabits to a few hundred megabits of capacity. When your application needs gigabytes — high-resolution video frames, machine-learning weight tables, large look-up tables — external <strong>DDR memory</strong> becomes essential.</p>
+<h2 id="why-external-ddr-memory">Why External DDR Memory?<a hidden class="anchor" aria-hidden="true" href="#why-external-ddr-memory">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Memory Type</th>
+          <th>Location</th>
+          <th>Typical Capacity</th>
+          <th>Bandwidth</th>
+          <th>Access Latency</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Distributed RAM</td>
+          <td>On-chip (LUT-based)</td>
+          <td>&lt; 1 MB</td>
+          <td>Very high</td>
+          <td>1 cycle</td>
+      </tr>
+      <tr>
+          <td>Block RAM (BRAM)</td>
+          <td>On-chip (dedicated)</td>
+          <td>up to ~200 MB</td>
+          <td>High</td>
+          <td>1–2 cycles</td>
+      </tr>
+      <tr>
+          <td>UltraRAM (URAM)</td>
+          <td>On-chip (UltraScale+)</td>
+          <td>up to ~500 MB</td>
+          <td>High</td>
+          <td>2–3 cycles</td>
+      </tr>
+      <tr>
+          <td><strong>External DDR</strong></td>
+          <td>Off-chip (dedicated chip)</td>
+          <td><strong>1–16+ GB</strong></td>
+          <td>Medium-High</td>
+          <td>~50–100 ns</td>
+      </tr>
+  </tbody>
+</table>
+<p>For applications such as:</p>
+<ul>
+<li>HD/4K video frame buffers</li>
+<li>Neural network weight storage for inference</li>
+<li>Radar/sonar data logging</li>
+<li>High-speed data recording</li>
+</ul>
+<p>…external DDR is not optional — it is a mandatory component.</p>
+<h2 id="ddr-memory-types">DDR Memory Types<a hidden class="anchor" aria-hidden="true" href="#ddr-memory-types">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Type</th>
+          <th>Supply Voltage</th>
+          <th>Max Data Rate</th>
+          <th>Channels per Chip</th>
+          <th>Typical Applications</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DDR3</td>
+          <td>1.5 V</td>
+          <td>~2,133 MT/s</td>
+          <td>1</td>
+          <td>Consumer, video processing</td>
+      </tr>
+      <tr>
+          <td>DDR4</td>
+          <td>1.2 V</td>
+          <td>~3,200 MT/s</td>
+          <td>1</td>
+          <td>High-performance servers, DSP, AI</td>
+      </tr>
+      <tr>
+          <td>DDR5</td>
+          <td>1.1 V</td>
+          <td>~8,400 MT/s</td>
+          <td>2</td>
+          <td>Next-gen servers, data centres</td>
+      </tr>
+      <tr>
+          <td>LPDDR4/4X</td>
+          <td>1.1 V / 0.6 V</td>
+          <td>~4,266 MT/s</td>
+          <td>2</td>
+          <td>Mobile, battery-powered embedded</td>
+      </tr>
+      <tr>
+          <td>HBM2e</td>
+          <td>1.2 V</td>
+          <td>~3.2 Gbps/pin</td>
+          <td>8</td>
+          <td>AI accelerators, HPC</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>MT/s</strong> = MegaTransfers per second. DDR memory transfers data on both the rising and falling edge of the clock, so a 1600 MHz DDR4 clock yields 3200 MT/s.</p>
+</blockquote>
+<p><strong>Effective bandwidth formula:</strong></p>
+<p>$$\text{Bandwidth (MB/s)} = \text{MT/s} \times \frac{\text{Bus width (bits)}}{8}$$</p>
+<p>Example: DDR4-3200 with a 32-bit bus → 3200 × 4 = <strong>12,800 MB/s = 12.5 GB/s</strong></p>
+<h2 id="choosing-the-right-ddr-type">Choosing the Right DDR Type<a hidden class="anchor" aria-hidden="true" href="#choosing-the-right-ddr-type">#</a></h2>
+<p><strong>High bandwidth (DSP, AI, radar):</strong> DDR4 or DDR5. HBM offers up to 18× higher bandwidth than DDR5 but only appears in high-end Versal / Alveo devices.</p>
+<p><strong>Power efficiency (battery-powered systems):</strong> LPDDR4/4X. Originally designed for mobile, LPDDR is increasingly being evaluated for data-centre rack servers where power-per-performance is a key metric.</p>
+<p><strong>Legacy / cost-sensitive:</strong> DDR3 remains widely available and sufficient for many video and networking applications.</p>
+<h2 id="ddr-chips-and-modules">DDR Chips and Modules<a hidden class="anchor" aria-hidden="true" href="#ddr-chips-and-modules">#</a></h2>
+<p>A single DDR chip typically has an <strong>×8</strong> (8-bit) or <strong>×16</strong> (16-bit) data bus width. To get wider buses:</p>
+<ul>
+<li><strong>DIMM (Desktop/Server):</strong> 8× ×8-bit chips in parallel → 64-bit bus.</li>
+<li><strong>FPGA board design:</strong> Connect 1–4 chips directly to the FPGA for 8, 16, 32, or 64-bit buses. The bus width is a key design decision — it directly scales the available bandwidth.</li>
+</ul>
+<h2 id="fpgaddr-interface-implementation">FPGA–DDR Interface Implementation<a hidden class="anchor" aria-hidden="true" href="#fpgaddr-interface-implementation">#</a></h2>
+<p>Routing dozens of DDR signals with precisely matched trace lengths, implementing the DDR PHY, and managing bank activation, refresh, and command scheduling are all extremely complex tasks. FPGA vendors solve this with dedicated Memory Interface IP cores.</p>
+<p><strong>AMD/Xilinx Memory Interface Generator (MIG):</strong> MIG generates a complete DDR controller plus PHY for Xilinx 7-Series, UltraScale, and UltraScale+ FPGAs. It handles:</p>
+<ul>
+<li>Memory initialisation sequence</li>
+<li>Bank and row management</li>
+<li>Command reordering and scheduling</li>
+<li>Read/write levelling and training</li>
+<li>Optional ECC (Error Correcting Code)</li>
+</ul>
+<p>The user interface presented by MIG is a simple AXI4 or native port — you do not need to understand the DDR command protocol to use it.</p>
+<h3 id="integrating-mig-in-vivado">Integrating MIG in Vivado<a hidden class="anchor" aria-hidden="true" href="#integrating-mig-in-vivado">#</a></h3>
+<ol>
+<li>Open the <strong>IP Catalog</strong> in Vivado and search for &ldquo;Memory Interface Generator&rdquo;.</li>
+<li>Select MIG 7-Series or UltraScale MIS depending on your device.</li>
+<li>In the configuration wizard, choose your DDR type, data width, and target speed.</li>
+</ol>
+<p><img alt="Select MIG from IP Catalog" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/09/image-1.png?w=1024">
+<em>MIG in the Vivado IP Catalog</em></p>
+<p><img alt="MIG configuration screen" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/09/image-2.png?w=1024">
+<em>Key parameter: Memory Device Interface Speed. At 1066 MHz → 2132 MT/s. With an 8-bit data width, theoretical bandwidth = 2.132 GB/s.</em></p>
+<blockquote>
+<p><strong>Tip:</strong> To increase bandwidth, widen the data bus — use 16, 32, or 64-bit configurations rather than running at a higher clock rate.</p>
+</blockquote>
+<p><img alt="MIG block diagram" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/09/image-3.png?w=544">
+<em>The user logic connects to the left side of the MIG block; the MIG drives the DDR bus directly.</em></p>
+<h2 id="ddr-efficiency-considerations">DDR Efficiency Considerations<a hidden class="anchor" aria-hidden="true" href="#ddr-efficiency-considerations">#</a></h2>
+<p>The theoretical peak bandwidth is rarely achievable in practice. Actual efficiency depends on:</p>
+<ul>
+<li><strong>Access pattern:</strong> Sequential burst reads/writes achieve the highest efficiency. Random access (especially read-write mixing to the same bank) incurs additional precharge and activate latency.</li>
+<li><strong>Bank conflicts:</strong> Accessing multiple rows in the same bank forces a precharge–activate sequence between commands, reducing throughput.</li>
+<li><strong>Refresh cycles:</strong> DDR requires periodic refresh commands that temporarily suspend access.</li>
+</ul>
+<p><img alt="DDR efficiency example" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/09/image-4.png?w=478">
+<em>Efficiency varies significantly by access pattern. Random mixed read/write to the same bank is worst-case.</em> (<a href="https://docs.amd.com/r/en-US/ug585-zynq-7000-SoC-TRM/Theoretical-Bandwidth">AMD reference</a>)</p>
+<p><strong>Design recommendation:</strong> Profile your application&rsquo;s access pattern early. If random access is unavoidable, consider adding a reorder buffer in your FPGA logic to coalesce requests into sequential bursts before sending them to the MIG.</p>
+<h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<ul>
+<li><a href="https://www.xilinx.com/support/documents/ip_documentation/mig/v7_1/pg150-ultrascale-mis.pdf">Xilinx/AMD UltraScale Memory Interface Solutions (PG150)</a></li>
+<li><a href="https://docs.amd.com/r/en-US/ug585-zynq-7000-SoC-TRM/Theoretical-Bandwidth">Zynq-7000 SoC Technical Reference Manual — Theoretical Bandwidth</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/amd/">AMD</a></li>
+      <li><a href="https://easyfpga.blog/tags/ddr/">DDR</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/mig/">MIG</a></li>
+      <li><a href="https://easyfpga.blog/tags/vivado/">Vivado</a></li>
+      <li><a href="https://easyfpga.blog/tags/xilinx/">Xilinx</a></li>
+      <li><a href="https://easyfpga.blog/tags/memory-interface/">Memory Interface</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/ethernet-ii-ipv4-udp-frame-structure/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Ethernet II &#43; IPv4 &#43; UDP Frame Structure Reference</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga-price-surge-and-design-challenges/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA Price Surge: Design Challenges and Alternative Strategies</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>High-Speed Parallel Interface Design: Principles, Limitations, and Practice | EasyFPGA</title>
+<meta name="keywords" content="parallel interface, high-speed, skew, PCB, DDR, FPGA, signal integrity">
+<meta name="description" content="A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/high-speed-parallel-interface-design/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/high-speed-parallel-interface-design/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/high-speed-parallel-interface-design/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="High-Speed Parallel Interface Design: Principles, Limitations, and Practice">
+  <meta property="og:description" content="A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-12T09:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-12T09:00:00+09:00">
+    <meta property="article:tag" content="Parallel Interface">
+    <meta property="article:tag" content="High-Speed">
+    <meta property="article:tag" content="Skew">
+    <meta property="article:tag" content="PCB">
+    <meta property="article:tag" content="DDR">
+    <meta property="article:tag" content="FPGA">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="High-Speed Parallel Interface Design: Principles, Limitations, and Practice">
+  <meta name="twitter:description" content="A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "High-Speed Parallel Interface Design: Principles, Limitations, and Practice",
+      "item": "https://easyfpga.blog/posts/high-speed-parallel-interface-design/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "High-Speed Parallel Interface Design: Principles, Limitations, and Practice",
+  "name": "High-Speed Parallel Interface Design: Principles, Limitations, and Practice",
+  "description": "A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.",
+  "keywords": [
+    "parallel interface", "high-speed", "skew", "PCB", "DDR", "FPGA", "signal integrity"
+  ],
+  "articleBody": "1. What Is a Parallel Interface? A parallel interface transmits multiple bits simultaneously across multiple data lines. As shown below, there are 8 to 32 or more data wires (D[7:0], D[31:0], etc.) between transmitter and receiver, along with a shared clock and control signals such as VALID and READY.\n┌─────────────┐ ┌─────────────┐\r│ Transmitter │ D[7:0] │ Receiver │\r│ ├────────►│ │\r│ │ CLK │ │\r│ ├────────►│ │\r│ │ VALID │ │\r│ ├────────►│ │\r└─────────────┘ └─────────────┘ Parallel Bus — 8 data bits transferred simultaneously each clock cycle\r■ CLK\r■ D[7:0] data\r■ VALID\rAdvantages:\nSimple, intuitive structure — easy to design and debug High bandwidth at low frequency (e.g., 8-bit × 100 MHz = 800 Mbps) No serializer/deserializer needed → low latency Shared clock makes synchronization straightforward 2. Limitations and Real-World Problems (1) Pin Count and PCB Complexity As data width increases, package pin count, PCB routing complexity, and cost grow rapidly.\nExample: A 32-bit parallel bus requires 32 data + 1 clock + 2–4 control = 35–37 pins\n(2) Skew — The Enemy of Timing All data bits must arrive simultaneously, but in practice each trace has slightly different lengths, impedances, and loads — causing arrival time differences known as skew. At high speeds, skew becomes critical.\nCLK ──┐ ┌──┐ ┌──\r└──┘ └──┘\rD[0] ─────────────── ← Ideal (no delay)\r∆t₁↕\rD[1] ─────────────── ← Delay from trace length difference\r∆t₂↕\rD[2] ─────────────── ← Additional delay Skew — each signal arrives at a different time due to trace length differences\r■ CLK\r■ D[0] ideal\r■ D[1] +70ps skew\r■ D[2] +140ps skew\r↕ valid sampling window\rReal-world impact:\nAt 1 GHz (1 ns period), 200 ps of skew consumes 20% of the timing budget A 1 cm trace length difference ≈ 60–70 ps of skew (propagation speed ~15–17 cm/ns) Excessive skew causes setup/hold violations and data errors Solutions:\nTrace length matching (serpentine routing) is mandatory in PCB layout Validate skew, reflections, and jitter using SI simulation (IBIS models, etc.) (3) EMI and Crosstalk When multiple signals switch simultaneously, electromagnetic interference (crosstalk) and SSN (Simultaneous Switching Noise) appear between adjacent lines — making FCC/CE EMC certification significantly harder to pass.\n(4) Signal Integrity at High Frequencies As frequency increases, reflections, ringing, overshoot, and undershoot become critical SI problems.\nPower consumption scales with both width and frequency:\n$$P = C \\times V^2 \\times f \\times N_{bits}$$\nIncreasing width worsens pin count, PCB complexity, EMI, and power. Increasing frequency worsens SI, skew, and EMI. Both directions have hard physical limits.\n(5) Board and Cable Design Difficulty All traces must be matched to within picoseconds — PCB layout becomes extremely complex Longer cables accumulate more skew; connector and cable costs increase accordingly Practical design tips:\nRoute data, clock, and control traces on the same layer with matched impedance and serpentine length matching For high-speed parallel buses like DDR, use per-byte DQS (source-synchronous strobe) to contain skew to within each byte lane Apply Write Leveling and Read Training to compensate for board-specific timing variation 3. Real-World Examples and the Evolution to Serial (1) DDR4 Memory Interface 64-bit data + 8-bit ECC = 72 signals total Each byte lane has its own DQS strobe signal → skew correction per byte group Write Leveling and Read Training automatically compensate for board-level timing variation (2) PCI → PCIe Evolution Interface Type Bus Frequency Bandwidth PCI Parallel 32-bit shared 33 MHz 133 MB/s PCI-X Parallel 64-bit shared 133 MHz 1,066 MB/s PCIe Gen1 x16 Serial 16 lanes × 1 pair 2.5 Gbps/lane ~4 GB/s PCIe Gen5 x16 Serial 16 lanes × 1 pair 32 Gbps/lane ~64 GB/s The industry shifted from parallel shared buses to serial point-to-point links — drastically reducing pin count while multiplying bandwidth by orders of magnitude.\nBandwidth comparison: Parallel bus → Serial PCIe\r4. Verilog Example 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 // Simple parallel data transfer example module parallel_tx ( input wire clk, // System clock input wire rst_n, // Active-low reset input wire [7:0] data_in, // 8-bit parallel input input wire valid_in, // Input valid signal output reg [7:0] data_out, // 8-bit parallel output output reg valid_out // Output valid signal ); always @(posedge clk or negedge rst_n) begin if (!rst_n) begin data_out \u003c= 8'h00; valid_out \u003c= 1'b0; end else begin data_out \u003c= data_in; // 1-clock pipeline delay valid_out \u003c= valid_in; end end endmodule This module registers 8-bit parallel data with a 1-clock pipeline delay — the foundation of synchronous parallel data transfer in FPGA and ASIC design.\nWaveform behavior: data_in is captured on the rising edge of clk, and data_out appears one clock cycle later. The valid signal is delayed identically to maintain handshake timing.\n5. Summary Parallel interfaces are intuitive and easy to implement, but face hard physical, electrical, and economic limits at high speeds. Skew, EMI, signal integrity, and cost constraints collectively push high-speed designs toward source-synchronous (DQ+DQS) or fully serial (PCIe, USB, etc.) architectures. When designing parallel interfaces, always apply trace length matching, SI simulation, and calibration techniques such as Write Leveling and Read Training. ",
+  "wordCount" : "853",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-12T09:00:00+09:00",
+  "dateModified": "2026-03-12T09:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/high-speed-parallel-interface-design/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      High-Speed Parallel Interface Design: Principles, Limitations, and Practice
+    </h1>
+    <div class="post-description">
+      A deep dive into parallel interface architecture, its bandwidth advantages, physical limitations like skew and EMI, and how real-world designs evolved toward serial interfaces.
+    </div>
+    <div class="post-meta"><span title='2026-03-12 09:00:00 +0900 KST'>March 12, 2026</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#1-what-is-a-parallel-interface" aria-label="1. What Is a Parallel Interface?">1. What Is a Parallel Interface?</a></li>
+                <li>
+                    <a href="#2-limitations-and-real-world-problems" aria-label="2. Limitations and Real-World Problems">2. Limitations and Real-World Problems</a><ul>
+                        
+                <li>
+                    <a href="#1-pin-count-and-pcb-complexity" aria-label="(1) Pin Count and PCB Complexity">(1) Pin Count and PCB Complexity</a></li>
+                <li>
+                    <a href="#2-skew--the-enemy-of-timing" aria-label="(2) Skew — The Enemy of Timing">(2) Skew — The Enemy of Timing</a></li>
+                <li>
+                    <a href="#3-emi-and-crosstalk" aria-label="(3) EMI and Crosstalk">(3) EMI and Crosstalk</a></li>
+                <li>
+                    <a href="#4-signal-integrity-at-high-frequencies" aria-label="(4) Signal Integrity at High Frequencies">(4) Signal Integrity at High Frequencies</a></li>
+                <li>
+                    <a href="#5-board-and-cable-design-difficulty" aria-label="(5) Board and Cable Design Difficulty">(5) Board and Cable Design Difficulty</a></li></ul>
+                </li>
+                <li>
+                    <a href="#3-real-world-examples-and-the-evolution-to-serial" aria-label="3. Real-World Examples and the Evolution to Serial">3. Real-World Examples and the Evolution to Serial</a><ul>
+                        
+                <li>
+                    <a href="#1-ddr4-memory-interface" aria-label="(1) DDR4 Memory Interface">(1) DDR4 Memory Interface</a></li>
+                <li>
+                    <a href="#2-pci--pcie-evolution" aria-label="(2) PCI → PCIe Evolution">(2) PCI → PCIe Evolution</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-verilog-example" aria-label="4. Verilog Example">4. Verilog Example</a></li>
+                <li>
+                    <a href="#5-summary" aria-label="5. Summary">5. Summary</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="1-what-is-a-parallel-interface">1. What Is a Parallel Interface?<a hidden class="anchor" aria-hidden="true" href="#1-what-is-a-parallel-interface">#</a></h2>
+<p>A parallel interface transmits multiple bits simultaneously across multiple data lines. As shown below, there are 8 to 32 or more data wires (D[7:0], D[31:0], etc.) between transmitter and receiver, along with a shared clock and control signals such as VALID and READY.</p>
+<pre tabindex="0"><code>┌─────────────┐         ┌─────────────┐
+│ Transmitter │  D[7:0] │  Receiver   │
+│             ├────────►│             │
+│             │  CLK    │             │
+│             ├────────►│             │
+│             │  VALID  │             │
+│             ├────────►│             │
+└─────────────┘         └─────────────┘
+</code></pre><div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:10px;">Parallel Bus — 8 data bits transferred simultaneously each clock cycle</div>
+  <canvas id="parallelBusCanvas" width="680" height="130" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:0.78rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; CLK</span>
+    <span style="color:#68d391;">&#9632; D[7:0] data</span>
+    <span style="color:#76e4f7;">&#9632; VALID</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('parallelBusCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const period = 90;
+  let t = 0;
+  const dataValues = ['A3','F0','12','7E','C9','55','88','3B'];
+
+  function drawClk(y, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = (x + t) % period;
+      const v = ph < period/2 ? y : y+22;
+      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function drawData(y, color) {
+    const H = y + 5;
+    const L = y + 25;
+    const M = (H + L) / 2;
+    const tw = 8;
+
+    function topY(x) {
+      const ph = ((x + t) % period + period) % period;
+      if (ph < tw) return M + (H - M) * (ph / tw);
+      if (ph > period - tw) return H + (M - H) * ((ph - (period - tw)) / tw);
+      return H;
+    }
+    function botY(x) {
+      const ph = ((x + t) % period + period) % period;
+      if (ph < tw) return M + (L - M) * (ph / tw);
+      if (ph > period - tw) return L + (M - L) * ((ph - (period - tw)) / tw);
+      return L;
+    }
+
+    
+    ctx.beginPath();
+    ctx.moveTo(0, topY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, topY(x));
+    for (let x = W - 1; x >= 0; x--) ctx.lineTo(x, botY(x));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(104,211,145,0.12)';
+    ctx.fill();
+
+    
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, topY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, topY(x));
+    ctx.stroke();
+
+    
+    ctx.beginPath();
+    ctx.moveTo(0, botY(0));
+    for (let x = 1; x < W; x++) ctx.lineTo(x, botY(x));
+    ctx.stroke();
+
+    
+    const baseSeg = Math.floor(t / period);
+    const offset = t % period;
+    for (let i = -1; i <= Math.ceil(W / period) + 1; i++) {
+      const segX = i * period - offset;
+      const labelX = segX + tw + 6;
+      if (labelX >= 4 && labelX < W - 28) {
+        const idx = ((baseSeg + i) % dataValues.length + dataValues.length) % dataValues.length;
+        ctx.fillStyle = color;
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText('0x' + dataValues[idx], labelX, M + 4);
+      }
+    }
+  }
+
+  function drawValid(y, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = (x + t) % period;
+      const v = ph < 6 || ph > period-6 ? y+11 : y+2;
+      x===0 ? ctx.moveTo(x,v) : ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function label(text, y, color){
+    ctx.fillStyle = color; ctx.font='11px monospace';
+    ctx.fillText(text, 4, y);
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    drawClk(10, '#f6e05e');
+    label('CLK', 22, '#f6e05e');
+    drawData(50, '#68d391');
+    label('D[7:0]', 62, '#68d391');
+    drawValid(95, '#76e4f7');
+    label('VALID', 107, '#76e4f7');
+    t = (t+0.7) % period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
+
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Simple, intuitive structure — easy to design and debug</li>
+<li>High bandwidth at low frequency (e.g., 8-bit × 100 MHz = 800 Mbps)</li>
+<li>No serializer/deserializer needed → low latency</li>
+<li>Shared clock makes synchronization straightforward</li>
+</ul>
+<hr>
+<h2 id="2-limitations-and-real-world-problems">2. Limitations and Real-World Problems<a hidden class="anchor" aria-hidden="true" href="#2-limitations-and-real-world-problems">#</a></h2>
+<h3 id="1-pin-count-and-pcb-complexity">(1) Pin Count and PCB Complexity<a hidden class="anchor" aria-hidden="true" href="#1-pin-count-and-pcb-complexity">#</a></h3>
+<p>As data width increases, package pin count, PCB routing complexity, and cost grow rapidly.</p>
+<blockquote>
+<p>Example: A 32-bit parallel bus requires 32 data + 1 clock + 2–4 control = <strong>35–37 pins</strong></p>
+</blockquote>
+<h3 id="2-skew--the-enemy-of-timing">(2) Skew — The Enemy of Timing<a hidden class="anchor" aria-hidden="true" href="#2-skew--the-enemy-of-timing">#</a></h3>
+<p>All data bits must arrive simultaneously, but in practice each trace has slightly different lengths, impedances, and loads — causing arrival time differences known as <strong>skew</strong>. At high speeds, skew becomes critical.</p>
+<pre tabindex="0"><code>CLK  ──┐  ┌──┐  ┌──
+       └──┘  └──┘
+D[0] ───────────────  ← Ideal (no delay)
+     ∆t₁↕
+D[1] ───────────────  ← Delay from trace length difference
+     ∆t₂↕
+D[2] ───────────────  ← Additional delay
+</code></pre><div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:10px;">Skew — each signal arrives at a different time due to trace length differences</div>
+  <canvas id="skewCanvas" width="680" height="160" style="width:100%;border-radius:6px;"></canvas>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:0.78rem;flex-wrap:wrap;">
+    <span style="color:#f6e05e;">&#9632; CLK</span>
+    <span style="color:#68d391;">&#9632; D[0] ideal</span>
+    <span style="color:#fc8181;">&#9632; D[1] +70ps skew</span>
+    <span style="color:#76e4f7;">&#9632; D[2] +140ps skew</span>
+    <span style="color:#ff6b6b;">&#8597; valid sampling window</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('skewCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const period = 100;
+  const skews = [0, 10, 20];
+  const colors = ['#68d391','#fc8181','#76e4f7'];
+  let t = 0;
+
+  function drawWave(y, color, skew){
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph = ((x+t-skew)%period+period)%period;
+      const v = ph<period/2 ? y : y+24;
+      x===0?ctx.moveTo(x,v):ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function drawClk(y){
+    ctx.strokeStyle='#f6e05e'; ctx.lineWidth=2.5; ctx.beginPath();
+    for(let x=0;x<W;x++){
+      const ph=(x+t)%period;
+      const v=ph<period/2?y:y+24;
+      x===0?ctx.moveTo(x,v):ctx.lineTo(x,v);
+    }
+    ctx.stroke();
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    drawClk(8);
+    ctx.fillStyle='#f6e05e'; ctx.font='11px monospace'; ctx.fillText('CLK',4,20);
+    skews.forEach((sk,i)=>{
+      drawWave(45+i*36, colors[i], sk);
+      ctx.fillStyle=colors[i]; ctx.font='11px monospace';
+      ctx.fillText('D['+i+']',4,57+i*36);
+    });
+    ctx.fillStyle='rgba(255,107,107,0.12)';
+    for(let x=0;x<W;x+=period){
+      const xBase = (x - t%period + period)%period;
+      ctx.fillRect(xBase+skews[2], 0, period/2-skews[2], H);
+    }
+    ctx.strokeStyle='#ff6b6b'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    for(let x=period/2;x<W;x+=period){
+      const xBase=(x-t%period+period)%period;
+      if(xBase>10 && xBase<W-40){
+        skews.forEach(sk=>{
+          ctx.beginPath(); ctx.moveTo(xBase+sk,0); ctx.lineTo(xBase+sk,H); ctx.stroke();
+        });
+      }
+    }
+    ctx.setLineDash([]);
+    t=(t+0.5)%period;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
+
+<p><strong>Real-world impact:</strong></p>
+<ul>
+<li>At 1 GHz (1 ns period), 200 ps of skew consumes <strong>20% of the timing budget</strong></li>
+<li>A 1 cm trace length difference ≈ 60–70 ps of skew (propagation speed ~15–17 cm/ns)</li>
+<li>Excessive skew causes setup/hold violations and data errors</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ul>
+<li>Trace length matching (serpentine routing) is mandatory in PCB layout</li>
+<li>Validate skew, reflections, and jitter using SI simulation (IBIS models, etc.)</li>
+</ul>
+<h3 id="3-emi-and-crosstalk">(3) EMI and Crosstalk<a hidden class="anchor" aria-hidden="true" href="#3-emi-and-crosstalk">#</a></h3>
+<p>When multiple signals switch simultaneously, electromagnetic interference (crosstalk) and SSN (Simultaneous Switching Noise) appear between adjacent lines — making FCC/CE EMC certification significantly harder to pass.</p>
+<h3 id="4-signal-integrity-at-high-frequencies">(4) Signal Integrity at High Frequencies<a hidden class="anchor" aria-hidden="true" href="#4-signal-integrity-at-high-frequencies">#</a></h3>
+<p>As frequency increases, reflections, ringing, overshoot, and undershoot become critical SI problems.</p>
+<p>Power consumption scales with both width and frequency:</p>
+<p>$$P = C \times V^2 \times f \times N_{bits}$$</p>
+<p>Increasing width worsens pin count, PCB complexity, EMI, and power. Increasing frequency worsens SI, skew, and EMI. Both directions have hard physical limits.</p>
+<h3 id="5-board-and-cable-design-difficulty">(5) Board and Cable Design Difficulty<a hidden class="anchor" aria-hidden="true" href="#5-board-and-cable-design-difficulty">#</a></h3>
+<ul>
+<li>All traces must be matched to within picoseconds — PCB layout becomes extremely complex</li>
+<li>Longer cables accumulate more skew; connector and cable costs increase accordingly</li>
+</ul>
+<p><strong>Practical design tips:</strong></p>
+<ul>
+<li>Route data, clock, and control traces on the same layer with matched impedance and serpentine length matching</li>
+<li>For high-speed parallel buses like DDR, use per-byte DQS (source-synchronous strobe) to contain skew to within each byte lane</li>
+<li>Apply Write Leveling and Read Training to compensate for board-specific timing variation</li>
+</ul>
+<hr>
+<h2 id="3-real-world-examples-and-the-evolution-to-serial">3. Real-World Examples and the Evolution to Serial<a hidden class="anchor" aria-hidden="true" href="#3-real-world-examples-and-the-evolution-to-serial">#</a></h2>
+<h3 id="1-ddr4-memory-interface">(1) DDR4 Memory Interface<a hidden class="anchor" aria-hidden="true" href="#1-ddr4-memory-interface">#</a></h3>
+<ul>
+<li>64-bit data + 8-bit ECC = 72 signals total</li>
+<li>Each byte lane has its own DQS strobe signal → skew correction per byte group</li>
+<li>Write Leveling and Read Training automatically compensate for board-level timing variation</li>
+</ul>
+<h3 id="2-pci--pcie-evolution">(2) PCI → PCIe Evolution<a hidden class="anchor" aria-hidden="true" href="#2-pci--pcie-evolution">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Interface</th>
+          <th>Type</th>
+          <th>Bus</th>
+          <th>Frequency</th>
+          <th>Bandwidth</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>PCI</td>
+          <td>Parallel</td>
+          <td>32-bit shared</td>
+          <td>33 MHz</td>
+          <td>133 MB/s</td>
+      </tr>
+      <tr>
+          <td>PCI-X</td>
+          <td>Parallel</td>
+          <td>64-bit shared</td>
+          <td>133 MHz</td>
+          <td>1,066 MB/s</td>
+      </tr>
+      <tr>
+          <td>PCIe Gen1 x16</td>
+          <td>Serial</td>
+          <td>16 lanes × 1 pair</td>
+          <td>2.5 Gbps/lane</td>
+          <td>~4 GB/s</td>
+      </tr>
+      <tr>
+          <td>PCIe Gen5 x16</td>
+          <td>Serial</td>
+          <td>16 lanes × 1 pair</td>
+          <td>32 Gbps/lane</td>
+          <td>~64 GB/s</td>
+      </tr>
+  </tbody>
+</table>
+<p>The industry shifted from parallel shared buses to serial point-to-point links — drastically reducing pin count while multiplying bandwidth by orders of magnitude.</p>
+<div style="background:#1a1a2e;border-radius:10px;padding:20px;margin:24px 0;font-family:monospace;">
+  <div style="color:#a0aec0;font-size:0.8rem;margin-bottom:14px;">Bandwidth comparison: Parallel bus &#8594; Serial PCIe</div>
+  <canvas id="bwCanvas" width="680" height="200" style="width:100%;border-radius:6px;"></canvas>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('bwCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  const bars = [
+    {label:'PCI',       bw:0.133, color:'#fc8181', type:'Parallel'},
+    {label:'PCI-X',     bw:1.066, color:'#f6ad55', type:'Parallel'},
+    {label:'PCIe G1x16',bw:4,     color:'#68d391', type:'Serial'},
+    {label:'PCIe G3x16',bw:16,    color:'#76e4f7', type:'Serial'},
+    {label:'PCIe G5x16',bw:64,    color:'#b794f4', type:'Serial'},
+  ];
+  const maxBW = 64;
+  let anim = 0;
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,W,H);
+    const barH = 28, gap = 10, leftPad = 110, topPad = 10;
+    anim = Math.min(anim+0.03, 1);
+    const ease = 1-Math.pow(1-anim,3);
+
+    bars.forEach((b,i)=>{
+      const y = topPad + i*(barH+gap);
+      const maxW = W - leftPad - 80;
+      const bw = b.bw * ease;
+      const barW = Math.max(2, (bw/maxBW)*maxW);
+
+      ctx.fillStyle='#a0aec0'; ctx.font='12px monospace';
+      ctx.fillText(b.label, 4, y+barH/2+4);
+
+      ctx.fillStyle=b.color+'33';
+      ctx.fillRect(leftPad, y, maxW, barH);
+      ctx.fillStyle=b.color;
+      ctx.fillRect(leftPad, y, barW, barH);
+
+      ctx.fillStyle='#e2e8f0'; ctx.font='bold 12px monospace';
+      const bwText = b.bw >= 1 ? b.bw+' GB/s' : (b.bw*1000).toFixed(0)+' MB/s';
+      ctx.fillText(bwText, leftPad+barW+6, y+barH/2+4);
+
+      ctx.fillStyle = b.type==='Serial'?'#68d39133':'#fc818133';
+      ctx.fillRect(W-72, y+4, 66, barH-8);
+      ctx.fillStyle = b.type==='Serial'?'#68d391':'#fc8181';
+      ctx.font='10px monospace';
+      ctx.fillText(b.type, W-68, y+barH/2+3);
+    });
+
+    if(anim < 1) requestAnimationFrame(render);
+  }
+  render();
+})();
+</script>
+
+<hr>
+<h2 id="4-verilog-example">4. Verilog Example<a hidden class="anchor" aria-hidden="true" href="#4-verilog-example">#</a></h2>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-verilog" data-lang="verilog"><span style="display:flex;"><span><span style="color:#75715e">// Simple parallel data transfer example
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> parallel_tx (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">wire</span>       clk,       <span style="color:#75715e">// System clock
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">wire</span>       rst_n,     <span style="color:#75715e">// Active-low reset
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">wire</span> [<span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] data_in,   <span style="color:#75715e">// 8-bit parallel input
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">input</span>  <span style="color:#66d9ef">wire</span>       valid_in,  <span style="color:#75715e">// Input valid signal
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">output</span> <span style="color:#66d9ef">reg</span>  [<span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>] data_out,  <span style="color:#75715e">// 8-bit parallel output
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">output</span> <span style="color:#66d9ef">reg</span>        valid_out  <span style="color:#75715e">// Output valid signal
+</span></span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">always</span> @(<span style="color:#66d9ef">posedge</span> clk <span style="color:#66d9ef">or</span> <span style="color:#66d9ef">negedge</span> rst_n) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>rst_n) <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>            data_out  <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">8&#39;h00</span>;
+</span></span><span style="display:flex;"><span>            valid_out <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">1</span><span style="color:#ae81ff">&#39;b0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span> <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">begin</span>
+</span></span><span style="display:flex;"><span>            data_out  <span style="color:#f92672">&lt;=</span> data_in;   <span style="color:#75715e">// 1-clock pipeline delay
+</span></span></span><span style="display:flex;"><span>            valid_out <span style="color:#f92672">&lt;=</span> valid_in;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">endmodule</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This module registers 8-bit parallel data with a 1-clock pipeline delay — the foundation of synchronous parallel data transfer in FPGA and ASIC design.</p>
+<p><img alt="Parallel Interface Waveform" loading="lazy" src="/posts/high-speed-parallel-interface-design/parallel_waveform.png"></p>
+<p><strong>Waveform behavior:</strong> <code>data_in</code> is captured on the rising edge of <code>clk</code>, and <code>data_out</code> appears one clock cycle later. The <code>valid</code> signal is delayed identically to maintain handshake timing.</p>
+<hr>
+<h2 id="5-summary">5. Summary<a hidden class="anchor" aria-hidden="true" href="#5-summary">#</a></h2>
+<ul>
+<li>Parallel interfaces are intuitive and easy to implement, but face hard physical, electrical, and economic limits at high speeds.</li>
+<li>Skew, EMI, signal integrity, and cost constraints collectively push high-speed designs toward source-synchronous (DQ+DQS) or fully serial (PCIe, USB, etc.) architectures.</li>
+<li>When designing parallel interfaces, always apply trace length matching, SI simulation, and calibration techniques such as Write Leveling and Read Training.</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/parallel-interface/">Parallel Interface</a></li>
+      <li><a href="https://easyfpga.blog/tags/high-speed/">High-Speed</a></li>
+      <li><a href="https://easyfpga.blog/tags/skew/">Skew</a></li>
+      <li><a href="https://easyfpga.blog/tags/pcb/">PCB</a></li>
+      <li><a href="https://easyfpga.blog/tags/ddr/">DDR</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/signal-integrity/">Signal Integrity</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/source-synchronous-parallel-interface/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Source-Synchronous Signaling: How High-Speed Parallel Interfaces Stay in Sync</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

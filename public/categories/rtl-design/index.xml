@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>RTL Design on EasyFPGA</title>
+    <link>https://easyfpga.blog/categories/rtl-design/</link>
+    <description>Recent content in RTL Design on EasyFPGA</description>
+    <image>
+      <title>EasyFPGA</title>
+      <url>https://easyfpga.blog/images/easyfpga_logo.jpg</url>
+      <link>https://easyfpga.blog/images/easyfpga_logo.jpg</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 13 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://easyfpga.blog/categories/rtl-design/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CRC Calculator &amp; RTL Generator: Complete Guide</title>
+      <link>https://easyfpga.blog/posts/crc-calculator-guide/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://easyfpga.blog/posts/crc-calculator-guide/</guid>
+      <description>&lt;p&gt;CRC (Cyclic Redundancy Check) is the most widely used error-detection mechanism in digital communication — from Ethernet frames to USB packets to SSD data integrity. This post explains how CRC works mathematically and shows how to use the &lt;a href=&#34;https://easyfpga.blog/tools/crc-calculator/&#34;&gt;free online CRC Calculator &amp;amp; RTL Generator&lt;/a&gt; to produce ready-to-simulate SystemVerilog code for your FPGA design.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;what-is-crc&#34;&gt;What Is CRC?&lt;/h2&gt;
+&lt;p&gt;CRC appends a checksum to a data block so the receiver can detect corruption. The transmitter computes a CRC value over the data and appends it; the receiver recomputes the CRC and compares. A mismatch means a transmission error occurred.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

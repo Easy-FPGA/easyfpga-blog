@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Quantization (양자화) | EasyFPGA</title>
+<meta name="keywords" content="FPGA, Quantization">
+<meta name="description" content="Quantization이란?
+
+
+신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정
+
+
+딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술
+
+
+CNN에서 의미
+CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.
+
+FPGA에서 floating-point는 자원 소모가 큼.
+
+DSP 블록, LUT, Flip-Flop 사용량 증가
+
+fixed-point는 연산속도가 빠르고 자원 소모가 적음.
+
+CNN 추론에 적합 (특히 edge device나 저전력 시스템)
+FPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/quantization-%ec%96%91%ec%9e%90%ed%99%94/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/quantization-%ec%96%91%ec%9e%90%ed%99%94/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://easyfpga.blog/posts/quantization-%ec%96%91%ec%9e%90%ed%99%94/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Quantization (양자화)">
+  <meta property="og:description" content="Quantization이란? 신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정
+딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술
+CNN에서 의미 CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.
+FPGA에서 floating-point는 자원 소모가 큼. DSP 블록, LUT, Flip-Flop 사용량 증가
+fixed-point는 연산속도가 빠르고 자원 소모가 적음. CNN 추론에 적합 (특히 edge device나 저전력 시스템)
+FPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-11-24T23:03:14+00:00">
+    <meta property="article:modified_time" content="2025-11-24T23:03:14+00:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="Quantization">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Quantization (양자화)">
+  <meta name="twitter:description" content="Quantization이란? 신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정
+딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술
+CNN에서 의미 CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.
+FPGA에서 floating-point는 자원 소모가 큼. DSP 블록, LUT, Flip-Flop 사용량 증가
+fixed-point는 연산속도가 빠르고 자원 소모가 적음. CNN 추론에 적합 (특히 edge device나 저전력 시스템)
+FPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Quantization (양자화)",
+      "item": "https://easyfpga.blog/posts/quantization-%ec%96%91%ec%9e%90%ed%99%94/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Quantization (양자화)",
+  "name": "Quantization (양자화)",
+  "description": "Quantization이란? 신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정\n딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술\nCNN에서 의미 CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.\nFPGA에서 floating-point는 자원 소모가 큼. DSP 블록, LUT, Flip-Flop 사용량 증가\nfixed-point는 연산속도가 빠르고 자원 소모가 적음. CNN 추론에 적합 (특히 edge device나 저전력 시스템)\nFPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.\n",
+  "keywords": [
+    "FPGA", "Quantization"
+  ],
+  "articleBody": "Quantization이란? 신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정\n딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술\nCNN에서 의미 CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.\nFPGA에서 floating-point는 자원 소모가 큼. DSP 블록, LUT, Flip-Flop 사용량 증가\nfixed-point는 연산속도가 빠르고 자원 소모가 적음. CNN 추론에 적합 (특히 edge device나 저전력 시스템)\nFPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.\n핵심 부동 소수점(floating point) 값을 정수(Integer) 값으로 mapping(매핑)하면서도 정보 소실을 최소화하는 것.\n변환 과정 Real_number = Stored_integer * Scaling factor,\n0.0.3508980572 를 ap_fixed\u003c8,2\u003e로 변환하는 과정\nScale 곱하기: 0.3508980572 x 64 = 22.457…\n정수변환: 22(10진수), 0x16(16진수)\n복원값: 22 / 64=0.34375\n2진수 표현:\n0x16= 0b00010110 정수부:00\n소수부: 010110 = 22/64=0.34375 참고 자료 https://kr.mathworks.com/company/technical-articles/what-is-int8-quantization-and-why-is-it-popular-for-deep-neural-networks.html\n",
+  "wordCount" : "154",
+  "inLanguage": "en",
+  "datePublished": "2025-11-24T23:03:14Z",
+  "dateModified": "2025-11-24T23:03:14Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/quantization-%ec%96%91%ec%9e%90%ed%99%94/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Quantization (양자화)
+    </h1>
+    <div class="post-meta"><span title='2025-11-24 23:03:14 +0000 +0000'>November 24, 2025</span>&nbsp;·&nbsp;<span>1 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#quantization%ec%9d%b4%eb%9e%80" aria-label="Quantization이란?">Quantization이란?</a></li>
+                <li>
+                    <a href="#cnn%ec%97%90%ec%84%9c-%ec%9d%98%eb%af%b8" aria-label="CNN에서 의미">CNN에서 의미</a></li>
+                <li>
+                    <a href="#%ed%95%b5%ec%8b%ac" aria-label="핵심">핵심</a></li>
+                <li>
+                    <a href="#%eb%b3%80%ed%99%98-%ea%b3%bc%ec%a0%95" aria-label="변환 과정">변환 과정</a></li>
+                <li>
+                    <a href="#%ec%b0%b8%ea%b3%a0-%ec%9e%90%eb%a3%8c" aria-label="참고 자료">참고 자료</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="quantization이란">Quantization이란?<a hidden class="anchor" aria-hidden="true" href="#quantization이란">#</a></h2>
+<ul>
+<li>
+<p>신호 처리 분야: 연속적인 값을 이산적인 값(정수 등)으로 바꾸는 과정</p>
+</li>
+<li>
+<p><strong>딥러닝/AI 분야: 부동소수점(FP32, FP16 등)으로 표현된 가중치나 활성값을 더 작은 정수(INT8 등)로 변환해 메모리와 연산량을 줄이는 기술</strong></p>
+</li>
+</ul>
+<h2 id="cnn에서-의미">CNN에서 의미<a hidden class="anchor" aria-hidden="true" href="#cnn에서-의미">#</a></h2>
+<p>CNN을 HDL로 구현할 때, floating-point 대신 fixed-point를 사용하는 경우가 많습니다.</p>
+<ul>
+<li>FPGA에서 floating-point는 자원 소모가 큼.</li>
+</ul>
+<p>DSP 블록, LUT, Flip-Flop 사용량 증가</p>
+<ul>
+<li>fixed-point는 연산속도가 빠르고 자원 소모가 적음.</li>
+</ul>
+<p>CNN 추론에 적합 (특히 edge device나 저전력 시스템)</p>
+<p>FPGA는 병렬 처리에 강점이 있지만, 자원이 제한적이라 모델을 잘 경량화시켜야 실시간 성능이 잘 나올 수 있습니다. 특히, Quantization 없이는 너무 무거운 모델이 FPGA에서 구동되기 어렵습니다. CNN 기반 객체 인식 모델은 계산량이 많기 때문에, Quantization은 필수라고 볼 수 있습니다.</p>
+<h2 id="핵심">핵심<a hidden class="anchor" aria-hidden="true" href="#핵심">#</a></h2>
+<p>부동 소수점(floating point) 값을 정수(Integer) 값으로 mapping(매핑)하면서도 <strong>정보 소실을 최소화하는 것.</strong></p>
+<h2 id="변환-과정">변환 과정<a hidden class="anchor" aria-hidden="true" href="#변환-과정">#</a></h2>
+<ul>
+<li>
+<p>Real_number = Stored_integer * Scaling factor,</p>
+</li>
+<li>
+<p>0.0.3508980572 를 ap_fixed&lt;8,2&gt;로 변환하는 과정</p>
+</li>
+<li>
+<p>Scale 곱하기: 0.3508980572 x 64 = 22.457&hellip;</p>
+</li>
+<li>
+<p>정수변환: 22(10진수), 0x16(16진수)</p>
+</li>
+<li>
+<p>복원값: 22 / 64=0.34375</p>
+</li>
+</ul>
+<p>2진수 표현:</p>
+<ul>
+<li>0x16= 0b00010110</li>
+</ul>
+<p>정수부:00</p>
+<ul>
+<li>소수부: 010110 = 22/64=0.34375</li>
+</ul>
+<h2 id="참고-자료">참고 자료<a hidden class="anchor" aria-hidden="true" href="#참고-자료">#</a></h2>
+<p><a href="https://kr.mathworks.com/company/technical-articles/what-is-int8-quantization-and-why-is-it-popular-for-deep-neural-networks.html">https://kr.mathworks.com/company/technical-articles/what-is-int8-quantization-and-why-is-it-popular-for-deep-neural-networks.html</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/quantization/">Quantization</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/critical-path%ec%99%80-pipelining/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Critical path와 Pipelining</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/fpga%ec%97%90%ec%84%9c-lenet-5-%ea%b0%9c%ec%9a%94/">
+    <span class="title">Next »</span>
+    <br>
+    <span>FPGA에서 LeNet-5 구현 개요</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

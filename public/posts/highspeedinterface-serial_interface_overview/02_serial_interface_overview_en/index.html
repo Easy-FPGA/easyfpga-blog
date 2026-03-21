@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>High-Speed Serial Interface: Why the World Moved Beyond Parallel | EasyFPGA</title>
+<meta name="keywords" content="serial interface, parallel interface, clock recovery, skew, differential signaling, EMI, protocol, FPGA, DDR">
+<meta name="description" content="Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="High-Speed Serial Interface: Why the World Moved Beyond Parallel">
+  <meta property="og:description" content="Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-21T09:00:00+09:00">
+    <meta property="article:modified_time" content="2026-03-21T09:00:00+09:00">
+    <meta property="article:tag" content="Serial Interface">
+    <meta property="article:tag" content="Parallel Interface">
+    <meta property="article:tag" content="Clock Recovery">
+    <meta property="article:tag" content="Skew">
+    <meta property="article:tag" content="Differential Signaling">
+    <meta property="article:tag" content="EMI">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="High-Speed Serial Interface: Why the World Moved Beyond Parallel">
+  <meta name="twitter:description" content="Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "High-Speed Serial Interface: Why the World Moved Beyond Parallel",
+      "item": "https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "High-Speed Serial Interface: Why the World Moved Beyond Parallel",
+  "name": "High-Speed Serial Interface: Why the World Moved Beyond Parallel",
+  "description": "Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.",
+  "keywords": [
+    "serial interface", "parallel interface", "clock recovery", "skew", "differential signaling", "EMI", "protocol", "FPGA", "DDR"
+  ],
+  "articleBody": "High-Speed Serial Interface Why Serial Interface? Summary of Parallel Interface Limitations 1 2 3 4 5 6 Parallel (8-bit @ 1GHz) Serial (1-bit @ 8GHz) ├─ Requires 9+ pins ├─ Requires 2 pins (Diff Pair) ├─ Severe skew issues ├─ No skew issues ├─ High EMI ├─ Low EMI (differential signal) ├─ High board complexity ├─ Simple board └─ Limited high-speed scaling └─ Easy high-speed scaling Paradigm Shift “Multiple slow lanes” → “One fast lane”\nKey Advantages of Serial Interface 1. Minimal Pin Count 1 2 3 4 5 6 ┌─────────────┐ ┌─────────────┐ │ TX IC │ TX+ │ RX IC │ │ ├──────────►│ │ │ │ TX- │ │ │ ├──────────►│ │ └─────────────┘ └─────────────┘ Communication possible with just 1 differential pair Bidirectional: TX pair + RX pair = 4 pins total Reduced package cost, enables more channels 2. Skew Problem Solution Complexity Reduction:\nParallel: Must manage skew between 9 signals (CLK + 8 data)\nInter-lane skew: hundreds of ps tolerance Requires length matching for all 9 traces Extremely difficult at high frequencies Serial: Only manage skew within differential pair (TX+, TX-)\nIntra-pair skew: few ps tolerance (±5ps typical) Length matching for just 2 traces Much simpler PCB design Common-mode noise rejection with differential signaling\nTiming margin drastically improved\n3. High-Speed Operation Capability Parallel: Difficult above 1GHz Serial: 10Gbps, 25Gbps, 56Gbps possible Data rate = Clock frequency × Encoding efficiency 4. Reduced Electromagnetic Interference (EMI) - Differential signals reduce electromagnetic radiation\r- Strong against external noise\r- Easy FCC/CE certification\r5. Simple PCB Design Manage only 2 traces Reduced length matching burden Can reduce layer count Challenges of Serial Interface 1. Clock Recovery In parallel interfaces, clock is transmitted separately, but in serial, clock must be extracted from data.\nSerial Data \u0026 Clock Recovery Animation\rSolution: CDR (Clock Data Recovery)\nPLL/DLL-based clock recovery Clock synchronization through edge detection 2. Maintaining DC Balance Risk of clock recovery failure with consecutive ‘0’s or ‘1’s\nProblem: 0000000000... ─────────── (no edges)\r1111111111... ────────────\rSolution: 01010101... ─┐ ┌─┐ ┌─┐ ┌─ (abundant edges)\r└─┘ └─┘ └─┘ Solutions:\n8b/10b encoding: Guarantees DC balance Scrambler: Data randomization 3. Ensuring Data Integrity Increased possibility of errors in high-speed transmission\nSolutions:\nCRC: Error detection FEC (Forward Error Correction): Error correction 4. Serialization/Deserialization Parallel → Serial Serial → Parallel\r[8 bits] [1-bit stream]\r┌──────────┐ ┌──────────┐\r│Serializer│ ────────────► │Deserializ│\r│ │ 1-bit │ er │\r└──────────┘ └──────────┘ Solution: SERDES (Serializer/Deserializer)\nMajor Standards and Protocols PCI Express (PCIe) Speed: Gen1 (2.5GT/s) ~ Gen5 (32GT/s) Encoding: Gen1/2 uses 8b/10b, Gen3+ uses 128b/130b Lanes: x1, x4, x8, x16 configurations USB USB 2.0: 480Mbps USB 3.0: 5Gbps (8b/10b) USB 3.1: 10Gbps USB4: 40Gbps SATA SATA 1.0: 1.5Gbps SATA 2.0: 3Gbps SATA 3.0: 6Gbps Encoding: 8b/10b Ethernet 1000BASE-T: 1Gbps 10GBASE-R: 10Gbps (64b/66b) 25G/50G/100G Ethernet: 25Gbps+ DisplayPort / HDMI DisplayPort 1.4: 32.4Gbps (4 lanes) HDMI 2.1: 48Gbps Aurora, RapidIO Xilinx and other FPGA manufacturer high-speed serial protocols Serial Interface Layer Architecture ┌─────────────────────────────────────┐\r│ Application Layer │ ← User data\r├─────────────────────────────────────┤\r│ Transaction/Link Layer │ ← Packetization, flow control\r│ - Packet framing │\r│ - CRC │\r│ - Flow control │\r├─────────────────────────────────────┤\r│ Physical Coding Sublayer (PCS) │ ← Encoding/Decoding\r│ - 8b/10b or 64b/66b encoding │\r│ - Scrambling │\r├─────────────────────────────────────┤\r│ Physical Media Attachment (PMA) │ ← SERDES\r│ - Serialization │\r│ - Deserialization │\r│ - Clock Recovery │\r├─────────────────────────────────────┤\r│ Physical Medium Dependent (PMD) │ ← Physical layer\r│ - TX Driver │\r│ - RX Equalizer │\r└─────────────────────────────────────┘ Bandwidth Comparison Parallel DDR3-1600 64-bit × 1600MT/s = 102.4 Gbps (theoretical)\rActual: 12.8 GB/s = 102.4 Gbps\rPin count: 64 data + control/clock = 80+ pins PCIe Gen3 x16 16 lanes × 8Gbps = 128 Gbps\rActual: 128b/130b encoding = ~125.9 Gbps\rPin count: 16 × 2 (differential) × 2 (TX/RX) = 64 pins (data only) Efficiency Analysis Bandwidth per pin: PCIe significantly higher Scalability: PCIe easily scales by adding lanes Transmission distance: Serial far superior Key Technologies in Serial Interface Implementation 1. 8b/10b Encoding Guarantees DC balance Supports clock recovery Control code insertion 2. Scrambler Data pattern randomization EMI distribution Improved clock recovery 3. CRC Data integrity verification Packet-level error detection 4. SERDES Parallel ↔ Serial conversion High-speed I/O interface CDR (Clock Data Recovery) Design Considerations Signal Integrity Impedance matching: 100Ω differential impedance Loss compensation: Pre-emphasis, Equalization Jitter management: Jitter budget calculation Power Consumption Power = C × V² × f × α\rHigh-speed serial:\r- f is high but fewer switching events\r- Small capacitance\r→ Overall power can be better than parallel Test and Verification BERT (Bit Error Rate Test): Measure bit error rate Eye Diagram: Evaluate signal quality Jitter analysis: Evaluate timing accuracy Conclusion High-speed serial interface has become the standard for modern high-speed communications for the following reasons:\nAdvantages ✓ Fewer pins ✓ Higher data transfer rates ✓ Simpler PCB design ✓ Lower EMI ✓ Excellent scalability\nChallenges to Overcome Clock recovery DC balance Data integrity Serialization/deserialization These challenges have been solved through technologies such as 8b/10b encoding, Scrambler, CRC, and SERDES.\nNext: Detailed principles of 8b/10b encoding\n",
+  "wordCount" : "839",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-03-21T09:00:00+09:00",
+  "dateModified": "2026-03-21T09:00:00+09:00",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/highspeedinterface-serial_interface_overview/02_serial_interface_overview_en/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      High-Speed Serial Interface: Why the World Moved Beyond Parallel
+    </h1>
+    <div class="post-description">
+      Explains the limitations of parallel interfaces—skew, EMI, pin count—and how high-speed serial interfaces (PCIe, SATA, USB, DDR, etc.) solve these challenges with differential signaling, clock recovery, and protocol innovation.
+    </div>
+    <div class="post-meta"><span title='2026-03-21 09:00:00 +0900 KST'>March 21, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#high-speed-serial-interface" aria-label="High-Speed Serial Interface">High-Speed Serial Interface</a><ul>
+                        
+                <li>
+                    <a href="#why-serial-interface" aria-label="Why Serial Interface?">Why Serial Interface?</a><ul>
+                        
+                <li>
+                    <a href="#summary-of-parallel-interface-limitations" aria-label="Summary of Parallel Interface Limitations">Summary of Parallel Interface Limitations</a></li>
+                <li>
+                    <a href="#paradigm-shift" aria-label="Paradigm Shift">Paradigm Shift</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-advantages-of-serial-interface" aria-label="Key Advantages of Serial Interface">Key Advantages of Serial Interface</a><ul>
+                        
+                <li>
+                    <a href="#1-minimal-pin-count" aria-label="1. Minimal Pin Count">1. Minimal Pin Count</a></li>
+                <li>
+                    <a href="#2-skew-problem-solution" aria-label="2. Skew Problem Solution">2. Skew Problem Solution</a></li>
+                <li>
+                    <a href="#3-high-speed-operation-capability" aria-label="3. High-Speed Operation Capability">3. High-Speed Operation Capability</a></li>
+                <li>
+                    <a href="#4-reduced-electromagnetic-interference-emi" aria-label="4. Reduced Electromagnetic Interference (EMI)">4. Reduced Electromagnetic Interference (EMI)</a></li>
+                <li>
+                    <a href="#5-simple-pcb-design" aria-label="5. Simple PCB Design">5. Simple PCB Design</a></li></ul>
+                </li>
+                <li>
+                    <a href="#challenges-of-serial-interface" aria-label="Challenges of Serial Interface">Challenges of Serial Interface</a><ul>
+                        
+                <li>
+                    <a href="#1-clock-recovery" aria-label="1. Clock Recovery">1. Clock Recovery</a></li>
+                <li>
+                    <a href="#2-maintaining-dc-balance" aria-label="2. Maintaining DC Balance">2. Maintaining DC Balance</a></li>
+                <li>
+                    <a href="#3-ensuring-data-integrity" aria-label="3. Ensuring Data Integrity">3. Ensuring Data Integrity</a></li>
+                <li>
+                    <a href="#4-serializationdeserialization" aria-label="4. Serialization/Deserialization">4. Serialization/Deserialization</a></li></ul>
+                </li>
+                <li>
+                    <a href="#major-standards-and-protocols" aria-label="Major Standards and Protocols">Major Standards and Protocols</a><ul>
+                        
+                <li>
+                    <a href="#pci-express-pcie" aria-label="PCI Express (PCIe)">PCI Express (PCIe)</a></li>
+                <li>
+                    <a href="#usb" aria-label="USB">USB</a></li>
+                <li>
+                    <a href="#sata" aria-label="SATA">SATA</a></li>
+                <li>
+                    <a href="#ethernet" aria-label="Ethernet">Ethernet</a></li>
+                <li>
+                    <a href="#displayport--hdmi" aria-label="DisplayPort / HDMI">DisplayPort / HDMI</a></li>
+                <li>
+                    <a href="#aurora-rapidio" aria-label="Aurora, RapidIO">Aurora, RapidIO</a></li></ul>
+                </li>
+                <li>
+                    <a href="#serial-interface-layer-architecture" aria-label="Serial Interface Layer Architecture">Serial Interface Layer Architecture</a></li>
+                <li>
+                    <a href="#bandwidth-comparison" aria-label="Bandwidth Comparison">Bandwidth Comparison</a><ul>
+                        
+                <li>
+                    <a href="#parallel-ddr3-1600" aria-label="Parallel DDR3-1600">Parallel DDR3-1600</a></li>
+                <li>
+                    <a href="#pcie-gen3-x16" aria-label="PCIe Gen3 x16">PCIe Gen3 x16</a></li>
+                <li>
+                    <a href="#efficiency-analysis" aria-label="Efficiency Analysis">Efficiency Analysis</a></li></ul>
+                </li>
+                <li>
+                    <a href="#key-technologies-in-serial-interface-implementation" aria-label="Key Technologies in Serial Interface Implementation">Key Technologies in Serial Interface Implementation</a><ul>
+                        
+                <li>
+                    <a href="#1-8b10b-encoding" aria-label="1. 8b/10b Encoding">1. 8b/10b Encoding</a></li>
+                <li>
+                    <a href="#2-scrambler" aria-label="2. Scrambler">2. Scrambler</a></li>
+                <li>
+                    <a href="#3-crc" aria-label="3. CRC">3. CRC</a></li>
+                <li>
+                    <a href="#4-serdes" aria-label="4. SERDES">4. SERDES</a></li></ul>
+                </li>
+                <li>
+                    <a href="#design-considerations" aria-label="Design Considerations">Design Considerations</a><ul>
+                        
+                <li>
+                    <a href="#signal-integrity" aria-label="Signal Integrity">Signal Integrity</a></li>
+                <li>
+                    <a href="#power-consumption" aria-label="Power Consumption">Power Consumption</a></li>
+                <li>
+                    <a href="#test-and-verification" aria-label="Test and Verification">Test and Verification</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a><ul>
+                        
+                <li>
+                    <a href="#advantages" aria-label="Advantages">Advantages</a></li>
+                <li>
+                    <a href="#challenges-to-overcome" aria-label="Challenges to Overcome">Challenges to Overcome</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="high-speed-serial-interface">High-Speed Serial Interface<a hidden class="anchor" aria-hidden="true" href="#high-speed-serial-interface">#</a></h1>
+<h2 id="why-serial-interface">Why Serial Interface?<a hidden class="anchor" aria-hidden="true" href="#why-serial-interface">#</a></h2>
+<h3 id="summary-of-parallel-interface-limitations">Summary of Parallel Interface Limitations<a hidden class="anchor" aria-hidden="true" href="#summary-of-parallel-interface-limitations">#</a></h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Parallel (8-bit @ 1GHz)          Serial (1-bit @ 8GHz)
+</span></span><span style="display:flex;"><span>├─ Requires 9+ pins              ├─ Requires 2 pins (Diff Pair)
+</span></span><span style="display:flex;"><span>├─ Severe skew issues            ├─ No skew issues
+</span></span><span style="display:flex;"><span>├─ High EMI                      ├─ Low EMI (differential signal)
+</span></span><span style="display:flex;"><span>├─ High board complexity         ├─ Simple board
+</span></span><span style="display:flex;"><span>└─ Limited high-speed scaling    └─ Easy high-speed scaling
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="paradigm-shift">Paradigm Shift<a hidden class="anchor" aria-hidden="true" href="#paradigm-shift">#</a></h3>
+<p><strong>&ldquo;Multiple slow lanes&rdquo; → &ldquo;One fast lane&rdquo;</strong></p>
+<h2 id="key-advantages-of-serial-interface">Key Advantages of Serial Interface<a hidden class="anchor" aria-hidden="true" href="#key-advantages-of-serial-interface">#</a></h2>
+<h3 id="1-minimal-pin-count">1. Minimal Pin Count<a hidden class="anchor" aria-hidden="true" href="#1-minimal-pin-count">#</a></h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>┌─────────────┐           ┌─────────────┐
+</span></span><span style="display:flex;"><span>│   TX IC     │   TX+     │   RX IC     │
+</span></span><span style="display:flex;"><span>│             ├──────────►│             │
+</span></span><span style="display:flex;"><span>│             │   TX-     │             │
+</span></span><span style="display:flex;"><span>│             ├──────────►│             │
+</span></span><span style="display:flex;"><span>└─────────────┘           └─────────────┘
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>Communication possible with just <strong>1 differential pair</strong></li>
+<li>Bidirectional: TX pair + RX pair = 4 pins total</li>
+<li>Reduced package cost, enables more channels</li>
+</ul>
+<h3 id="2-skew-problem-solution">2. Skew Problem Solution<a hidden class="anchor" aria-hidden="true" href="#2-skew-problem-solution">#</a></h3>
+<iframe src="/high-speed-interface/Parallel-vs-Serial-Skew.html" width="100%" height="360" style="border:0;" title="Parallel vs Serial Skew animation"></iframe>
+<p><strong>Complexity Reduction:</strong></p>
+<ul>
+<li>
+<p><strong>Parallel</strong>: Must manage skew between 9 signals (CLK + 8 data)</p>
+<ul>
+<li>Inter-lane skew: hundreds of ps tolerance</li>
+<li>Requires length matching for all 9 traces</li>
+<li>Extremely difficult at high frequencies</li>
+</ul>
+</li>
+<li>
+<p><strong>Serial</strong>: Only manage skew within differential pair (TX+, TX-)</p>
+<ul>
+<li>Intra-pair skew: few ps tolerance (±5ps typical)</li>
+<li>Length matching for just 2 traces</li>
+<li>Much simpler PCB design</li>
+</ul>
+</li>
+<li>
+<p><strong>Common-mode noise rejection</strong> with differential signaling</p>
+</li>
+<li>
+<p><strong>Timing margin</strong> drastically improved</p>
+</li>
+</ul>
+<h3 id="3-high-speed-operation-capability">3. High-Speed Operation Capability<a hidden class="anchor" aria-hidden="true" href="#3-high-speed-operation-capability">#</a></h3>
+<ul>
+<li><strong>Parallel</strong>: Difficult above 1GHz</li>
+<li><strong>Serial</strong>: 10Gbps, 25Gbps, 56Gbps possible</li>
+<li>Data rate = Clock frequency × Encoding efficiency</li>
+</ul>
+<h3 id="4-reduced-electromagnetic-interference-emi">4. Reduced Electromagnetic Interference (EMI)<a hidden class="anchor" aria-hidden="true" href="#4-reduced-electromagnetic-interference-emi">#</a></h3>
+<iframe src="/high-speed-interface/Differential-Field-Animation.html" width="100%" height="360" style="border:0;" title="Differential pair field animation"></iframe>
+- Differential signals reduce electromagnetic radiation
+- Strong against external noise
+- Easy FCC/CE certification
+<h3 id="5-simple-pcb-design">5. Simple PCB Design<a hidden class="anchor" aria-hidden="true" href="#5-simple-pcb-design">#</a></h3>
+<ul>
+<li>Manage only 2 traces</li>
+<li>Reduced length matching burden</li>
+<li>Can reduce layer count</li>
+</ul>
+<h2 id="challenges-of-serial-interface">Challenges of Serial Interface<a hidden class="anchor" aria-hidden="true" href="#challenges-of-serial-interface">#</a></h2>
+<h3 id="1-clock-recovery">1. Clock Recovery<a hidden class="anchor" aria-hidden="true" href="#1-clock-recovery">#</a></h3>
+<p>In parallel interfaces, clock is transmitted separately, but in serial, clock must be extracted from data.</p>
+
+
+
+
+
+<div style="text-align:center; margin:24px 0; max-width:100%;">
+  <iframe src="/high-speed-interface/Serial%20Clock%20Recovery%20Animation.html"
+          width="900" height="480"
+          style="width:100%; max-width:900px; height:480px; border:1px solid #334155; border-radius:12px; background:#0f172a;"
+          title="Serial Data Clock Recovery Animation"
+          loading="lazy"></iframe>
+  <div style="color:#a5b4fc; font-size:14px; margin-top:8px;">Serial Data &amp; Clock Recovery Animation</div>
+</div>
+<p><strong>Solution</strong>: CDR (Clock Data Recovery)</p>
+<ul>
+<li>PLL/DLL-based clock recovery</li>
+<li>Clock synchronization through edge detection</li>
+</ul>
+<h3 id="2-maintaining-dc-balance">2. Maintaining DC Balance<a hidden class="anchor" aria-hidden="true" href="#2-maintaining-dc-balance">#</a></h3>
+<p>Risk of clock recovery failure with consecutive &lsquo;0&rsquo;s or &lsquo;1&rsquo;s</p>
+<pre tabindex="0"><code>Problem: 0000000000... ─────────── (no edges)
+         1111111111... ────────────
+
+Solution: 01010101... ─┐ ┌─┐ ┌─┐ ┌─ (abundant edges)
+                       └─┘ └─┘ └─┘
+</code></pre><p><strong>Solutions</strong>:</p>
+<ul>
+<li><strong>8b/10b encoding</strong>: Guarantees DC balance</li>
+<li><strong>Scrambler</strong>: Data randomization</li>
+</ul>
+<h3 id="3-ensuring-data-integrity">3. Ensuring Data Integrity<a hidden class="anchor" aria-hidden="true" href="#3-ensuring-data-integrity">#</a></h3>
+<p>Increased possibility of errors in high-speed transmission</p>
+<p><strong>Solutions</strong>:</p>
+<ul>
+<li><strong>CRC</strong>: Error detection</li>
+<li><strong>FEC (Forward Error Correction)</strong>: Error correction</li>
+</ul>
+<h3 id="4-serializationdeserialization">4. Serialization/Deserialization<a hidden class="anchor" aria-hidden="true" href="#4-serializationdeserialization">#</a></h3>
+<pre tabindex="0"><code>Parallel → Serial          Serial → Parallel
+[8 bits]                   [1-bit stream]
+
+┌──────────┐               ┌──────────┐
+│Serializer│ ────────────► │Deserializ│
+│          │  1-bit        │   er     │
+└──────────┘               └──────────┘
+</code></pre><p><strong>Solution</strong>: SERDES (Serializer/Deserializer)</p>
+<h2 id="major-standards-and-protocols">Major Standards and Protocols<a hidden class="anchor" aria-hidden="true" href="#major-standards-and-protocols">#</a></h2>
+<h3 id="pci-express-pcie">PCI Express (PCIe)<a hidden class="anchor" aria-hidden="true" href="#pci-express-pcie">#</a></h3>
+<ul>
+<li><strong>Speed</strong>: Gen1 (2.5GT/s) ~ Gen5 (32GT/s)</li>
+<li><strong>Encoding</strong>: Gen1/2 uses 8b/10b, Gen3+ uses 128b/130b</li>
+<li><strong>Lanes</strong>: x1, x4, x8, x16 configurations</li>
+</ul>
+<h3 id="usb">USB<a hidden class="anchor" aria-hidden="true" href="#usb">#</a></h3>
+<ul>
+<li><strong>USB 2.0</strong>: 480Mbps</li>
+<li><strong>USB 3.0</strong>: 5Gbps (8b/10b)</li>
+<li><strong>USB 3.1</strong>: 10Gbps</li>
+<li><strong>USB4</strong>: 40Gbps</li>
+</ul>
+<h3 id="sata">SATA<a hidden class="anchor" aria-hidden="true" href="#sata">#</a></h3>
+<ul>
+<li><strong>SATA 1.0</strong>: 1.5Gbps</li>
+<li><strong>SATA 2.0</strong>: 3Gbps</li>
+<li><strong>SATA 3.0</strong>: 6Gbps</li>
+<li><strong>Encoding</strong>: 8b/10b</li>
+</ul>
+<h3 id="ethernet">Ethernet<a hidden class="anchor" aria-hidden="true" href="#ethernet">#</a></h3>
+<ul>
+<li><strong>1000BASE-T</strong>: 1Gbps</li>
+<li><strong>10GBASE-R</strong>: 10Gbps (64b/66b)</li>
+<li><strong>25G/50G/100G Ethernet</strong>: 25Gbps+</li>
+</ul>
+<h3 id="displayport--hdmi">DisplayPort / HDMI<a hidden class="anchor" aria-hidden="true" href="#displayport--hdmi">#</a></h3>
+<ul>
+<li><strong>DisplayPort 1.4</strong>: 32.4Gbps (4 lanes)</li>
+<li><strong>HDMI 2.1</strong>: 48Gbps</li>
+</ul>
+<h3 id="aurora-rapidio">Aurora, RapidIO<a hidden class="anchor" aria-hidden="true" href="#aurora-rapidio">#</a></h3>
+<ul>
+<li>Xilinx and other FPGA manufacturer high-speed serial protocols</li>
+</ul>
+<h2 id="serial-interface-layer-architecture">Serial Interface Layer Architecture<a hidden class="anchor" aria-hidden="true" href="#serial-interface-layer-architecture">#</a></h2>
+<pre tabindex="0"><code>┌─────────────────────────────────────┐
+│   Application Layer                 │  ← User data
+├─────────────────────────────────────┤
+│   Transaction/Link Layer            │  ← Packetization, flow control
+│   - Packet framing                  │
+│   - CRC                             │
+│   - Flow control                    │
+├─────────────────────────────────────┤
+│   Physical Coding Sublayer (PCS)    │  ← Encoding/Decoding
+│   - 8b/10b or 64b/66b encoding      │
+│   - Scrambling                      │
+├─────────────────────────────────────┤
+│   Physical Media Attachment (PMA)   │  ← SERDES
+│   - Serialization                   │
+│   - Deserialization                 │
+│   - Clock Recovery                  │
+├─────────────────────────────────────┤
+│   Physical Medium Dependent (PMD)   │  ← Physical layer
+│   - TX Driver                       │
+│   - RX Equalizer                    │
+└─────────────────────────────────────┘
+</code></pre><h2 id="bandwidth-comparison">Bandwidth Comparison<a hidden class="anchor" aria-hidden="true" href="#bandwidth-comparison">#</a></h2>
+<h3 id="parallel-ddr3-1600">Parallel DDR3-1600<a hidden class="anchor" aria-hidden="true" href="#parallel-ddr3-1600">#</a></h3>
+<pre tabindex="0"><code>64-bit × 1600MT/s = 102.4 Gbps (theoretical)
+Actual: 12.8 GB/s = 102.4 Gbps
+Pin count: 64 data + control/clock = 80+ pins
+</code></pre><h3 id="pcie-gen3-x16">PCIe Gen3 x16<a hidden class="anchor" aria-hidden="true" href="#pcie-gen3-x16">#</a></h3>
+<pre tabindex="0"><code>16 lanes × 8Gbps = 128 Gbps
+Actual: 128b/130b encoding = ~125.9 Gbps
+Pin count: 16 × 2 (differential) × 2 (TX/RX) = 64 pins (data only)
+</code></pre><h3 id="efficiency-analysis">Efficiency Analysis<a hidden class="anchor" aria-hidden="true" href="#efficiency-analysis">#</a></h3>
+<ul>
+<li>Bandwidth per pin: PCIe significantly higher</li>
+<li>Scalability: PCIe easily scales by adding lanes</li>
+<li>Transmission distance: Serial far superior</li>
+</ul>
+<h2 id="key-technologies-in-serial-interface-implementation">Key Technologies in Serial Interface Implementation<a hidden class="anchor" aria-hidden="true" href="#key-technologies-in-serial-interface-implementation">#</a></h2>
+<h3 id="1-8b10b-encoding">1. 8b/10b Encoding<a hidden class="anchor" aria-hidden="true" href="#1-8b10b-encoding">#</a></h3>
+<ul>
+<li>Guarantees DC balance</li>
+<li>Supports clock recovery</li>
+<li>Control code insertion</li>
+</ul>
+<h3 id="2-scrambler">2. Scrambler<a hidden class="anchor" aria-hidden="true" href="#2-scrambler">#</a></h3>
+<ul>
+<li>Data pattern randomization</li>
+<li>EMI distribution</li>
+<li>Improved clock recovery</li>
+</ul>
+<h3 id="3-crc">3. CRC<a hidden class="anchor" aria-hidden="true" href="#3-crc">#</a></h3>
+<ul>
+<li>Data integrity verification</li>
+<li>Packet-level error detection</li>
+</ul>
+<h3 id="4-serdes">4. SERDES<a hidden class="anchor" aria-hidden="true" href="#4-serdes">#</a></h3>
+<ul>
+<li>Parallel ↔ Serial conversion</li>
+<li>High-speed I/O interface</li>
+<li>CDR (Clock Data Recovery)</li>
+</ul>
+<h2 id="design-considerations">Design Considerations<a hidden class="anchor" aria-hidden="true" href="#design-considerations">#</a></h2>
+<h3 id="signal-integrity">Signal Integrity<a hidden class="anchor" aria-hidden="true" href="#signal-integrity">#</a></h3>
+<ul>
+<li><strong>Impedance matching</strong>: 100Ω differential impedance</li>
+<li><strong>Loss compensation</strong>: Pre-emphasis, Equalization</li>
+<li><strong>Jitter management</strong>: Jitter budget calculation</li>
+</ul>
+<h3 id="power-consumption">Power Consumption<a hidden class="anchor" aria-hidden="true" href="#power-consumption">#</a></h3>
+<pre tabindex="0"><code>Power = C × V² × f × α
+
+High-speed serial:
+- f is high but fewer switching events
+- Small capacitance
+→ Overall power can be better than parallel
+</code></pre><h3 id="test-and-verification">Test and Verification<a hidden class="anchor" aria-hidden="true" href="#test-and-verification">#</a></h3>
+<ul>
+<li><strong>BERT (Bit Error Rate Test)</strong>: Measure bit error rate</li>
+<li><strong>Eye Diagram</strong>: Evaluate signal quality</li>
+<li><strong>Jitter analysis</strong>: Evaluate timing accuracy</li>
+</ul>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>High-speed serial interface has become the standard for modern high-speed communications for the following reasons:</p>
+<h3 id="advantages">Advantages<a hidden class="anchor" aria-hidden="true" href="#advantages">#</a></h3>
+<p>✓ Fewer pins
+✓ Higher data transfer rates
+✓ Simpler PCB design
+✓ Lower EMI
+✓ Excellent scalability</p>
+<h3 id="challenges-to-overcome">Challenges to Overcome<a hidden class="anchor" aria-hidden="true" href="#challenges-to-overcome">#</a></h3>
+<ul>
+<li>Clock recovery</li>
+<li>DC balance</li>
+<li>Data integrity</li>
+<li>Serialization/deserialization</li>
+</ul>
+<p>These challenges have been solved through technologies such as <strong>8b/10b encoding</strong>, <strong>Scrambler</strong>, <strong>CRC</strong>, and <strong>SERDES</strong>.</p>
+<hr>
+<p><em>Next: Detailed principles of 8b/10b encoding</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/serial-interface/">Serial Interface</a></li>
+      <li><a href="https://easyfpga.blog/tags/parallel-interface/">Parallel Interface</a></li>
+      <li><a href="https://easyfpga.blog/tags/clock-recovery/">Clock Recovery</a></li>
+      <li><a href="https://easyfpga.blog/tags/skew/">Skew</a></li>
+      <li><a href="https://easyfpga.blog/tags/differential-signaling/">Differential Signaling</a></li>
+      <li><a href="https://easyfpga.blog/tags/emi/">EMI</a></li>
+      <li><a href="https://easyfpga.blog/tags/protocol/">Protocol</a></li>
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/ddr/">DDR</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://easyfpga.blog/posts/uart-implementation-ep5/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Custom RTL Design: TX &amp; RX</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

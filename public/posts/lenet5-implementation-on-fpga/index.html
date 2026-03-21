@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>LeNet-5 Implementation on FPGA: An Overview | EasyFPGA</title>
+<meta name="keywords" content="FPGA, LeNet, CNN, Deep Learning, Hardware Accelerator">
+<meta name="description" content="Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/lenet5-implementation-on-fpga/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/lenet5-implementation-on-fpga/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/lenet5-implementation-on-fpga/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="LeNet-5 Implementation on FPGA: An Overview">
+  <meta property="og:description" content="Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-11-23T22:47:19+00:00">
+    <meta property="article:modified_time" content="2025-11-23T22:47:19+00:00">
+    <meta property="article:tag" content="FPGA">
+    <meta property="article:tag" content="LeNet">
+    <meta property="article:tag" content="CNN">
+    <meta property="article:tag" content="Deep Learning">
+    <meta property="article:tag" content="Hardware Accelerator">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="LeNet-5 Implementation on FPGA: An Overview">
+  <meta name="twitter:description" content="Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "LeNet-5 Implementation on FPGA: An Overview",
+      "item": "https://easyfpga.blog/posts/lenet5-implementation-on-fpga/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "LeNet-5 Implementation on FPGA: An Overview",
+  "name": "LeNet-5 Implementation on FPGA: An Overview",
+  "description": "Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources.",
+  "keywords": [
+    "FPGA", "LeNet", "CNN", "Deep Learning", "Hardware Accelerator"
+  ],
+  "articleBody": "What Is LeNet-5? LeNet-5 is a convolutional neural network (CNN) proposed by Yann LeCun and colleagues in 1998 for handwritten digit recognition (the MNIST dataset). It is widely regarded as the historical model that established the foundational concepts of modern deep learning: convolution, pooling, and hierarchical feature extraction.\nLeNet-5 architecture as shown in (LeCun et al., 1998)\nMNIST — 70,000 greyscale 28×28 images of handwritten digits\nNetwork Architecture LeNet-5 takes a 32×32 greyscale image as input and processes it through 7 layers:\nLayer Type Details Output Shape Input — 32×32×1 greyscale 32×32×1 C1 Convolution 6 filters, 5×5 kernel, stride 1, no padding 28×28×6 S2 Average Pooling 2×2, stride 2 14×14×6 C3 Convolution 16 filters, 5×5 kernel 10×10×16 S4 Average Pooling 2×2, stride 2 5×5×16 C5 Convolution 120 filters, 5×5 kernel (fully-connected equivalent) 1×1×120 F6 Fully Connected 84 neurons 84 Output Fully Connected 10 neurons (softmax) 10 Activation function: tanh (original paper); ReLU commonly used in modern re-implementations Learning algorithm: Backpropagation Total parameters: ~61,000 Historical applications: ATM cheque reading, postal code recognition Why Implement LeNet-5 on an FPGA? LeNet-5 is an ideal starting point for FPGA-based neural network hardware because it is small enough to fit entirely on-chip:\nResource Estimate (INT8 weights) Weight storage ~61,000 × 8 bits ≈ 62 KB BRAM (18 kb blocks) ~28 blocks for weights + some for line buffers Total BRAM budget ~50–60 blocks (fits in a mid-range Artix/Kintex) MAC operations per frame ~340,000 multiply-accumulates Because all weights fit in on-chip BRAM, the design avoids the latency and bandwidth overhead of an external DDR interface — making it much simpler to build and analyse.\nMapping CNN Layers to FPGA Logic Convolutional Layers (C1, C3, C5) Each convolutional layer performs a sliding-window multiply-accumulate:\n$$y[r][c][k] = \\sum_{i}\\sum_{j} x[r+i][c+j] \\cdot w_k[i][j] + b_k$$\nFPGA implementation approach:\nStore the filter weights in BRAM or distributed RAM (small enough for LUT-RAM in early layers). Use a line buffer (a shift-register chain) to hold the current window of input pixels. Multiply each pixel in the window by the corresponding weight using DSP48 slices. Accumulate partial sums with an adder tree. To maximise throughput, unroll the convolution loop over the filter dimension so that all K filters compute in parallel.\nPooling Layers (S2, S4) LeNet-5 uses average pooling: divide the 2×2 window sum by 4 (a 2-bit right shift). This is a trivial operation in hardware — no multiplier required.\nFully Connected Layers (F6, Output) These are standard matrix-vector multiplications. With 84 or 10 output neurons, even a sequential implementation completes in very few clock cycles.\nPrecision: Why Floating-Point Is Impractical on FPGA The original C5/F6 layers use 32-bit floating-point (FP32) weights. On an FPGA:\nFP32 multipliers consume large numbers of LUTs and DSP slices. Latency is high relative to fixed-point alternatives. Fixed-point (e.g., INT8 or ap_fixed\u003c8,2\u003e) is the practical choice:\nEach multiplier becomes an 8×8-bit integer multiply — fits easily in one DSP48 slice. Memory footprint drops from 4 bytes to 1 byte per weight. Accuracy loss is minimal if quantisation is done correctly (see Quantization for CNN Inference on FPGA). Design Flow Summary Train and quantize: Train in PyTorch/TensorFlow (FP32), export calibrated INT8 weights. Map weights to BRAM: Use Vivado Block Memory Generator or initialise with $readmemh. Implement line buffers: Use shift-register primitives (SRL16/32 on Xilinx) to build the sliding input window. Instantiate DSP48 MAC arrays: One DSP per filter tap, or share a single DSP via systolic scheduling. Verify against software: Simulate the RTL against the golden PyTorch output using a common test image. Profile timing and resources: Target 100–150 MHz on a mid-range Artix-7 or Kintex-7. Summary LeNet-5 is arguably the best first CNN to build in hardware:\nSmall enough to fit entirely on-chip (no external DDR required) Architecture is well-documented and easy to understand layer by layer Sufficient complexity to teach all the key FPGA CNN implementation techniques: line buffers, fixed-point MAC arrays, BRAM weight storage Acts as a foundation for larger networks (ResNet, MobileNet) once the basic flow is mastered ",
+  "wordCount" : "663",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2025-11-23T22:47:19Z",
+  "dateModified": "2025-11-23T22:47:19Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/lenet5-implementation-on-fpga/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      LeNet-5 Implementation on FPGA: An Overview
+    </h1>
+    <div class="post-description">
+      Why LeNet-5 is an ideal first CNN to implement on an FPGA, and how its layers map to FPGA resources.
+    </div>
+    <div class="post-meta"><span title='2025-11-23 22:47:19 +0000 +0000'>November 23, 2025</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-lenet-5" aria-label="What Is LeNet-5?">What Is LeNet-5?</a></li>
+                <li>
+                    <a href="#network-architecture" aria-label="Network Architecture">Network Architecture</a></li>
+                <li>
+                    <a href="#why-implement-lenet-5-on-an-fpga" aria-label="Why Implement LeNet-5 on an FPGA?">Why Implement LeNet-5 on an FPGA?</a></li>
+                <li>
+                    <a href="#mapping-cnn-layers-to-fpga-logic" aria-label="Mapping CNN Layers to FPGA Logic">Mapping CNN Layers to FPGA Logic</a><ul>
+                        
+                <li>
+                    <a href="#convolutional-layers-c1-c3-c5" aria-label="Convolutional Layers (C1, C3, C5)">Convolutional Layers (C1, C3, C5)</a></li>
+                <li>
+                    <a href="#pooling-layers-s2-s4" aria-label="Pooling Layers (S2, S4)">Pooling Layers (S2, S4)</a></li>
+                <li>
+                    <a href="#fully-connected-layers-f6-output" aria-label="Fully Connected Layers (F6, Output)">Fully Connected Layers (F6, Output)</a></li></ul>
+                </li>
+                <li>
+                    <a href="#precision-why-floating-point-is-impractical-on-fpga" aria-label="Precision: Why Floating-Point Is Impractical on FPGA">Precision: Why Floating-Point Is Impractical on FPGA</a></li>
+                <li>
+                    <a href="#design-flow-summary" aria-label="Design Flow Summary">Design Flow Summary</a></li>
+                <li>
+                    <a href="#summary" aria-label="Summary">Summary</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="what-is-lenet-5">What Is LeNet-5?<a hidden class="anchor" aria-hidden="true" href="#what-is-lenet-5">#</a></h2>
+<p><strong>LeNet-5</strong> is a convolutional neural network (CNN) proposed by Yann LeCun and colleagues in 1998 for handwritten digit recognition (the MNIST dataset). It is widely regarded as the historical model that established the foundational concepts of modern deep learning: <strong>convolution, pooling, and hierarchical feature extraction</strong>.</p>
+<p><img alt="LeNet-5 architecture from the original paper" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/11/image.png?w=1024">
+<em>LeNet-5 architecture as shown in <a href="http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf">(LeCun et al., 1998)</a></em></p>
+<p><img alt="MNIST dataset" loading="lazy" src="https://easyfpgadesign.wordpress.com/wp-content/uploads/2025/11/image-1.png?w=1024">
+<em>MNIST — 70,000 greyscale 28×28 images of handwritten digits</em></p>
+<h2 id="network-architecture">Network Architecture<a hidden class="anchor" aria-hidden="true" href="#network-architecture">#</a></h2>
+<p>LeNet-5 takes a <strong>32×32 greyscale image</strong> as input and processes it through 7 layers:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Layer</th>
+          <th>Type</th>
+          <th>Details</th>
+          <th>Output Shape</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Input</td>
+          <td>—</td>
+          <td>32×32×1 greyscale</td>
+          <td>32×32×1</td>
+      </tr>
+      <tr>
+          <td>C1</td>
+          <td>Convolution</td>
+          <td>6 filters, 5×5 kernel, stride 1, no padding</td>
+          <td>28×28×6</td>
+      </tr>
+      <tr>
+          <td>S2</td>
+          <td>Average Pooling</td>
+          <td>2×2, stride 2</td>
+          <td>14×14×6</td>
+      </tr>
+      <tr>
+          <td>C3</td>
+          <td>Convolution</td>
+          <td>16 filters, 5×5 kernel</td>
+          <td>10×10×16</td>
+      </tr>
+      <tr>
+          <td>S4</td>
+          <td>Average Pooling</td>
+          <td>2×2, stride 2</td>
+          <td>5×5×16</td>
+      </tr>
+      <tr>
+          <td>C5</td>
+          <td>Convolution</td>
+          <td>120 filters, 5×5 kernel (fully-connected equivalent)</td>
+          <td>1×1×120</td>
+      </tr>
+      <tr>
+          <td>F6</td>
+          <td>Fully Connected</td>
+          <td>84 neurons</td>
+          <td>84</td>
+      </tr>
+      <tr>
+          <td>Output</td>
+          <td>Fully Connected</td>
+          <td>10 neurons (softmax)</td>
+          <td>10</td>
+      </tr>
+  </tbody>
+</table>
+<ul>
+<li><strong>Activation function:</strong> tanh (original paper); ReLU commonly used in modern re-implementations</li>
+<li><strong>Learning algorithm:</strong> Backpropagation</li>
+<li><strong>Total parameters:</strong> ~61,000</li>
+<li><strong>Historical applications:</strong> ATM cheque reading, postal code recognition</li>
+</ul>
+<h2 id="why-implement-lenet-5-on-an-fpga">Why Implement LeNet-5 on an FPGA?<a hidden class="anchor" aria-hidden="true" href="#why-implement-lenet-5-on-an-fpga">#</a></h2>
+<p>LeNet-5 is an ideal starting point for FPGA-based neural network hardware because it is <strong>small enough to fit entirely on-chip</strong>:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Resource</th>
+          <th>Estimate (INT8 weights)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Weight storage</td>
+          <td>~61,000 × 8 bits ≈ <strong>62 KB</strong></td>
+      </tr>
+      <tr>
+          <td>BRAM (18 kb blocks)</td>
+          <td>~28 blocks for weights + some for line buffers</td>
+      </tr>
+      <tr>
+          <td>Total BRAM budget</td>
+          <td><strong>~50–60 blocks</strong> (fits in a mid-range Artix/Kintex)</td>
+      </tr>
+      <tr>
+          <td>MAC operations per frame</td>
+          <td>~340,000 multiply-accumulates</td>
+      </tr>
+  </tbody>
+</table>
+<p>Because all weights fit in on-chip BRAM, the design avoids the latency and bandwidth overhead of an external DDR interface — making it much simpler to build and analyse.</p>
+<h2 id="mapping-cnn-layers-to-fpga-logic">Mapping CNN Layers to FPGA Logic<a hidden class="anchor" aria-hidden="true" href="#mapping-cnn-layers-to-fpga-logic">#</a></h2>
+<h3 id="convolutional-layers-c1-c3-c5">Convolutional Layers (C1, C3, C5)<a hidden class="anchor" aria-hidden="true" href="#convolutional-layers-c1-c3-c5">#</a></h3>
+<p>Each convolutional layer performs a sliding-window multiply-accumulate:</p>
+<p>$$y[r][c][k] = \sum_{i}\sum_{j} x[r+i][c+j] \cdot w_k[i][j] + b_k$$</p>
+<p><strong>FPGA implementation approach:</strong></p>
+<ul>
+<li>Store the filter weights in BRAM or distributed RAM (small enough for LUT-RAM in early layers).</li>
+<li>Use a <strong>line buffer</strong> (a shift-register chain) to hold the current window of input pixels.</li>
+<li>Multiply each pixel in the window by the corresponding weight using DSP48 slices.</li>
+<li>Accumulate partial sums with an adder tree.</li>
+</ul>
+<p>To maximise throughput, unroll the convolution loop over the filter dimension so that all K filters compute in parallel.</p>
+<h3 id="pooling-layers-s2-s4">Pooling Layers (S2, S4)<a hidden class="anchor" aria-hidden="true" href="#pooling-layers-s2-s4">#</a></h3>
+<p>LeNet-5 uses average pooling: divide the 2×2 window sum by 4 (a 2-bit right shift). This is a trivial operation in hardware — no multiplier required.</p>
+<h3 id="fully-connected-layers-f6-output">Fully Connected Layers (F6, Output)<a hidden class="anchor" aria-hidden="true" href="#fully-connected-layers-f6-output">#</a></h3>
+<p>These are standard matrix-vector multiplications. With 84 or 10 output neurons, even a sequential implementation completes in very few clock cycles.</p>
+<h2 id="precision-why-floating-point-is-impractical-on-fpga">Precision: Why Floating-Point Is Impractical on FPGA<a hidden class="anchor" aria-hidden="true" href="#precision-why-floating-point-is-impractical-on-fpga">#</a></h2>
+<p>The original C5/F6 layers use 32-bit floating-point (FP32) weights. On an FPGA:</p>
+<ul>
+<li>FP32 multipliers consume large numbers of LUTs and DSP slices.</li>
+<li>Latency is high relative to fixed-point alternatives.</li>
+</ul>
+<p><strong>Fixed-point (e.g., INT8 or <code>ap_fixed&lt;8,2&gt;</code>) is the practical choice:</strong></p>
+<ul>
+<li>Each multiplier becomes an 8×8-bit integer multiply — fits easily in one DSP48 slice.</li>
+<li>Memory footprint drops from 4 bytes to 1 byte per weight.</li>
+<li>Accuracy loss is minimal if quantisation is done correctly (see <a href="../quantization-for-fpga-cnn/">Quantization for CNN Inference on FPGA</a>).</li>
+</ul>
+<h2 id="design-flow-summary">Design Flow Summary<a hidden class="anchor" aria-hidden="true" href="#design-flow-summary">#</a></h2>
+<ol>
+<li><strong>Train and quantize:</strong> Train in PyTorch/TensorFlow (FP32), export calibrated INT8 weights.</li>
+<li><strong>Map weights to BRAM:</strong> Use Vivado Block Memory Generator or initialise with <code>$readmemh</code>.</li>
+<li><strong>Implement line buffers:</strong> Use shift-register primitives (<code>SRL16/32</code> on Xilinx) to build the sliding input window.</li>
+<li><strong>Instantiate DSP48 MAC arrays:</strong> One DSP per filter tap, or share a single DSP via systolic scheduling.</li>
+<li><strong>Verify against software:</strong> Simulate the RTL against the golden PyTorch output using a common test image.</li>
+<li><strong>Profile timing and resources:</strong> Target 100–150 MHz on a mid-range Artix-7 or Kintex-7.</li>
+</ol>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>LeNet-5 is arguably the best first CNN to build in hardware:</p>
+<ul>
+<li>Small enough to fit entirely on-chip (no external DDR required)</li>
+<li>Architecture is well-documented and easy to understand layer by layer</li>
+<li>Sufficient complexity to teach all the key FPGA CNN implementation techniques: line buffers, fixed-point MAC arrays, BRAM weight storage</li>
+<li>Acts as a foundation for larger networks (ResNet, MobileNet) once the basic flow is mastered</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fpga/">FPGA</a></li>
+      <li><a href="https://easyfpga.blog/tags/lenet/">LeNet</a></li>
+      <li><a href="https://easyfpga.blog/tags/cnn/">CNN</a></li>
+      <li><a href="https://easyfpga.blog/tags/deep-learning/">Deep Learning</a></li>
+      <li><a href="https://easyfpga.blog/tags/hardware-accelerator/">Hardware Accelerator</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/quantization-for-fpga-cnn/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Quantization for CNN Inference on FPGA</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/ethernet-version-1-vs-2/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Ethernet II vs IEEE 802.3: Key Differences Explained</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

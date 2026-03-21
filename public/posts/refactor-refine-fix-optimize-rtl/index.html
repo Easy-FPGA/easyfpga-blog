@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development | EasyFPGA</title>
+<meta name="keywords" content="Fix/Correct, Optimize, Refactor, Refine, RTL, Code Quality">
+<meta name="description" content="Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.">
+<meta name="author" content="EasyFPGA">
+<link rel="canonical" href="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a29c24210eb31d9ce56f669c66a35c9c51b17376b7764e336a49af7dec914cf0.css" integrity="sha256-opwkIQ6zHZzlb2acZqNcnFGxc3a3dk4zakmvfeyRTPA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://easyfpga.blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://easyfpga.blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://easyfpga.blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://easyfpga.blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://easyfpga.blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/contrib/auto-render.min.js" integrity="sha384-bHBqxz8fokvgoJ/sc17HODNxa42TlaEhB+w8ZJXTc2nZf1VgEaFZeZvT4Mznfz0v" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          
+          
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          
+          throwOnError : false
+        });
+    });
+</script><meta property="og:url" content="https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/">
+  <meta property="og:site_name" content="EasyFPGA">
+  <meta property="og:title" content="Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development">
+  <meta property="og:description" content="Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-19T00:47:21+00:00">
+    <meta property="article:modified_time" content="2026-02-19T00:47:21+00:00">
+    <meta property="article:tag" content="Fix/Correct">
+    <meta property="article:tag" content="Optimize">
+    <meta property="article:tag" content="Refactor">
+    <meta property="article:tag" content="Refine">
+    <meta property="article:tag" content="RTL">
+    <meta property="article:tag" content="Code Quality">
+      <meta property="og:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://easyfpga.blog/images/easyfpga_logo.jpg">
+  <meta name="twitter:title" content="Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development">
+  <meta name="twitter:description" content="Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://easyfpga.blog/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development",
+      "item": "https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development",
+  "name": "Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development",
+  "description": "Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.",
+  "keywords": [
+    "Fix/Correct", "Optimize", "Refactor", "Refine", "RTL", "Code Quality"
+  ],
+  "articleBody": "In FPGA and RTL development, four terms are frequently used to describe code changes: refactor, refine, fix/correct, and optimize. They are often used interchangeably in casual conversation, but they mean distinctly different things. Using the right term helps your team understand immediately what kind of change is being made — and whether to expect any behavioural differences.\nRefactor Definition: Restructure internal implementation without changing externally observable behaviour.\nA refactored module passes the same test vectors before and after the change. Simulation output is bit-identical. Timing may or may not improve.\nGoal: Readability, maintainability, reducing duplication.\nRTL examples:\nReplace a hardcoded LFSR feedback expression with a for loop or generate statement so the polynomial degree is a parameter. Split a monolithic 500-line always block into a separate FSM block and a separate datapath block for clearer code structure. Rename signals from sig_123 to s_tx_byte_valid to make their purpose self-documenting. Replace a repeated pattern used in three modules with a shared RTL function or common module instantiation. “I am refactoring the CRC module — output is unchanged, just making it parameterisable.”\nRefine Definition: Improve an already-working implementation to bring it closer to a target specification, reference model, or desired accuracy.\nA refinement change typically produces slightly different (and more correct) output, but the core algorithm is not broken — it is just not perfectly matching the spec yet.\nGoal: Accuracy improvement, fine-tuning, alignment with reference.\nRTL examples:\nSynchronise the reset seed value in an RTL scrambler with the initial state in the software reference model — the LFSR was working but starting from a different seed. Adjust polynomial tap positions in an LFSR by one bit to match the exact specification in a 3GPP or PCIe standard document. Tune the fixed-point scaling factor in a filter so that the quantization error matches the target SNR from the golden model. “We need to refine the scrambler — the polynomial is correct but the initial seed is off by one.”\nFix / Correct Definition: Eliminate a definite bug or mismatch. Something is observably wrong and must be made right.\nThis is the most direct category — there is a clear before (broken) and after (working) state.\nGoal: Bug elimination, correctness restoration.\nRTL examples:\nThe CRC polynomial register was initialised to 0x00 instead of 0xFF — output never matches reference. An off-by-one error in a state counter causes the FSM to generate one extra idle cycle, breaking packet framing. A missing else branch leaves a latch inferred in a synthesised design, causing unpredictable RTL/gate-level simulation mismatch. “This is a bug fix — the polynomial was wrong, the output was completely incorrect.”\nOptimize Definition: Improve measurable resource usage, timing, or power without changing the functional specification.\nAn optimised design is functionally equivalent to the pre-optimisation version but runs faster, uses fewer resources, or consumes less power.\nGoal: Timing closure, LUT/DSP/BRAM reduction, power reduction.\nRTL examples:\nRestructure an adder tree from a linear chain (critical path ∝ N) to a balanced binary tree (critical path ∝ log₂N) to improve Fmax. Replace a synchronous clear on a high-fanout reset net with a gate-enable style to reduce hold-time violations at the expense of a slightly larger circuit. Move a register stage across a long combinational path (retiming) to equalise pipeline stage depths and allow a higher clock frequency. Merge two independent case statements that operate on the same signal into one to reduce LUT packing overhead. “After optimization, the LFSR now synthesises to 32 fewer LUTs and timing margin improved to +1.2 ns.”\nSummary Table Term Observable behaviour changes? Typical review comment Refactor No “Same output, cleaner structure” Refine Slightly (more accurate) “Closer to spec / reference model” Fix / Correct Yes (from wrong to right) “Bug fixed” Optimize No (functionally equivalent) “Faster / smaller / lower power” Using the correct term in a code review, commit message, or design review prevents misunderstandings like: “You said you were refactoring — why did the test vector change?”\n",
+  "wordCount" : "657",
+  "inLanguage": "en",
+  "image": "https://easyfpga.blog/images/easyfpga_logo.jpg","datePublished": "2026-02-19T00:47:21Z",
+  "dateModified": "2026-02-19T00:47:21Z",
+  "author":{
+    "@type": "Person",
+    "name": "EasyFPGA"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://easyfpga.blog/posts/refactor-refine-fix-optimize-rtl/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "EasyFPGA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://easyfpga.blog/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://easyfpga.blog/" accesskey="h" title="EasyFPGA (Alt + H)">
+                <img src="https://easyfpga.blog/images/easyfpga_logo.jpg" alt="" aria-label="logo"
+                    height="35">EasyFPGA</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://easyfpga.blog/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/courses/" title="Courses">
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/tools/crc-calculator/" title="🔢 CRC Tool">
+                    <span>🔢 CRC Tool</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/ip-store/" title="IP Store">
+                    <span>IP Store</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://easyfpga.blog/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://easyfpga.blog/">Home</a>&nbsp;»&nbsp;<a href="https://easyfpga.blog/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Refactor, Refine, Fix, and Optimize: Precise Terminology for RTL Development
+    </h1>
+    <div class="post-description">
+      Using the right word when reviewing or requesting RTL changes makes communication faster and less ambiguous. Here is what each term means in an FPGA context.
+    </div>
+    <div class="post-meta"><span title='2026-02-19 00:47:21 +0000 +0000'>February 19, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>EasyFPGA</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#refactor" aria-label="Refactor">Refactor</a></li>
+                <li>
+                    <a href="#refine" aria-label="Refine">Refine</a></li>
+                <li>
+                    <a href="#fix--correct" aria-label="Fix / Correct">Fix / Correct</a></li>
+                <li>
+                    <a href="#optimize" aria-label="Optimize">Optimize</a></li>
+                <li>
+                    <a href="#summary-table" aria-label="Summary Table">Summary Table</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>In FPGA and RTL development, four terms are frequently used to describe code changes: <strong>refactor</strong>, <strong>refine</strong>, <strong>fix/correct</strong>, and <strong>optimize</strong>. They are often used interchangeably in casual conversation, but they mean distinctly different things. Using the right term helps your team understand immediately what kind of change is being made — and whether to expect any behavioural differences.</p>
+<h2 id="refactor">Refactor<a hidden class="anchor" aria-hidden="true" href="#refactor">#</a></h2>
+<p><strong>Definition:</strong> Restructure internal implementation without changing externally observable behaviour.</p>
+<p>A refactored module passes the same test vectors before and after the change. Simulation output is bit-identical. Timing may or may not improve.</p>
+<p><strong>Goal:</strong> Readability, maintainability, reducing duplication.</p>
+<p><strong>RTL examples:</strong></p>
+<ul>
+<li>Replace a hardcoded LFSR feedback expression with a <code>for</code> loop or <code>generate</code> statement so the polynomial degree is a parameter.</li>
+<li>Split a monolithic 500-line <code>always</code> block into a separate FSM block and a separate datapath block for clearer code structure.</li>
+<li>Rename signals from <code>sig_123</code> to <code>s_tx_byte_valid</code> to make their purpose self-documenting.</li>
+<li>Replace a repeated pattern used in three modules with a shared RTL function or common module instantiation.</li>
+</ul>
+<blockquote>
+<p><em>&ldquo;I am refactoring the CRC module — output is unchanged, just making it parameterisable.&rdquo;</em></p>
+</blockquote>
+<h2 id="refine">Refine<a hidden class="anchor" aria-hidden="true" href="#refine">#</a></h2>
+<p><strong>Definition:</strong> Improve an already-working implementation to bring it closer to a target specification, reference model, or desired accuracy.</p>
+<p>A refinement change typically produces slightly different (and more correct) output, but the core algorithm is not broken — it is just not perfectly matching the spec yet.</p>
+<p><strong>Goal:</strong> Accuracy improvement, fine-tuning, alignment with reference.</p>
+<p><strong>RTL examples:</strong></p>
+<ul>
+<li>Synchronise the reset seed value in an RTL scrambler with the initial state in the software reference model — the LFSR was working but starting from a different seed.</li>
+<li>Adjust polynomial tap positions in an LFSR by one bit to match the exact specification in a 3GPP or PCIe standard document.</li>
+<li>Tune the fixed-point scaling factor in a filter so that the quantization error matches the target SNR from the golden model.</li>
+</ul>
+<blockquote>
+<p><em>&ldquo;We need to refine the scrambler — the polynomial is correct but the initial seed is off by one.&rdquo;</em></p>
+</blockquote>
+<h2 id="fix--correct">Fix / Correct<a hidden class="anchor" aria-hidden="true" href="#fix--correct">#</a></h2>
+<p><strong>Definition:</strong> Eliminate a definite bug or mismatch. Something is observably wrong and must be made right.</p>
+<p>This is the most direct category — there is a clear before (broken) and after (working) state.</p>
+<p><strong>Goal:</strong> Bug elimination, correctness restoration.</p>
+<p><strong>RTL examples:</strong></p>
+<ul>
+<li>The CRC polynomial register was initialised to <code>0x00</code> instead of <code>0xFF</code> — output never matches reference.</li>
+<li>An off-by-one error in a state counter causes the FSM to generate one extra idle cycle, breaking packet framing.</li>
+<li>A missing <code>else</code> branch leaves a latch inferred in a synthesised design, causing unpredictable RTL/gate-level simulation mismatch.</li>
+</ul>
+<blockquote>
+<p><em>&ldquo;This is a bug fix — the polynomial was wrong, the output was completely incorrect.&rdquo;</em></p>
+</blockquote>
+<h2 id="optimize">Optimize<a hidden class="anchor" aria-hidden="true" href="#optimize">#</a></h2>
+<p><strong>Definition:</strong> Improve measurable resource usage, timing, or power without changing the functional specification.</p>
+<p>An optimised design is functionally equivalent to the pre-optimisation version but runs faster, uses fewer resources, or consumes less power.</p>
+<p><strong>Goal:</strong> Timing closure, LUT/DSP/BRAM reduction, power reduction.</p>
+<p><strong>RTL examples:</strong></p>
+<ul>
+<li>Restructure an adder tree from a linear chain (critical path ∝ N) to a balanced binary tree (critical path ∝ log₂N) to improve Fmax.</li>
+<li>Replace a synchronous clear on a high-fanout reset net with a gate-enable style to reduce hold-time violations at the expense of a slightly larger circuit.</li>
+<li>Move a register stage across a long combinational path (retiming) to equalise pipeline stage depths and allow a higher clock frequency.</li>
+<li>Merge two independent <code>case</code> statements that operate on the same signal into one to reduce LUT packing overhead.</li>
+</ul>
+<blockquote>
+<p><em>&ldquo;After optimization, the LFSR now synthesises to 32 fewer LUTs and timing margin improved to +1.2 ns.&rdquo;</em></p>
+</blockquote>
+<hr>
+<h2 id="summary-table">Summary Table<a hidden class="anchor" aria-hidden="true" href="#summary-table">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Term</th>
+          <th>Observable behaviour changes?</th>
+          <th>Typical review comment</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Refactor</strong></td>
+          <td>No</td>
+          <td>&ldquo;Same output, cleaner structure&rdquo;</td>
+      </tr>
+      <tr>
+          <td><strong>Refine</strong></td>
+          <td>Slightly (more accurate)</td>
+          <td>&ldquo;Closer to spec / reference model&rdquo;</td>
+      </tr>
+      <tr>
+          <td><strong>Fix / Correct</strong></td>
+          <td>Yes (from wrong to right)</td>
+          <td>&ldquo;Bug fixed&rdquo;</td>
+      </tr>
+      <tr>
+          <td><strong>Optimize</strong></td>
+          <td>No (functionally equivalent)</td>
+          <td>&ldquo;Faster / smaller / lower power&rdquo;</td>
+      </tr>
+  </tbody>
+</table>
+<p>Using the correct term in a code review, commit message, or design review prevents misunderstandings like: <em>&ldquo;You said you were refactoring — why did the test vector change?&rdquo;</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://easyfpga.blog/tags/fix/correct/">Fix/Correct</a></li>
+      <li><a href="https://easyfpga.blog/tags/optimize/">Optimize</a></li>
+      <li><a href="https://easyfpga.blog/tags/refactor/">Refactor</a></li>
+      <li><a href="https://easyfpga.blog/tags/refine/">Refine</a></li>
+      <li><a href="https://easyfpga.blog/tags/rtl/">RTL</a></li>
+      <li><a href="https://easyfpga.blog/tags/code-quality/">Code Quality</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://easyfpga.blog/posts/high-speed-parallel-interface-design/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>High-Speed Parallel Interface Design: Principles, Limitations, and Practice</span>
+  </a>
+  <a class="next" href="https://easyfpga.blog/posts/board-level-debugging-for-fpga-engineers/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Board-Level Understanding and Debugging for FPGA Engineers</span>
+  </a>
+</nav>
+
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="Easy-FPGA/easyfpga-blog"
+        data-repo-id="R_kgDORkyHXw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORkyHX84C4Njr"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://easyfpga.blog/">EasyFPGA</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
